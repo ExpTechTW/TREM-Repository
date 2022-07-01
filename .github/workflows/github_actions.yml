@@ -2,11 +2,9 @@ name: TREM
 
 on:
   push:
-    branches:
-    - master
+    branches: [ "主要的-(main)" ]
   pull_request:
-    branches:
-    - master
+    branches: [ "主要的-(main)" ]
 
 jobs:
   build_node:
