@@ -1,4 +1,3 @@
-const bytenode = require("bytenode");
 const fs = require("node:fs");
 const v8 = require("v8");
 const vm = require("vm");

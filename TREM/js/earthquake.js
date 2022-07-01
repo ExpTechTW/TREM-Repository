@@ -1,12 +1,12 @@
 const { BrowserWindow, app, ipcMain } = require("@electron/remote");
-const { ipcRenderer } = require("electron");
-const WebSocket = require("ws");
 const {
 	NOTIFICATION_RECEIVED,
 	NOTIFICATION_SERVICE_ERROR,
 	NOTIFICATION_SERVICE_STARTED,
 	START_NOTIFICATION_SERVICE,
 } = require("electron-fcm-push-receiver/src/constants");
+const WebSocket = require("ws");
+const { ipcRenderer } = require("electron");
 
 // #region config
 const Config = {
@@ -196,7 +196,7 @@ const time = document.getElementById("time");
 const title = document.getElementById("title");
 title.innerHTML = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
 
-setInterval(async () => {
+setInterval(() => {
 	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
 	if (config["location.city"]["value"] != Check["city"] || config["location.town"]["value"] != Check["town"]) {
 		Check["city"] = config["location.city"]["value"];
@@ -229,7 +229,7 @@ setInterval(async () => {
 	}
 }, 100);
 
-async function init() {
+function init() {
 	const MAP = document.getElementById("map");
 
 	MAP.style.height = window.innerHeight;
@@ -253,7 +253,7 @@ async function init() {
 		},
 	}).addTo(map1);
 
-	map.on("click", function(e) {
+	map.on("click", (e) => {
 		if (ReportMarkID != null) {
 			ReportMarkID = null;
 			for (let index = 0; index < MarkList.length; index++)
@@ -291,25 +291,19 @@ async function init() {
 	ReportGET({});
 
 	fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/locations.json")
-		.then(function(response) {
-			return response.json();
-		})
-		.then(async function(location) {
+		.then((response) => response.json())
+		.then((location) => {
 			fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")
-				.then(function(response) {
-					return response.json();
-				})
-				.then(async function(station) {
+				.then((response) => response.json())
+				.then((station) => {
 					dump("Get Station File");
 					fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/pga.json")
-						.then(function(response) {
-							return response.json();
-						})
-						.then(async function(PGAjson) {
+						.then((response) => response.json())
+						.then((PGAjson) => {
 							dump("Get PGA-Location File");
 							if (config["earthquake.Real-time"]["value"]) {
 								dump("Start PGA Timer");
-								setInterval(async () => {
+								setInterval(() => {
 									const data = {
 										"APIkey"        : "https://github.com/ExpTechTW",
 										"Function"      : "data",
@@ -318,7 +312,7 @@ async function init() {
 									};
 
 									axios.post("https://exptech.mywire.org:1015", data)
-										.then(async function(response) {
+										.then((response) => {
 											const data1 = {
 												"APIkey"        : "https://github.com/ExpTechTW",
 												"Function"      : "data",
@@ -327,7 +321,7 @@ async function init() {
 											};
 
 											axios.post("https://exptech.mywire.org:1015", data1)
-												.then(async function(Response1) {
+												.then((Response1) => {
 													for (let index = 0; index < Object.keys(Station).length; index++) {
 														map.removeLayer(Station[Object.keys(Station)[index]]);
 														delete Station[Object.keys(Station)[index]];
@@ -560,11 +554,11 @@ async function init() {
 															}
 														}
 													}
-												}).catch(function(error) {
+												}).catch((error) => {
 													dump(`Alert Timer > ${error}`, "Error");
 												});
 										})
-										.catch(function(error) {
+										.catch((error) => {
 											dump(`PGA Timer > ${error}`, "Error");
 										});
 								}, 500);
@@ -579,7 +573,7 @@ async function init() {
 function reconnect() {
 	if (Reconnect) return;
 	Reconnect = true;
-	setTimeout(function() {
+	setTimeout(() => {
 		createWebSocket();
 		Reconnect = false;
 	}, 2000);
@@ -600,11 +594,11 @@ function initEventHandle() {
 		reconnect();
 	};
 
-	ws.onerror = function(err) {
+	ws.onerror = () => {
 		reconnect();
 	};
 
-	ws.onopen = async function() {
+	ws.onopen = () => {
 		err = "";
 		ws.send(JSON.stringify({
 			"APIkey"        : "https://github.com/ExpTechTW",
@@ -616,7 +610,7 @@ function initEventHandle() {
 		dump("connected to API Server | UUID[" + localStorage["UUID"] + "]");
 	};
 
-	ws.onmessage = async function(evt) {
+	ws.onmessage = (evt) => {
 		const json = JSON.parse(evt.data);
 		if (json.Function == "NTP") {
 			lifeTime = new Date().getTime();
@@ -631,10 +625,8 @@ function initEventHandle() {
 // #region 用戶所在位置
 function Loc() {
 	fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")
-		.then(function(response) {
-			return response.json();
-		})
-		.then(async function(loc) {
+		.then((response) => response.json())
+		.then((loc) => {
 			dump("Get Location File");
 			Lat = loc[config["location.city"]["value"]][config["location.town"]["value"]][1];
 			Long = loc[config["location.city"]["value"]][config["location.town"]["value"]][2];
@@ -667,10 +659,10 @@ function focus(Loc, size, args) {
 // #endregion
 
 // #region 音頻播放
-async function audioPlay(src) {
+function audioPlay(src) {
 	audioList.push(src);
 
-	let AudioT = setInterval(async () => {
+	let AudioT = setInterval(() => {
 		if (audioLock == false) {
 			audioLock = true;
 			if (audioList.length != 0)
@@ -693,7 +685,7 @@ async function audioPlay(src) {
 			dump(`Playing Audio > ${src}`);
 			var promise = audioDOM.play();
 			promise.then(resolve => {
-				audioDOM.addEventListener("ended", function() {
+				audioDOM.addEventListener("ended", () => {
 					audioLock = false;
 				});
 			}).catch(reject => {
@@ -702,7 +694,7 @@ async function audioPlay(src) {
 			dump(`Playing Audio > ${src}`);
 			var promise = audioDOM.play();
 			promise.then(resolve => {
-				audioDOM.addEventListener("ended", function() {
+				audioDOM.addEventListener("ended", () => {
 					audioLock = false;
 				});
 			}).catch(reject => {
@@ -723,7 +715,7 @@ function ReportGET(eew) {
 	};
 
 	axios.post("https://exptech.mywire.org:1015", data)
-		.then(function(response) {
+		.then((response) => {
 			dump("Get Report");
 			if (response.data["state"] == "Warn") {
 				alert("API 速度限制\n短時間內訪問太多次伺服器\n請稍後再試");
@@ -731,14 +723,14 @@ function ReportGET(eew) {
 			}
 			ReportList(response.data, eew);
 		})
-		.catch(function(error) {
+		.catch((error) => {
 			dump(`Get Report > ${error}`, "Error");
 		});
 }
 // #endregion
 
 // #region Report 點擊
-async function ReportClick(time) {
+function ReportClick(time) {
 	if (ReportMarkID == time) {
 		ReportMarkID = null;
 		for (let index = 0; index < MarkList.length; index++)
@@ -801,7 +793,7 @@ async function ReportClick(time) {
 // #endregion
 
 // #region Report list
-async function ReportList(Data, eew) {
+function ReportList(Data, eew) {
 	clear();
 	function clear() {
 		const roll = document.getElementById("rolllist");
@@ -815,7 +807,7 @@ async function ReportList(Data, eew) {
 
 	}
 
-	async function add() {
+	function add() {
 		const roll = document.getElementById("rolllist");
 		for (let index = 0; index < Data["response"].length; index++) {
 			const DATA = Data["response"][index];
@@ -885,7 +877,7 @@ async function ReportList(Data, eew) {
 
 			Div.style.backgroundColor = color(DATA["data"][0]["areaIntensity"]);
 			ReportCache[DATA["originTime"]] = Data["response"][index];
-			Div.addEventListener("click", function() {
+			Div.addEventListener("click", () => {
 				ReportClick(DATA["originTime"]);
 			});
 			roll.appendChild(Div);
@@ -988,7 +980,7 @@ if (localStorage["test"] != undefined) {
 	if (config["accept.eew.jp"]["value"]) delete data["Addition"];
 	dump(err);
 	axios.post("https://exptech.mywire.org:1015", data)
-		.catch(function(error) {
+		.catch((error) => {
 			dump(`Test Mode > ${error}`, "Error");
 		});
 }
@@ -1026,7 +1018,7 @@ setInterval(() => {
 // #endregion
 
 // #region EEW
-async function FCMdata(data) {
+function FCMdata(data) {
 	const win = BrowserWindow.fromId(process.env.window * 1);
 	const json = JSON.parse(data);
 	if (Server.includes(json.TimeStamp)) return;
@@ -1106,7 +1098,7 @@ async function FCMdata(data) {
 				};
 				dump("Post Webhook");
 				axios.post(config["webhook.url"]["value"], msg)
-					.catch(function(error) {
+					.catch((error) => {
 						dump(`Webhook > ${error}`, "Error");
 					});
 			}
@@ -1227,7 +1219,7 @@ async function FCMdata(data) {
 				Info["Alert"] = json.ID;
 				Info["AlertS"] = value;
 				if (t != null) clearInterval(t);
-				t = setInterval(async () => {
+				t = setInterval(() => {
 					value = Math.round((distance - ((NOW.getTime() - json.Time) / 1000) * Sspeed) / Sspeed);
 					if (Stamp != value && audioList.length == 0 && !audioLock) {
 						Stamp = value;
@@ -1332,12 +1324,10 @@ async function FCMdata(data) {
 			text();
 
 			if (ITimer == null)
-				ITimer = setInterval(async () => {
-					text();
-				}, 1000);
+				ITimer = setInterval(() => text(), 1000);
 
 
-			EarthquakeList[json.ID]["Timer"] = setInterval(async () => {
+			EarthquakeList[json.ID]["Timer"] = setInterval(() => {
 				if (config["shock.p"]["value"]) {
 					if (EarthquakeList[json.ID]["Pcircle"] != null)
 						map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
@@ -1501,12 +1491,10 @@ async function FCMdata(data) {
 				else
 					Catch.innerHTML = "";
 
-
 				if (TINFO + 1 >= INFO.length)
 					TINFO = 0;
 				else
 					TINFO++;
-
 			}
 		}
 	}
