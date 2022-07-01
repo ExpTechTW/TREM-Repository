@@ -131,3 +131,6 @@ dist
 
 # Compiled Script files
 TREM/js/compiled
+
+# Settings files
+TREM/Data
