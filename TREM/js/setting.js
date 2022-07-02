@@ -250,8 +250,8 @@ const restart = () => {
 };
 
 const testAudioState = {
-	audio: new Audio(),
-	is_playing: false,
+	audio      : new Audio(),
+	is_playing : false,
 };
 let testAudioBtn;
 testAudioState.audio.addEventListener("ended", () => {
