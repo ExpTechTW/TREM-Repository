@@ -14,7 +14,8 @@
 		"dump": "readonly",
 		"L": "readonly",
 		"fs": "readonly",
-		"geojson": "writable"
+		"geojson": "writable",
+		"statesData": "readonly"
 	},
 	"rules": {
 		"require-sort/require-sort": "warn",
