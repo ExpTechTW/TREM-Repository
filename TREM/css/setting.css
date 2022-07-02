@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Roboto&display=swap');
-@import url("../css/m3_theme.css");
-@import url("../css/m3_dialog.css");
-@import url("../css/m3_filled_tonal_button.css");
-@import url("../css/m3_flat_button.css");
-@import url("../css/m3_input_field.css");
-@import url("../css/m3_select_menu.css");
-@import url("../css/m3_switch.css");
+@import url("../css/m3/m3_theme.css");
+@import url("../css/m3/m3_dialog.css");
+@import url("../css/m3/m3_filled_tonal_button.css");
+@import url("../css/m3/m3_flat_button.css");
+@import url("../css/m3/m3_input_field.css");
+@import url("../css/m3/m3_select_menu.css");
+@import url("../css/m3/m3_switch.css");
 @import url("../css/disable_scrollbar.css");
 
 body {
@@ -66,31 +66,16 @@ body {
 
 .titlebar {
     user-select: none;
-    padding: 28px 28px 16px 28px;
-}
-
-.titlebar .headline-medium {
-    margin: 32px 0 5px 0;
-}
-
-.titlebar .titlebar-button {
-    display: flex;
-    flex-direction: row-reverse;
-}
-
-.titlebar .titlebar-button .button-with-label span {
-    font-size: 20px;
-    line-height: 20px;
-    height: 20px
+    padding: 32px;
 }
 
 .headline-medium {
-    position: sticky;
-    top: 0;
     color: rgb(var(--md3-on-surface));
-    font-size: 36px;
+    font-size: 36px !important;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 400;
+    line-height: 34px;
+    margin: 0 4px;
 }
 
 #list {
