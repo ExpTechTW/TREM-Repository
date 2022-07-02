@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
 
-process.env.Version = "3.8.5";
+process.env.Version = "22w27-pre6";
 
 let MainWindow = null;
 let SettingWindow = null;
