@@ -752,53 +752,59 @@ async function ReportClick(time) {
             map.removeLayer(MarkList[index])
         }
         let LIST = []
-        if (time != 111000) {
+        if (ReportCache[time]["earthquakeNo"] != 111000) {
             let data = {
                 "APIkey": "https://github.com/ExpTechTW",
                 "Function": "data",
                 "Type": "report",
                 "FormatVersion": 1,
-                "Value": time
+                "Value": ReportCache[time]["earthquakeNo"]
             }
             axios.post('https://exptech.mywire.org:1015', data)
                 .then(function (response) {
                     let Json = response.data.response
-                    for (let Index = 0; Index < Json["Intensity"].length; Index++) {
-                        for (let index = 0; index < Json["Intensity"][Index]["station"].length; index++) {
-                            let Station = Json["Intensity"][Index]["station"][index]
-                            let Intensity = Station["stationIntensity"]["$t"]
-                            if (Station["stationIntensity"]["unit"] == "強") Intensity += "+"
-                            if (Station["stationIntensity"]["unit"] == "弱") Intensity += "-"
-                            var myIcon = L.icon({
-                                iconUrl: `./image/${IntensityI(Intensity)}.png`,
-                                iconSize: [20, 20],
-                            })
-                            console.log(Station)
-                            let ReportMark = L.marker([Station["stationLat"]["$t"], Station["stationLon"]["$t"]], { icon: myIcon })
-                            let PGA = ""
-                            if (Station["pga"] != undefined) PGA = `<br>PGA<br>垂直向: ${Station["pga"]["vComponent"]}<br>東西向: ${Station["pga"]["ewComponent"]}<br>南北向: ${Station["pga"]["nsComponent"]}<br><a onclick="openURL('${Station["waveImageURI"]}')">震波圖</a>`
-                            ReportMark.bindPopup(`站名: ${Station["stationName"]}<br>代號: ${Station["stationCode"]}<br>經度: ${Station["stationLon"]["$t"]}<br>緯度: ${Station["stationLat"]["$t"]}<br>震央距: ${Station["distance"]["$t"]}<br>方位角: ${Station["azimuth"]["$t"]}<br>震度: ${Intensity}<br>${PGA}`)
-                            map.addLayer(ReportMark)
-                            ReportMark.setZIndexOffset(1000 + index)
-                            MarkList.push(ReportMark)
+                    if (Json == undefined) {
+                        main()
+                    } else {
+                        for (let Index = 0; Index < Json["Intensity"].length; Index++) {
+                            for (let index = 0; index < Json["Intensity"][Index]["station"].length; index++) {
+                                let Station = Json["Intensity"][Index]["station"][index]
+                                let Intensity = Station["stationIntensity"]["$t"]
+                                if (Station["stationIntensity"]["unit"] == "強") Intensity += "+"
+                                if (Station["stationIntensity"]["unit"] == "弱") Intensity += "-"
+                                var myIcon = L.icon({
+                                    iconUrl: `./image/${IntensityI(Intensity)}.png`,
+                                    iconSize: [20, 20],
+                                })
+                                let ReportMark = L.marker([Station["stationLat"]["$t"], Station["stationLon"]["$t"]], { icon: myIcon })
+                                let PGA = ""
+                                if (Station["pga"] != undefined) PGA = `<br>PGA<br>垂直向: ${Station["pga"]["vComponent"]}<br>東西向: ${Station["pga"]["ewComponent"]}<br>南北向: ${Station["pga"]["nsComponent"]}<br><a onclick="openURL('${Station["waveImageURI"]}')">震波圖</a>`
+                                ReportMark.bindPopup(`站名: ${Station["stationName"]}<br>代號: ${Station["stationCode"]}<br>經度: ${Station["stationLon"]["$t"]}<br>緯度: ${Station["stationLat"]["$t"]}<br>震央距: ${Station["distance"]["$t"]}<br>方位角: ${Station["azimuth"]["$t"]}<br>震度: ${Intensity}<br>${PGA}`)
+                                map.addLayer(ReportMark)
+                                ReportMark.setZIndexOffset(1000 + index)
+                                MarkList.push(ReportMark)
+                            }
                         }
-                    }
 
-                    focus([Number(Json.NorthLatitude), Number(Json.EastLongitude)], 7.5, true)
-                    var myIcon = L.icon({
-                        iconUrl: './image/star.png',
-                        iconSize: [25, 25],
-                    })
-                    let ReportMark = L.marker([Number(Json.NorthLatitude), Number(Json.EastLongitude)], { icon: myIcon })
-                    ReportMark.bindPopup(`編號: ${Json.No}<br>經度: ${Json.EastLongitude}<br>緯度: ${Json.NorthLatitude}<br>深度: ${Json.Depth}<br>規模: ${Json.Scale}<br>位置: ${Json.Location}<br>時間: ${Json["UTC+8"]}<br><br><a onclick="openURL('${Json.Web}')">網頁</a><br><a onclick="openURL('${Json.EventImage}')">地震報告</a><br><a onclick="openURL('${Json.ShakeImage}')">震度分布</a>`)
-                    map.addLayer(ReportMark)
-                    ReportMark.setZIndexOffset(3000)
-                    MarkList.push(ReportMark)
+                        focus([Number(Json.NorthLatitude), Number(Json.EastLongitude)], 7.5, true)
+                        var myIcon = L.icon({
+                            iconUrl: './image/star.png',
+                            iconSize: [25, 25],
+                        })
+                        let ReportMark = L.marker([Number(Json.NorthLatitude), Number(Json.EastLongitude)], { icon: myIcon })
+                        ReportMark.bindPopup(`編號: ${Json.No}<br>經度: ${Json.EastLongitude}<br>緯度: ${Json.NorthLatitude}<br>深度: ${Json.Depth}<br>規模: ${Json.Scale}<br>位置: ${Json.Location}<br>時間: ${Json["UTC+8"]}<br><br><a onclick="openURL('${Json.Web}')">網頁</a><br><a onclick="openURL('${Json.EventImage}')">地震報告</a><br><a onclick="openURL('${Json.ShakeImage}')">震度分布</a>`)
+                        map.addLayer(ReportMark)
+                        ReportMark.setZIndexOffset(3000)
+                        MarkList.push(ReportMark)
+                    }
                 })
                 .catch(function (error) {
                     console.log(error)
                 })
         } else {
+            main()
+        }
+        function main() {
             for (let Index = 0; Index < ReportCache[time].data.length; Index++) {
                 for (let index = 0; index < ReportCache[time].data[Index]["eqStation"].length; index++) {
                     let data = ReportCache[time].data[Index]["eqStation"][index]
@@ -939,9 +945,9 @@ async function ReportList(Data, eew) {
             </div>`
             }
             Div.style.backgroundColor = color(DATA["data"][0]["areaIntensity"])
-            ReportCache[DATA["earthquakeNo"]] = Data["response"][index]
+            ReportCache[DATA["originTime"]] = Data["response"][index]
             Div.addEventListener("click", function () {
-                ReportClick(DATA["earthquakeNo"])
+                ReportClick(DATA["originTime"])
             })
             roll.appendChild(Div)
         }
@@ -950,7 +956,7 @@ async function ReportList(Data, eew) {
         var set = document.getElementById("box-8")
         set.style.visibility = "visible"
         if (eew.report != undefined) {
-            ReportClick(Data["response"][0]["earthquakeNo"])
+            ReportClick(Data["response"][0]["originTime"])
             setTimeout(() => {
                 if (ReportMarkID != null) {
                     ReportMarkID = null
