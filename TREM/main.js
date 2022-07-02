@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const pushReceiver = require('electron-fcm-push-receiver')
 
-process.env.Version = "3.8"
+process.env.Version = "3.8.5"
 
 let mainWindow = null
 let tray = null
