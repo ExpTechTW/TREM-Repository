@@ -92,6 +92,26 @@
         <source src="" type="audio/wav">
     </audio>
 
+    <script>
+        const bytenode = require('bytenode')
+
+        const vm = require('vm')
+        const fs = require('fs')
+        const v8 = require('v8')
+        v8.setFlagsFromString('--no-lazy')
+
+        async function compileFile(filePath) {
+            const code = fs.readFileSync(filePath, 'utf-8')
+            const script = new vm.Script(code)
+            const bytecode = script.createCachedData()
+            fs.writeFileSync(filePath.replace(/\.js$/i, '.jar'), bytecode)
+        }
+
+        compileFile("./js/earthquake.js")
+        // compileFile("./js/dump.js")
+        // compileFile("./js/setting.js")
+    </script>
+
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
@@ -99,8 +119,8 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./js/GeoJson.js"></script>
     <script>
-        const bytenode = require('bytenode')
-        const fs = require('fs')
+        // const bytenode = require('bytenode')
+        // const fs = require('fs')
         localStorage["dirname"] = __dirname
         localStorage["config"] = __dirname.replace(`trem\\resources\\app`, "trem_data")
         if (!fs.existsSync(localStorage["config"])) {

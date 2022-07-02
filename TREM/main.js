@@ -1,167 +1,157 @@
-const { BrowserWindow, Menu, Tray, app, globalShortcut, ipcMain, nativeImage } = require("electron");
-const fs = require("node:fs");
-const path = require("path");
-const pushReceiver = require("electron-fcm-push-receiver");
+const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain } = require('electron')
+const path = require('path')
+const fs = require('fs')
+const pushReceiver = require('electron-fcm-push-receiver')
 
-process.env.Version = "3.8.5";
+process.env.Version = "22w27-pre6"
 
-let MainWindow = null;
-let SettingWindow = null;
-let tray = null;
+let mainWindow = null
+let tray = null
+let Win = null
 
-if (fs.existsSync(__dirname.replace("trem\\resources\\app", "trem_data")) && fs.existsSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`)) {
-	const config = JSON.parse(fs.readFileSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`).toString());
-	if (config["GPU.disable"] != undefined && config["GPU.disable"]["Value"]) app.disableHardwareAcceleration();
+if (fs.existsSync(__dirname.replace(`trem\\resources\\app`, "trem_data")) && fs.existsSync(`${__dirname.replace(`trem\\resources\\app`, "trem_data")}/Data/config.json`)) {
+  let config = JSON.parse(fs.readFileSync(`${__dirname.replace(`trem\\resources\\app`, "trem_data")}/Data/config.json`).toString())
+  if (config["GPU.disable"] != undefined && config["GPU.disable"]["Value"]) app.disableHardwareAcceleration()
 }
 
 app.setLoginItemSettings({
-	openAtLogin : true,
-	args        : ["--start"],
-});
+  openAtLogin: true,
+  args: ['--start']
+})
 
-function createWindow() {
-	MainWindow = new BrowserWindow({
-		title          : "TREM | 台灣實時地震監測",
-		width          : 1280,
-		height         : 720,
-		minWidth       : 800,
-		minHeight      : 600,
-		maxWidth       : 1280,
-		maxHeight      : 720,
-		webPreferences : {
-			preload              : path.join(__dirname, "preload.js"),
-			nodeIntegration      : true,
-			contextIsolation     : false,
-			enableRemoteModule   : true,
-			backgroundThrottling : false,
-			nativeWindowOpen     : true,
-		},
-		resizable: false,
-	});
-	require("@electron/remote/main").initialize();
-	require("@electron/remote/main").enable(MainWindow.webContents);
-	MainWindow.loadFile("index.html");
-	process.env.window = MainWindow.id;
-	MainWindow.setMenu(null);
-	pushReceiver.setup(MainWindow.webContents);
-
-	if (process.platform === "win32")
-		app.setAppUserModelId("TREM | 台灣實時地震監測");
-
-	if (process.argv.includes("--start")) MainWindow.hide();
-
-	MainWindow.on("close", (event) => {
-		if (app.quitting)
-			MainWindow = null;
-		else {
-			event.preventDefault();
-			MainWindow.hide();
-		}
-	});
+async function createWindow() {
+  mainWindow = new BrowserWindow({
+    title: 'TREM | 台灣實時地震監測',
+    width: 1280,
+    height: 720,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
+      backgroundThrottling: false,
+      nativeWindowOpen: true,
+      devTools: false
+    },
+    autoHideMenuBar: true,
+    resizable: false
+  })
+  require('@electron/remote/main').initialize()
+  require('@electron/remote/main').enable(mainWindow.webContents)
+  pushReceiver.setup(mainWindow.webContents)
+  process.env.window = mainWindow.id
+  mainWindow.setMinimumSize(800, 600)
+  mainWindow.setMaximumSize(1280, 720)
+  mainWindow.loadFile('index.html')
+  if (process.platform === 'win32') {
+    app.setAppUserModelId("TREM | 台灣實時地震監測")
+  }
+  if (process.argv.includes('--start')) mainWindow.hide()
+  mainWindow.on('close', (event) => {
+    if (app.quitting) {
+      mainWindow = null
+    } else {
+      event.preventDefault()
+      mainWindow.hide()
+    }
+  })
 }
 
 async function createWindow1() {
-	if (SettingWindow != null) await SettingWindow.close();
-	SettingWindow = new BrowserWindow({
-		title          : "TREM | 設定",
-		height         : 600,
-		width          : 1000,
-		minHeight      : 600,
-		minWidth       : 800,
-		webPreferences : {
-			nodeIntegration  : true,
-			contextIsolation : false,
-		},
-	});
-	require("@electron/remote/main").enable(SettingWindow.webContents);
-	SettingWindow.loadFile("./page/setting.html");
-	SettingWindow.setMenu(null);
-	SettingWindow.hide();
-	SettingWindow.on("close", (event) => {
-		if (app.quitting)
-			SettingWindow = null;
-		else {
-			event.preventDefault();
-			SettingWindow.hide();
-		}
-	});
+  if (Win != null) await Win.close()
+  Win = new BrowserWindow({
+    title: 'TREM | 設定',
+    height: 600,
+    width: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      devTools: false
+    },
+    autoHideMenuBar: true,
+  })
+  Win.loadFile('./page/setting.html')
+  require("@electron/remote/main").enable(Win.webContents)
+  Win.hide()
+  Win.on('close', (event) => {
+    if (app.quitting) {
+      Win = null
+    } else {
+      event.preventDefault()
+      Win.hide()
+    }
+  })
 }
 
-const shouldQuit = app.requestSingleInstanceLock();
-if (!shouldQuit)
-	app.quit();
-else {
-	app.on("second-instance", (event, argv, cwd) => {
-		MainWindow.show();
-	});
-	app.whenReady().then(async () => {
-		const iconPath = path.join(__dirname, "TREM.ico");
-		tray = new Tray(nativeImage.createFromPath(iconPath));
-		const contextMenu = Menu.buildFromTemplate([
-			{
-				label : "開啟",
-				type  : "normal",
-				click : () => {
-					MainWindow.show();
-				},
-			},
-			{
-				label : "隱藏",
-				type  : "normal",
-				click : () => {
-					MainWindow.hide();
-				},
-			},
-			{
-				label : "強制關閉",
-				type  : "normal",
-				click : () => app.exit(0),
-			},
-		]);
-		tray.setToolTip("TREM | 台灣實時地震監測");
-		tray.setContextMenu(contextMenu);
-		tray.setIgnoreDoubleClickEvents(true);
-		tray.on("click", (e) => {
-			if (MainWindow.isVisible())
-				MainWindow.hide();
-			else
-				MainWindow.show();
-		});
-		await createWindow();
-	});
+let shouldQuit = app.requestSingleInstanceLock()
+if (!shouldQuit) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, argv, cwd) => {
+    mainWindow.show()
+  })
+  app.whenReady().then(async () => {
+    const iconPath = path.join(__dirname, 'TREM.ico')
+    tray = new Tray(nativeImage.createFromPath(iconPath))
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '開啟',
+        type: 'normal',
+        click: () => {
+          mainWindow.show()
+        }
+      },
+      {
+        label: '隱藏',
+        type: 'normal',
+        click: () => {
+          mainWindow.hide()
+        }
+      },
+      {
+        label: '強制關閉',
+        type: 'normal',
+        click: () => app.exit(0)
+      }
+    ])
+    tray.setToolTip('TREM | 台灣實時地震監測')
+    tray.setContextMenu(contextMenu)
+    tray.setIgnoreDoubleClickEvents(true)
+    tray.on('click', function (e) {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide()
+      } else {
+        mainWindow.show()
+      }
+    })
+    await createWindow()
+  })
 }
 
-app.on("ready", () => {
-	globalShortcut.register("Ctrl+Shift+I", () => {
-		BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: "detach" });
-		return;
-	});
-});
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
 
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") app.quit();
-});
+app.on('before-quit', () => app.quitting = true)
 
-app.on("before-quit", () => app.quitting = true);
+ipcMain.on("createChildWindow", async (event, arg) => {
+  createWindow1()
+})
 
-ipcMain.on("createChildWindow", (event, arg) => {
-	createWindow1();
-});
-
-ipcMain.on("openChildWindow", (event, arg) => {
-	SettingWindow.show();
-});
+ipcMain.on("openChildWindow", async (event, arg) => {
+  Win.show()
+})
 
 ipcMain.on("closeChildWindow", (event, arg) => {
-	SettingWindow.hide();
-});
+  Win.hide()
+})
 
 ipcMain.on("reset", (event, arg) => {
-	app.exit(0);
-});
+  app.exit(0)
+})
 
 ipcMain.on("restart", () => {
-	app.relaunch();
-	SettingWindow.close();
-	app.quit();
+  app.relaunch();
+  Win.close();
+  app.quit();
 });
