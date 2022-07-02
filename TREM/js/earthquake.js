@@ -162,7 +162,6 @@ let Report = 0
 let Sspeed = 4
 let Pspeed = 7
 let Server = []
-let PAlert = {}
 //#endregion
 
 //#region 設定檔
@@ -320,225 +319,235 @@ async function init() {
 
                                     axios.post('https://exptech.mywire.org:1015', data)
                                         .then(async function (response) {
-                                            for (let index = 0; index < Object.keys(Station).length; index++) {
-                                                map.removeLayer(Station[Object.keys(Station)[index]])
-                                                delete Station[Object.keys(Station)[index]]
-                                                index--
+                                            let data1 = {
+                                                "APIkey": "https://github.com/ExpTechTW",
+                                                "Function": "data",
+                                                "Type": "palert",
+                                                "FormatVersion": 1,
                                             }
-                                            if (response.data["state"] != "Success") return
-                                            let Json = response.data["response"]
-                                            let All = []
-                                            MAXPGA = { pga: 0, station: "NA", level: 0 }
-                                            for (let index = 0; index < Object.keys(Json).length; index++) {
-                                                let Sdata = Json[Object.keys(Json)[index]]
-                                                let amount = 0
-                                                if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"])
-                                                if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue
-                                                let Intensity = NOW.getTime() - Sdata["TimeStamp"] > 5000 ? "NA" :
-                                                    amount >= 800 ? 9 :
-                                                        amount >= 440 ? 8 :
-                                                            amount >= 250 ? 7 :
-                                                                amount >= 140 ? 6 :
-                                                                    amount >= 80 ? 5 :
-                                                                        amount >= 25 ? 4 :
-                                                                            amount >= 8 ? 3 :
-                                                                                amount >= 5 ? 2 :
-                                                                                    amount >= 3.5 ? 1 :
-                                                                                        0
-                                                let size = 15
-                                                if (Intensity == 0) size = 5
-                                                var myIcon = L.icon({
-                                                    iconUrl: `./image/$${Intensity}.png`,
-                                                    iconSize: [size, size],
-                                                })
-                                                let ReportMark = L.marker([station[Object.keys(Json)[index]]["Lat"], station[Object.keys(Json)[index]]["Long"]], { icon: myIcon })
-                                                let Level = IntensityI(Intensity)
-                                                let now = new Date(Sdata["Time"])
-                                                let Now = (now.getMonth() + 1) +
-                                                    "/" + now.getDate() +
-                                                    " " + now.getHours() +
-                                                    ":" + now.getMinutes() +
-                                                    ":" + now.getSeconds()
-                                                let Catch = document.getElementById("box-7")
-                                                if (Object.keys(Json)[index] == config["Real-time.station"]["value"]) Catch.innerHTML = `<font color="white" size="2"><b>${station[Object.keys(Json)[index]]["Loc"]}</b></font><br><font color="white" size="2"><b>${Now}</b> </font><br><font color="white" size="2"><b>震度: ${Intensity}</b> </font><font color="white" size="2"><b> PGA: ${amount}</b></font>`
-                                                map.addLayer(ReportMark)
-                                                Station[Object.keys(Json)[index]] = ReportMark
-                                                if (pga[station[Object.keys(Json)[index]]["PGA"]] == undefined && Intensity != "NA") {
-                                                    pga[station[Object.keys(Json)[index]]["PGA"]] = {
-                                                        "Intensity": Intensity,
-                                                        "Time": 0
+
+                                            axios.post('https://exptech.mywire.org:1015', data1)
+                                                .then(async function (Response1) {
+                                                    for (let index = 0; index < Object.keys(Station).length; index++) {
+                                                        map.removeLayer(Station[Object.keys(Station)[index]])
+                                                        delete Station[Object.keys(Station)[index]]
+                                                        index--
                                                     }
-                                                }
-                                                if (Intensity != "NA" && Intensity != 0) {
-                                                    All.push({
-                                                        "loc": station[Object.keys(Json)[index]]["Loc"],
-                                                        "intensity": Intensity
-                                                    })
-                                                    if (Intensity > pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"]) pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"] = Intensity
-                                                    if (amount >= 3.5) {
-                                                        if (Pga[Object.keys(Json)[index]]) {
-                                                            if (amount > 8 && PGALimit == 0) {
-                                                                PGALimit = 1
-                                                                audioPlay(`./audio/PGA1.wav`)
-                                                            } else if (amount > 250 && PGALimit != 2) {
-                                                                PGALimit = 2
-                                                                audioPlay(`./audio/PGA2.wav`)
+                                                    let Response = Response1.data.response
+                                                    if (response.data["state"] != "Success") return
+                                                    let Json = response.data["response"]
+                                                    let All = []
+                                                    MAXPGA = { pga: 0, station: "NA", level: 0 }
+                                                    for (let index = 0; index < Object.keys(Json).length; index++) {
+                                                        let Sdata = Json[Object.keys(Json)[index]]
+                                                        let amount = 0
+                                                        if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"])
+                                                        if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue
+                                                        let Intensity = NOW.getTime() - Sdata["TimeStamp"] > 5000 ? "NA" :
+                                                            amount >= 800 ? 9 :
+                                                                amount >= 440 ? 8 :
+                                                                    amount >= 250 ? 7 :
+                                                                        amount >= 140 ? 6 :
+                                                                            amount >= 80 ? 5 :
+                                                                                amount >= 25 ? 4 :
+                                                                                    amount >= 8 ? 3 :
+                                                                                        amount >= 5 ? 2 :
+                                                                                            amount >= 3.5 ? 1 :
+                                                                                                0
+                                                        let size = 15
+                                                        if (Intensity == 0) size = 5
+                                                        var myIcon = L.icon({
+                                                            iconUrl: `./image/$${Intensity}.png`,
+                                                            iconSize: [size, size],
+                                                        })
+                                                        let ReportMark = L.marker([station[Object.keys(Json)[index]]["Lat"], station[Object.keys(Json)[index]]["Long"]], { icon: myIcon })
+                                                        let Level = IntensityI(Intensity)
+                                                        let now = new Date(Sdata["Time"])
+                                                        let Now = (now.getMonth() + 1) +
+                                                            "/" + now.getDate() +
+                                                            " " + now.getHours() +
+                                                            ":" + now.getMinutes() +
+                                                            ":" + now.getSeconds()
+                                                        let Catch = document.getElementById("box-7")
+                                                        if (Object.keys(Json)[index] == config["Real-time.station"]["value"]) Catch.innerHTML = `<font color="white" size="2"><b>${station[Object.keys(Json)[index]]["Loc"]}</b></font><br><font color="white" size="2"><b>${Now}</b> </font><br><font color="white" size="2"><b>震度: ${Intensity}</b> </font><font color="white" size="2"><b> PGA: ${amount}</b></font>`
+                                                        map.addLayer(ReportMark)
+                                                        Station[Object.keys(Json)[index]] = ReportMark
+                                                        if (pga[station[Object.keys(Json)[index]]["PGA"]] == undefined && Intensity != "NA") {
+                                                            pga[station[Object.keys(Json)[index]]["PGA"]] = {
+                                                                "Intensity": Intensity,
+                                                                "Time": 0
                                                             }
-                                                            pga[station[Object.keys(Json)[index]]["PGA"]]["Time"] = NOW.getTime()
+                                                        }
+                                                        if (Intensity != "NA" && Intensity != 0) {
+                                                            All.push({
+                                                                "loc": station[Object.keys(Json)[index]]["Loc"],
+                                                                "intensity": Intensity
+                                                            })
+                                                            if (Intensity > pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"]) pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"] = Intensity
+                                                            if (amount >= 3.5) {
+                                                                if (Pga[Object.keys(Json)[index]]) {
+                                                                    if (amount > 8 && PGALimit == 0) {
+                                                                        PGALimit = 1
+                                                                        audioPlay(`./audio/PGA1.wav`)
+                                                                    } else if (amount > 250 && PGALimit != 2) {
+                                                                        PGALimit = 2
+                                                                        audioPlay(`./audio/PGA2.wav`)
+                                                                    }
+                                                                    pga[station[Object.keys(Json)[index]]["PGA"]]["Time"] = NOW.getTime()
+                                                                } else {
+                                                                    Pga[Object.keys(Json)[index]] = true
+                                                                }
+                                                            }
+                                                            if (MAXPGA["pga"] < amount && Level != "NA") {
+                                                                MAXPGA["pga"] = amount
+                                                                MAXPGA["station"] = Object.keys(Json)[index]
+                                                                MAXPGA["level"] = Level
+                                                                MAXPGA["lat"] = station[Object.keys(Json)[index]]["Lat"]
+                                                                MAXPGA["long"] = station[Object.keys(Json)[index]]["Long"]
+                                                                MAXPGA["loc"] = station[Object.keys(Json)[index]]["Loc"]
+                                                                MAXPGA["intensity"] = Intensity
+                                                                MAXPGA["ms"] = NOW.getTime() - Sdata["TimeStamp"]
+                                                            }
                                                         } else {
-                                                            Pga[Object.keys(Json)[index]] = true
+                                                            delete Pga[Object.keys(Json)[index]]
                                                         }
                                                     }
-                                                    if (MAXPGA["pga"] < amount && Level != "NA") {
-                                                        MAXPGA["pga"] = amount
-                                                        MAXPGA["station"] = Object.keys(Json)[index]
-                                                        MAXPGA["level"] = Level
-                                                        MAXPGA["lat"] = station[Object.keys(Json)[index]]["Lat"]
-                                                        MAXPGA["long"] = station[Object.keys(Json)[index]]["Long"]
-                                                        MAXPGA["loc"] = station[Object.keys(Json)[index]]["Loc"]
-                                                        MAXPGA["intensity"] = Intensity
-                                                        MAXPGA["ms"] = NOW.getTime() - Sdata["TimeStamp"]
+                                                    for (let index = 0; index < Response.data.length; index++) {
+                                                        if (NOW.getTime() - Response.timestamp > 30000) break
+                                                        if (pga[Response.data[index]["TREM"]] == undefined) {
+                                                            pga[Response.data[index]["TREM"]] = {
+                                                                "Intensity": 0,
+                                                                "Time": 0
+                                                            }
+                                                        }
+                                                        var myIcon = L.icon({
+                                                            iconUrl: `./image/${Response.data[index]["intensity"]}.png`,
+                                                            iconSize: [15, 15],
+                                                        })
+                                                        let list = Response.data[index]["loc"].split(" ")
+                                                        let city = list[0]
+                                                        let town = list[1]
+                                                        let ReportMark = L.marker([location[city][town][1], location[city][town][2]], { icon: myIcon })
+                                                        map.addLayer(ReportMark)
+                                                        Station[Response.data[index]["loc"]] = ReportMark
+                                                        if (Response.data[index]["intensity"] > pga[Response.data[index]["TREM"]]["Intensity"]) pga[Response.data[index]["TREM"]]["Intensity"] = Response.data[index]["intensity"]
+                                                        pga[Response.data[index]["TREM"]]["Time"] = NOW.getTime()
+                                                        All.push({
+                                                            "loc": Response.data[index]["loc"],
+                                                            "intensity": Response.data[index]["intensity"]
+                                                        })
+                                                        if (IntensityN(MAXPGA["level"]) < Response.data[index]["intensity"]) {
+                                                            MAXPGA["pga"] = ""
+                                                            MAXPGA["level"] = IntensityI(Response.data[index]["intensity"])
+                                                            MAXPGA["loc"] = Response.data[index]["loc"]
+                                                            MAXPGA["intensity"] = Response.data[index]["intensity"]
+                                                        }
                                                     }
-                                                } else {
-                                                    delete Pga[Object.keys(Json)[index]]
-                                                }
-                                            }
-                                            for (let index = 0; index < PAlert.data.length; index++) {
-                                                if (NOW.getTime() - PAlert.timestamp > 30000) break
-                                                if (pga[PAlert.data[index]["TREM"]] == undefined) {
-                                                    pga[PAlert.data[index]["TREM"]] = {
-                                                        "Intensity": 0,
-                                                        "Time": 0
+                                                    for (let index = 0; index < Object.keys(PGA).length; index++) {
+                                                        map.removeLayer(PGA[Object.keys(PGA)[index]])
+                                                        delete PGA[Object.keys(PGA)[index]]
+                                                        index--
                                                     }
-                                                }
-                                                var myIcon = L.icon({
-                                                    iconUrl: `./image/${PAlert.data[index]["intensity"]}.png`,
-                                                    iconSize: [15, 15],
-                                                })
-                                                let list = PAlert.data[index]["loc"].split(" ")
-                                                let city = list[0]
-                                                let town = list[1]
-                                                let ReportMark = L.marker([location[city][town][1], location[city][town][2]], { icon: myIcon })
-                                                map.addLayer(ReportMark)
-                                                Station[PAlert.data[index]["loc"]] = ReportMark
-                                                if (PAlert.data[index]["intensity"] > pga[PAlert.data[index]["TREM"]]["Intensity"]) pga[PAlert.data[index]["TREM"]]["Intensity"] = PAlert.data[index]["intensity"]
-                                                pga[PAlert.data[index]["TREM"]]["Time"] = NOW.getTime()
-                                                All.push({
-                                                    "loc": PAlert.data[index]["loc"],
-                                                    "intensity": PAlert.data[index]["intensity"]
-                                                })
-                                                if (IntensityN(MAXPGA["level"]) < PAlert.data[index]["intensity"]) {
-                                                    MAXPGA["pga"] = ""
-                                                    MAXPGA["level"] = IntensityI(PAlert.data[index]["intensity"])
-                                                    MAXPGA["loc"] = PAlert.data[index]["loc"]
-                                                    MAXPGA["intensity"] = PAlert.data[index]["intensity"]
-                                                }
-                                            }
-                                            for (let index = 0; index < Object.keys(PGA).length; index++) {
-                                                map.removeLayer(PGA[Object.keys(PGA)[index]])
-                                                delete PGA[Object.keys(PGA)[index]]
-                                                index--
-                                            }
-                                            for (let index = 0; index < Object.keys(pga).length; index++) {
-                                                let Intensity = pga[Object.keys(pga)[index]]["Intensity"]
-                                                if (NOW.getTime() - pga[Object.keys(pga)[index]]["Time"] > 5000) {
-                                                    delete pga[Object.keys(pga)[index]]
-                                                    index--
-                                                } else {
-                                                    PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
-                                                        color: color(Intensity),
-                                                        fillColor: 'transparent',
-                                                    }).addTo(map)
-                                                    PGAaudio = true
-                                                }
-                                            }
-                                            if (Object.keys(pga).length != 0 && !PGAmark) {
-                                                PGAmark = true
-                                                focus([23.608428, 120.799168], 7, true)
-                                            }
-                                            if (PGAmark && Object.keys(pga).length == 0) {
-                                                PGAmark = false
-                                                focus()
-                                            }
-                                            if (Object.keys(PGA).length == 0) PGAaudio = false
-                                            if (PGAaudio) {
-                                                let Catch = document.getElementById("intensity-2")
-                                                Catch.style.height = "auto"
-                                                Catch = document.getElementById("intensity-3")
-                                                Catch.innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`
-                                                Catch = document.getElementById("box-3")
-                                                Catch.style.backgroundColor = color(MAXPGA["intensity"])
-                                            } else {
-                                                let Catch = document.getElementById("intensity-2")
-                                                Catch.style.height = "0%"
-                                                Catch = document.getElementById("intensity-3")
-                                                Catch.innerHTML = ``
-                                                Catch = document.getElementById("box-3")
-                                                Catch.style.backgroundColor = "gray"
-                                                PGAAudio = false
-                                                PGAtag = 0
-                                                PGALimit = 0
-                                            }
-                                            if (!PGAAudio && PGAaudio) {
-                                                if (!win.isVisible()) {
-                                                    if (config["Real-time.show"]["value"]) {
-                                                        win.show()
-                                                        if (config["Real-time.cover"]["value"]) win.setAlwaysOnTop(true)
-                                                        win.setAlwaysOnTop(false)
+                                                    for (let index = 0; index < Object.keys(pga).length; index++) {
+                                                        let Intensity = pga[Object.keys(pga)[index]]["Intensity"]
+                                                        if (NOW.getTime() - pga[Object.keys(pga)[index]]["Time"] > 5000) {
+                                                            delete pga[Object.keys(pga)[index]]
+                                                            index--
+                                                        } else {
+                                                            PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
+                                                                color: color(Intensity),
+                                                                fillColor: 'transparent',
+                                                            }).addTo(map)
+                                                            PGAaudio = true
+                                                        }
                                                     }
-                                                }
-                                                PGAAudio = true
-                                            }
-                                            for (let Index = 0; Index < All.length - 1; Index++) {
-                                                for (let index = 0; index < All.length - 1; index++) {
-                                                    if (All[index]["intensity"] < All[index + 1]["intensity"]) {
-                                                        let Temp = All[index + 1]
-                                                        All[index + 1] = All[index]
-                                                        All[index] = Temp
+                                                    if (Object.keys(pga).length != 0 && !PGAmark) {
+                                                        PGAmark = true
+                                                        focus([23.608428, 120.799168], 7, true)
                                                     }
-                                                }
-                                            }
-                                            if (All.length != 0 && All[0]["intensity"] > PGAtag && Object.keys(pga).length != 0) {
-                                                if (config["Real-time.audio"]["value"]) {
-                                                    if (All[0]["intensity"] >= 5 && PGAtag < 5) {
-                                                        audioPlay(`./audio/Shindo2.wav`)
-                                                    } else if (All[0]["intensity"] >= 2 && PGAtag < 2) {
-                                                        audioPlay(`./audio/Shindo1.wav`)
-                                                    } else if (PGAtag == 0) {
-                                                        audioPlay(`./audio/Shindo0.wav`)
+                                                    if (PGAmark && Object.keys(pga).length == 0) {
+                                                        PGAmark = false
+                                                        focus()
                                                     }
-                                                }
-                                                if (All[0]["intensity"] >= 2) {
-                                                    let Now = NOW.getFullYear() +
-                                                        "/" + (NOW.getMonth() + 1) +
-                                                        "/" + NOW.getDate() +
-                                                        " " + NOW.getHours() +
-                                                        ":" + NOW.getMinutes() +
-                                                        ":" + NOW.getSeconds()
-                                                    Report = NOW.getTime()
-                                                    ReportGET({
-                                                        Max: All[0]["intensity"],
-                                                        Time: Now
-                                                    })
-                                                }
-                                                PGAtag = All[0]["intensity"]
-                                            }
-                                            clear()
-                                            function clear() {
-                                                let Catch = document.getElementById("box-6")
-                                                if (Catch.childNodes.length != 0) {
-                                                    Catch.childNodes.forEach((childNodes) => {
-                                                        Catch.removeChild(childNodes)
-                                                    })
+                                                    if (Object.keys(PGA).length == 0) PGAaudio = false
+                                                    if (PGAaudio) {
+                                                        let Catch = document.getElementById("intensity-2")
+                                                        Catch.style.height = "auto"
+                                                        Catch = document.getElementById("intensity-3")
+                                                        Catch.innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`
+                                                        Catch = document.getElementById("box-3")
+                                                        Catch.style.backgroundColor = color(MAXPGA["intensity"])
+                                                    } else {
+                                                        let Catch = document.getElementById("intensity-2")
+                                                        Catch.style.height = "0%"
+                                                        Catch = document.getElementById("intensity-3")
+                                                        Catch.innerHTML = ``
+                                                        Catch = document.getElementById("box-3")
+                                                        Catch.style.backgroundColor = "gray"
+                                                        PGAAudio = false
+                                                        PGAtag = 0
+                                                        PGALimit = 0
+                                                    }
+                                                    if (!PGAAudio && PGAaudio) {
+                                                        if (!win.isVisible()) {
+                                                            if (config["Real-time.show"]["value"]) {
+                                                                win.show()
+                                                                if (config["Real-time.cover"]["value"]) win.setAlwaysOnTop(true)
+                                                                win.setAlwaysOnTop(false)
+                                                            }
+                                                        }
+                                                        PGAAudio = true
+                                                    }
+                                                    for (let Index = 0; Index < All.length - 1; Index++) {
+                                                        for (let index = 0; index < All.length - 1; index++) {
+                                                            if (All[index]["intensity"] < All[index + 1]["intensity"]) {
+                                                                let Temp = All[index + 1]
+                                                                All[index + 1] = All[index]
+                                                                All[index] = Temp
+                                                            }
+                                                        }
+                                                    }
+                                                    if (All.length != 0 && All[0]["intensity"] > PGAtag && Object.keys(pga).length != 0) {
+                                                        if (config["Real-time.audio"]["value"]) {
+                                                            if (All[0]["intensity"] >= 5 && PGAtag < 5) {
+                                                                audioPlay(`./audio/Shindo2.wav`)
+                                                            } else if (All[0]["intensity"] >= 2 && PGAtag < 2) {
+                                                                audioPlay(`./audio/Shindo1.wav`)
+                                                            } else if (PGAtag == 0) {
+                                                                audioPlay(`./audio/Shindo0.wav`)
+                                                            }
+                                                        }
+                                                        if (All[0]["intensity"] >= 2) {
+                                                            let Now = NOW.getFullYear() +
+                                                                "/" + (NOW.getMonth() + 1) +
+                                                                "/" + NOW.getDate() +
+                                                                " " + NOW.getHours() +
+                                                                ":" + NOW.getMinutes() +
+                                                                ":" + NOW.getSeconds()
+                                                            Report = NOW.getTime()
+                                                            ReportGET({
+                                                                Max: All[0]["intensity"],
+                                                                Time: Now
+                                                            })
+                                                        }
+                                                        PGAtag = All[0]["intensity"]
+                                                    }
                                                     clear()
-                                                }
-                                                else {
-                                                    let count = 0
-                                                    for (let Index = 0; Index < All.length; Index++) {
-                                                        if (!PGAaudio || count >= 10) break
-                                                        var Div = document.createElement("DIV")
-                                                        Div.innerHTML =
-                                                            `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
+                                                    function clear() {
+                                                        let Catch = document.getElementById("box-6")
+                                                        if (Catch.childNodes.length != 0) {
+                                                            Catch.childNodes.forEach((childNodes) => {
+                                                                Catch.removeChild(childNodes)
+                                                            })
+                                                            clear()
+                                                        }
+                                                        else {
+                                                            let count = 0
+                                                            for (let Index = 0; Index < All.length; Index++) {
+                                                                if (!PGAaudio || count >= 10) break
+                                                                var Div = document.createElement("DIV")
+                                                                Div.innerHTML =
+                                                                    `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
                                                             <div class="left" style="width: 30%;text-align: center;">
                                                                 <b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
                                                             </div>
@@ -546,12 +555,15 @@ async function init() {
                                                             <b><font color="white" size="2">${All[Index]["loc"].replace(" ", "<br>")}</font></b>
                                                             </div>
                                                         </div>`
-                                                        Div.style.backgroundColor = color(All[Index]["intensity"])
-                                                        Catch.appendChild(Div)
-                                                        count++
+                                                                Div.style.backgroundColor = color(All[Index]["intensity"])
+                                                                Catch.appendChild(Div)
+                                                                count++
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                            }
+                                                }).catch(function (error) {
+                                                    dump(`Alert Timer > ${error}`, "Error")
+                                                })
                                         })
                                         .catch(function (error) {
                                             dump(`PGA Timer > ${error}`, "Error")
@@ -1107,8 +1119,6 @@ async function FCMdata(data) {
             win.setAlwaysOnTop(false)
         }
         if (config["report.audio"]["value"]) audioPlay(`./audio/Water.wav`)
-    } if (json.Function == "palert") {
-        PAlert = json.Data
     } else if (json.Function == "report") {
         dump(`Got Report form API Server`)
         if (config["report.show"]["value"]) {
