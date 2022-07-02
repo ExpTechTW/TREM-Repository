@@ -8,6 +8,7 @@ process.env.Version = "22w27-pre6";
 let MainWindow = null;
 let SettingWindow = null;
 let tray = null;
+let _devMode = false;
 
 if (fs.existsSync(__dirname.replace("trem\\resources\\app", "trem_data")) && fs.existsSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`)) {
 	const config = JSON.parse(fs.readFileSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`).toString());
@@ -49,7 +50,7 @@ function createWindow() {
 		app.setAppUserModelId("TREM | 台灣實時地震監測");
 
 	if (process.argv.includes("--start")) MainWindow.hide();
-
+	if (process.argv.includes("--dev")) _devMode = true;
 	MainWindow.on("close", (event) => {
 		if (app.quitting)
 			MainWindow = null;
@@ -133,7 +134,8 @@ else {
 
 app.on("ready", () => {
 	globalShortcut.register("Ctrl+Shift+I", () => {
-		BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: "detach" });
+		if (_devMode)
+			BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: "detach" });
 		return;
 	});
 });
