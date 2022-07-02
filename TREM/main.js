@@ -40,8 +40,8 @@ function createWindow() {
 	});
 	require("@electron/remote/main").initialize();
 	require("@electron/remote/main").enable(MainWindow.webContents);
-	MainWindow.loadFile("index.html");
 	process.env.window = MainWindow.id;
+	MainWindow.loadFile("index.html");
 	MainWindow.setMenu(null);
 	pushReceiver.setup(MainWindow.webContents);
 
