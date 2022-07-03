@@ -165,6 +165,50 @@ const Server = [];
 let PAlert = {};
 // #endregion
 
+// #region override Date.format()
+Date.prototype.format =
+	/**
+	 * Format DateTime into string with provided formatting string.
+	 * @param {string} format The formatting string to use.
+	 * @returns {string} The formatted string.
+	 */
+	function(format) {
+		/**
+		 * @type {Date}
+		 */
+		const me = this;
+		return format.replace(/a|A|Z|S(SS)?|ss?|mm?|HH?|hh?|D{1,2}|M{1,2}|YY(YY)?|'([^']|'')*'/g, (str) => {
+			let c1 = str.charAt(0);
+			const ret = str.charAt(0) == "'"
+				? (c1 = 0) || str.slice(1, -1).replace(/''/g, "'")
+				: str == "a"
+					? (me.getHours() < 12 ? "am" : "pm")
+					: str == "A"
+						? (me.getHours() < 12 ? "AM" : "PM")
+						: str == "Z"
+							? (("+" + -me.getTimezoneOffset() / 60).replace(/^\D?(\D)/, "$1").replace(/^(.)(.)$/, "$10$2") + "00")
+							: c1 == "S"
+								? me.getMilliseconds()
+								: c1 == "s"
+									? me.getSeconds()
+									: c1 == "H"
+										? me.getHours()
+										: c1 == "h"
+											? (me.getHours() % 12) || 12
+											: c1 == "D"
+												? me.getDate()
+												: c1 == "m"
+													? me.getMinutes()
+													: c1 == "M"
+														? me.getMonth() + 1
+														: ("" + me.getFullYear()).slice(-str.length);
+			return c1 && str.length < 4 && ("" + ret).length < str.length
+				? ("00" + ret).slice(-str.length)
+				: ret;
+		});
+	};
+// #endregion
+
 // #region 設定檔
 if (!fs.existsSync(`${localStorage["config"]}/Data`))
 	fs.mkdirSync(`${localStorage["config"]}/Data`);
@@ -213,7 +257,7 @@ setInterval(async () => {
 		time.style.color = "red";
 	else {
 		time.style.color = "white";
-		time.innerHTML = `<font size="5"><b>${Now} </b></font><font size="1"><b>${process.env.Version}</b></font>`;
+		time.innerText = NOW.format("YYYY/MM/DD HH:mm:ss");
 	}
 	if (Object.keys(Tsunami).length != 0)
 		if (NOW.getTime() - Tsunami["Time"] > 240000) {
@@ -426,7 +470,6 @@ async function init() {
 													MAXPGA["loc"] = PAlert.data[index]["loc"];
 													MAXPGA["intensity"] = PAlert.data[index]["intensity"];
 												}
-											}
 											for (let index = 0; index < Object.keys(PGA).length; index++) {
 												map.removeLayer(PGA[Object.keys(PGA)[index]]);
 												delete PGA[Object.keys(PGA)[index]];
@@ -928,8 +971,7 @@ async function ReportList(Data, eew) {
 			});
 			roll.appendChild(Div);
 		}
-		const load = document.getElementById("#load");
-		load.style.height = "0%";
+		$("#load").fadeOut(100);
 		const set = document.getElementById("box-8");
 		set.style.visibility = "visible";
 		if (eew.report != undefined) {
@@ -1030,7 +1072,6 @@ if (localStorage["test"] != undefined) {
 			dump(`Test Mode > ${error}`, "Error");
 		});
 }
-ipcRenderer.send("createChildWindow");
 // #endregion
 
 // #region FCM
@@ -1326,23 +1367,17 @@ async function FCMdata(data) {
 			if (EarthquakeList["ITimer"] != undefined) clearInterval(EarthquakeList["ITimer"]);
 			PNG = NOW.getTime();
 
-			let Catch = document.getElementById("box-4");
-			Catch.style.height = "20%";
-			Catch = document.getElementById("box-5");
-			Catch.style.height = "80%";
-			Catch = document.getElementById("alert");
-			Catch.style.display = "none";
+			let classString = "alert-box ";
 
-			let test = "";
-			if (json.Test) {
-				Catch.style.display = "inline";
-				test = "(測試報)";
-			} else if (json.Test != undefined && json.Test == null)
-				test = "(歷史)";
+			// AlertBox: 種類
+			if (json.Test)
+				classString += "eew-test";
 			else if (json.Alert)
-				test = "(警報)";
+				classString += "eew-alert";
+			else if (json.Test != undefined && json.Test == null)
+				classString += "eew-history";
 			else
-				test = "(預報)";
+				classString += "eew-pred";
 
 			let find = -1;
 			for (let index = 0; index < INFO.length; index++)
@@ -1353,25 +1388,26 @@ async function FCMdata(data) {
 
 			if (find == -1) find = INFO.length;
 			INFO[find] = {
-				"ID"           : json.ID,
-				"title-1"      : test,
-				"title-2"      : `<font color="white" size="3"><b>第 ${json.Version} 報</b></font>`,
-				"intensity-1"  : `<font color="white" size="7"><b>${IntensityI(MaxIntensity)}</b></font>`,
-				"location-1"   : `<font color="white" size="4"><b>${json.Location ?? "未知區域"}</b></font>`,
-				"time-1"       : `<font color="white" size="2"><b>${json["UTC+8"]}</b></font>`,
-				"info-1"       : `<font color="white" size="4"><b>M ${json.Scale} </b></font><font color="white" size="3"><b> 深度: ${json.Depth} km</b></font>`,
-				"info-2"       : `<font color="white" size="3"><b>${json.Unit}</b></font>`,
-				"MaxIntensity" : MaxIntensity,
-				"level"        : `<b>${level}</b>`,
-				"PS"           : color(IntensityN(level)),
-				"distance"     : distance,
-				"Time"         : json.Time,
-				"Depth"        : json.Depth,
+				"ID"            : json.ID,
+				alert_number    : json.Version,
+				alert_intensity : MaxIntensity,
+				alert_location  : json.Location ?? "未知區域",
+				alert_time      : new Date(json.Time),
+				alert_magnitude : json.Scale,
+				alert_depth     : json.Depth,
+				alert_provider  : json.Unit,
+				alert_type      : classString,
+				"intensity-1"   : `<font color="white" size="7"><b>${IntensityI(MaxIntensity)}</b></font>`,
+				"time-1"        : `<font color="white" size="2"><b>${json["UTC+8"]}</b></font>`,
+				"info-1"        : `<font color="white" size="4"><b>M ${json.Scale} </b></font><font color="white" size="3"><b> 深度: ${json.Depth} km</b></font>`,
+				"level"         : `<b>${level}</b>`,
+				"PS"            : color(IntensityN(level)),
+				"distance"      : distance,
 			};
 			text();
 
 			if (ITimer == null)
-				ITimer = setInterval(async () => {
+				ITimer = setInterval(() => {
 					text();
 				}, 1000);
 
@@ -1500,23 +1536,36 @@ async function FCMdata(data) {
 			}, speed);
 
 			function text() {
-				let Catch = document.getElementById("title-1");
-				Catch.innerHTML = `<font color="white" size="3"><b>強震即時警報 ${TINFO + 1} ${INFO[TINFO]["title-1"]}</b></font>`;
-				Catch = document.getElementById("title-2");
-				Catch.innerHTML = INFO[TINFO]["title-2"];
-				Catch = document.getElementById("intensity-1");
-				Catch.innerHTML = INFO[TINFO]["intensity-1"];
-				Catch = document.getElementById("location-1");
-				Catch.innerHTML = INFO[TINFO]["location-1"];
-				Catch = document.getElementById("time-1");
-				Catch.innerHTML = INFO[TINFO]["time-1"];
-				Catch = document.getElementById("info-1");
-				Catch.innerHTML = INFO[TINFO]["info-1"];
-				Catch = document.getElementById("info-2");
-				Catch.innerHTML = INFO[TINFO]["info-2"];
-				Catch = document.getElementById("box-5");
-				Catch.style.backgroundColor = color(INFO[TINFO]["MaxIntensity"]);
+				const intensity = INFO[TINFO].alert_intensity;
+				const intensity_str = (intensity == 9)
+					? " seven"
+					: (intensity == 8)
+						? " six strong"
+						: (intensity == 7)
+							? " six"
+							: (intensity == 6)
+								? " five strong"
+								: (intensity == 5)
+									? " five"
+									: (intensity == 4)
+										? " four"
+										: (intensity == 3)
+											? " three"
+											: (intensity == 2)
+												? " two"
+												: " one";
 
+				$("#alert-box")[0].className = INFO[TINFO].alert_type + intensity_str;
+				$("#alert-provider").text(INFO[TINFO].alert_provider);
+				$("#alert-number").text(`#${INFO[TINFO].alert_number}`);
+				$("#alert-location").text(INFO[TINFO].alert_location);
+				$("#alert-time").text(INFO[TINFO].alert_time.format("YYYY/MM/DD HH:mm:ss"));
+				$("#alert-magnitude").text(INFO[TINFO].alert_magnitude);
+				$("#alert-depth").text(INFO[TINFO].alert_depth);
+				$("#alert-box").addClass("show");
+
+
+				let Catch = document.getElementById("title-1");
 				Catch = document.getElementById("level");
 				Catch.innerHTML = INFO[TINFO]["level"];
 				Catch = document.getElementById("PS");
@@ -1545,7 +1594,6 @@ async function FCMdata(data) {
 					TINFO = 0;
 				else
 					TINFO++;
-
 			}
 		}
 	}
