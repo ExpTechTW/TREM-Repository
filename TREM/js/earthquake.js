@@ -194,8 +194,7 @@ try {
 const win = BrowserWindow.fromId(process.env.window * 1);
 win.setAlwaysOnTop(false);
 const time = document.getElementById("time");
-const title = document.getElementById("title");
-title.innerHTML = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
+document.title = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
 
 setInterval(async () => {
 	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
