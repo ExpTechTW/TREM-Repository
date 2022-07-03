@@ -11,15 +11,11 @@ let Dump = fs.readFileSync(`${localStorage["config"]}/Log/TREM.log`).toString();
 function dump(msg, type) {
 	if (type == undefined) type = "Info";
 	const now = new Date();
-	const Now = now.getFullYear() +
-        "/" + (now.getMonth() + 1) +
-        "/" + now.getDate() +
-        " " + now.getHours() +
-        ":" + now.getMinutes() +
-        ":" + now.getSeconds();
+	const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1);
 	const list = Dump.split("\n");
 	if (list.length > 1000) Dump = "";
-	Dump = `[${Now}] ${type} >> ${msg}\n` + Dump;
+	Dump = `[${now}] ${type} >> ${msg}\n` + Dump;
+	console.log(`[${now}] ${type} >> ${msg}`);
 	fs.writeFileSync(`${localStorage["config"]}/Log/TREM.log`, Dump, "utf8");
 }
 
