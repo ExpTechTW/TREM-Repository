@@ -1065,7 +1065,6 @@ setInterval(() => {
 
 // #region EEW
 async function FCMdata(data) {
-	const win = BrowserWindow.fromId(process.env.window * 1);
 	const json = JSON.parse(data);
 	if (Server.includes(json.TimeStamp)) return;
 	Server.push(json.TimeStamp);
