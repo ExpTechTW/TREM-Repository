@@ -451,37 +451,38 @@ function init() {
 							delete Pga[Object.keys(Json)[index]];
 
 					}
-					for (let index = 0; index < PAlert.data.length; index++) {
-						if (NOW.getTime() - PAlert.timestamp > 30000) break;
-						if (pga[PAlert.data[index]["TREM"]] == undefined)
-							pga[PAlert.data[index]["TREM"]] = {
-								"Intensity" : 0,
-								"Time"      : 0,
-							};
+					if (PAlert.data != undefined)
+						for (let index = 0; index < PAlert.data.length; index++) {
+							if (NOW.getTime() - PAlert.timestamp > 30000) break;
+							if (pga[PAlert.data[index]["TREM"]] == undefined)
+								pga[PAlert.data[index]["TREM"]] = {
+									"Intensity" : 0,
+									"Time"      : 0,
+								};
 
-						let myIcon = L.icon({
-							iconUrl  : `./image/${PAlert.data[index]["intensity"]}.png`,
-							iconSize : [15, 15],
-						});
-						let list = PAlert.data[index]["loc"].split(" ");
-						let city = list[0];
-						let town = list[1];
-						let ReportMark = L.marker([location[city][town][1], location[city][town][2]], { icon: myIcon });
-						map.addLayer(ReportMark);
-						Station[PAlert.data[index]["loc"]] = ReportMark;
-						if (PAlert.data[index]["intensity"] > pga[PAlert.data[index]["TREM"]]["Intensity"]) pga[PAlert.data[index]["TREM"]]["Intensity"] = PAlert.data[index]["intensity"];
-						pga[PAlert.data[index]["TREM"]]["Time"] = NOW.getTime();
-						All.push({
-							"loc"       : PAlert.data[index]["loc"],
-							"intensity" : PAlert.data[index]["intensity"],
-						});
-						if (IntensityN(MAXPGA["level"]) < PAlert.data[index]["intensity"]) {
-							MAXPGA["pga"] = "";
-							MAXPGA["level"] = IntensityI(PAlert.data[index]["intensity"]);
-							MAXPGA["loc"] = PAlert.data[index]["loc"];
-							MAXPGA["intensity"] = PAlert.data[index]["intensity"];
+							let myIcon = L.icon({
+								iconUrl  : `./image/${PAlert.data[index]["intensity"]}.png`,
+								iconSize : [15, 15],
+							});
+							let list = PAlert.data[index]["loc"].split(" ");
+							let city = list[0];
+							let town = list[1];
+							let ReportMark = L.marker([location[city][town][1], location[city][town][2]], { icon: myIcon });
+							map.addLayer(ReportMark);
+							Station[PAlert.data[index]["loc"]] = ReportMark;
+							if (PAlert.data[index]["intensity"] > pga[PAlert.data[index]["TREM"]]["Intensity"]) pga[PAlert.data[index]["TREM"]]["Intensity"] = PAlert.data[index]["intensity"];
+							pga[PAlert.data[index]["TREM"]]["Time"] = NOW.getTime();
+							All.push({
+								"loc"       : PAlert.data[index]["loc"],
+								"intensity" : PAlert.data[index]["intensity"],
+							});
+							if (IntensityN(MAXPGA["level"]) < PAlert.data[index]["intensity"]) {
+								MAXPGA["pga"] = "";
+								MAXPGA["level"] = IntensityI(PAlert.data[index]["intensity"]);
+								MAXPGA["loc"] = PAlert.data[index]["loc"];
+								MAXPGA["intensity"] = PAlert.data[index]["intensity"];
+							}
 						}
-					}
 					for (let index = 0; index < Object.keys(PGA).length; index++) {
 						map.removeLayer(PGA[Object.keys(PGA)[index]]);
 						delete PGA[Object.keys(PGA)[index]];
