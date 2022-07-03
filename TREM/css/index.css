@@ -128,12 +128,15 @@ body {
     bottom: -100px;
     height: 48px;
     width: 600px;
+    opacity: 0;
     transform: translateX(-50%);
     pointer-events: none;
-    transition: buttom .1s ease-in-out;
+    transition: bottom .2s ease-in-out,
+                opacity .2s ease-in-out;
 }
 .alert-box.show {
     bottom: 60px;
+    opacity: 1;
 }
 .alert-box-body {
     z-index: 1001;
