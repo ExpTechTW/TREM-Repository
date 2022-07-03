@@ -247,12 +247,6 @@ setInterval(async () => {
 		Check["town"] = config["location.town"]["value"];
 		Loc();
 	}
-	const Now = NOW.getFullYear() +
-        "/" + (NOW.getMonth() + 1) +
-        "/" + NOW.getDate() +
-        " " + NOW.getHours() +
-        ":" + NOW.getMinutes() +
-        ":" + NOW.getSeconds();
 	if (err != "")
 		time.style.color = "red";
 	else {
