@@ -470,82 +470,82 @@ async function init() {
 													MAXPGA["loc"] = PAlert.data[index]["loc"];
 													MAXPGA["intensity"] = PAlert.data[index]["intensity"];
 												}
-											for (let index = 0; index < Object.keys(PGA).length; index++) {
-												map.removeLayer(PGA[Object.keys(PGA)[index]]);
-												delete PGA[Object.keys(PGA)[index]];
-												index--;
-											}
-											for (let index = 0; index < Object.keys(pga).length; index++) {
-												const Intensity = pga[Object.keys(pga)[index]]["Intensity"];
-												if (NOW.getTime() - pga[Object.keys(pga)[index]]["Time"] > 5000) {
-													delete pga[Object.keys(pga)[index]];
+												for (let index = 0; index < Object.keys(PGA).length; index++) {
+													map.removeLayer(PGA[Object.keys(PGA)[index]]);
+													delete PGA[Object.keys(PGA)[index]];
 													index--;
-												} else {
-													PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
-														color     : color(Intensity),
-														fillColor : "transparent",
-													}).addTo(map);
-													PGAaudio = true;
 												}
-											}
-											if (Object.keys(pga).length != 0 && !PGAmark) {
-												PGAmark = true;
-												focus([23.608428, 120.799168], 7, true);
-											}
-											if (PGAmark && Object.keys(pga).length == 0) {
-												PGAmark = false;
-												focus();
-											}
-											if (Object.keys(PGA).length == 0) PGAaudio = false;
-											if (PGAaudio) {
-												let Catch = document.getElementById("intensity-2");
-												Catch.style.height = "auto";
-												Catch = document.getElementById("intensity-3");
-												Catch.innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`;
-												Catch = document.getElementById("box-3");
-												Catch.style.backgroundColor = color(MAXPGA["intensity"]);
-											} else {
-												let Catch = document.getElementById("intensity-2");
-												Catch.style.height = "0%";
-												Catch = document.getElementById("intensity-3");
-												Catch.innerHTML = "";
-												Catch = document.getElementById("box-3");
-												Catch.style.backgroundColor = "gray";
-												PGAAudio = false;
-												PGAtag = 0;
-												PGALimit = 0;
-											}
-											if (!PGAAudio && PGAaudio) {
-												if (!win.isVisible())
-													if (config["Real-time.show"]["value"]) {
-														win.show();
-														if (config["Real-time.cover"]["value"]) win.setAlwaysOnTop(true);
-														win.setAlwaysOnTop(false);
+												for (let index = 0; index < Object.keys(pga).length; index++) {
+													const Intensity = pga[Object.keys(pga)[index]]["Intensity"];
+													if (NOW.getTime() - pga[Object.keys(pga)[index]]["Time"] > 5000) {
+														delete pga[Object.keys(pga)[index]];
+														index--;
+													} else {
+														PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
+															color     : color(Intensity),
+															fillColor : "transparent",
+														}).addTo(map);
+														PGAaudio = true;
 													}
+												}
+												if (Object.keys(pga).length != 0 && !PGAmark) {
+													PGAmark = true;
+													focus([23.608428, 120.799168], 7, true);
+												}
+												if (PGAmark && Object.keys(pga).length == 0) {
+													PGAmark = false;
+													focus();
+												}
+												if (Object.keys(PGA).length == 0) PGAaudio = false;
+												if (PGAaudio) {
+													let Catch = document.getElementById("intensity-2");
+													Catch.style.height = "auto";
+													Catch = document.getElementById("intensity-3");
+													Catch.innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`;
+													Catch = document.getElementById("box-3");
+													Catch.style.backgroundColor = color(MAXPGA["intensity"]);
+												} else {
+													let Catch = document.getElementById("intensity-2");
+													Catch.style.height = "0%";
+													Catch = document.getElementById("intensity-3");
+													Catch.innerHTML = "";
+													Catch = document.getElementById("box-3");
+													Catch.style.backgroundColor = "gray";
+													PGAAudio = false;
+													PGAtag = 0;
+													PGALimit = 0;
+												}
+												if (!PGAAudio && PGAaudio) {
+													if (!win.isVisible())
+														if (config["Real-time.show"]["value"]) {
+															win.show();
+															if (config["Real-time.cover"]["value"]) win.setAlwaysOnTop(true);
+															win.setAlwaysOnTop(false);
+														}
 
-												PGAAudio = true;
-											}
-											for (let Index = 0; Index < All.length - 1; Index++)
-												for (let index = 0; index < All.length - 1; index++)
-													if (All[index]["intensity"] < All[index + 1]["intensity"]) {
-														const Temp = All[index + 1];
-														All[index + 1] = All[index];
-														All[index] = Temp;
-													}
+													PGAAudio = true;
+												}
+												for (let Index = 0; Index < All.length - 1; Index++)
+													for (let index = 0; index < All.length - 1; index++)
+														if (All[index]["intensity"] < All[index + 1]["intensity"]) {
+															const Temp = All[index + 1];
+															All[index + 1] = All[index];
+															All[index] = Temp;
+														}
 
 
-											if (All.length != 0 && All[0]["intensity"] > PGAtag && Object.keys(pga).length != 0) {
-												if (config["Real-time.audio"]["value"])
-													if (All[0]["intensity"] >= 5 && PGAtag < 5)
-														audioPlay("./audio/Shindo2.wav");
-													else if (All[0]["intensity"] >= 2 && PGAtag < 2)
-														audioPlay("./audio/Shindo1.wav");
-													else if (PGAtag == 0)
-														audioPlay("./audio/Shindo0.wav");
+												if (All.length != 0 && All[0]["intensity"] > PGAtag && Object.keys(pga).length != 0) {
+													if (config["Real-time.audio"]["value"])
+														if (All[0]["intensity"] >= 5 && PGAtag < 5)
+															audioPlay("./audio/Shindo2.wav");
+														else if (All[0]["intensity"] >= 2 && PGAtag < 2)
+															audioPlay("./audio/Shindo1.wav");
+														else if (PGAtag == 0)
+															audioPlay("./audio/Shindo0.wav");
 
 
-												if (All[0]["intensity"] >= 2) {
-													const Now = NOW.getFullYear() +
+													if (All[0]["intensity"] >= 2) {
+														const Now = NOW.getFullYear() +
                                                         "/" + (NOW.getMonth() + 1) +
                                                         "/" + NOW.getDate() +
                                                         " " + NOW.getHours() +
@@ -557,22 +557,20 @@ async function init() {
 														Time : Now,
 													});
 												}
-												PGAtag = All[0]["intensity"];
-											}
-											clear();
-											function clear() {
-												const Catch = document.getElementById("box-6");
-												if (Catch.childNodes.length != 0) {
-													Catch.childNodes.forEach((childNodes) => {
-														Catch.removeChild(childNodes);
-													});
-													clear();
-												} else {
-													let count = 0;
-													for (let Index = 0; Index < All.length; Index++) {
-														if (!PGAaudio || count >= 10) break;
-														const Div = document.createElement("DIV");
-														Div.innerHTML =
+												clear();
+												function clear() {
+													const Catch = document.getElementById("box-6");
+													if (Catch.childNodes.length != 0) {
+														Catch.childNodes.forEach((childNodes) => {
+															Catch.removeChild(childNodes);
+														});
+														clear();
+													} else {
+														let count = 0;
+														for (let Index = 0; Index < All.length; Index++) {
+															if (!PGAaudio || count >= 10) break;
+															const Div = document.createElement("DIV");
+															Div.innerHTML =
                                                             `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
                                                             <div class="left" style="width: 30%;text-align: center;">
                                                                 <b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
@@ -581,15 +579,16 @@ async function init() {
                                                             <b><font color="white" size="2">${All[Index]["loc"].replace(" ", "<br>")}</font></b>
                                                             </div>
                                                         </div>`;
-														Div.style.backgroundColor = color(All[Index]["intensity"]);
-														Catch.appendChild(Div);
-														count++;
+															Div.style.backgroundColor = color(All[Index]["intensity"]);
+															Catch.appendChild(Div);
+															count++;
+														}
 													}
 												}
 											}
 										})
 										.catch((error) => {
-											dump(`PGA Timer > ${error}`, "Error");
+											dump(`PGA Timer > ${error}`, "Error", error);
 										});
 								}, 500);
 							}
