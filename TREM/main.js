@@ -132,8 +132,11 @@ else {
 
 app.on("ready", () => {
 	globalShortcut.register("Ctrl+Shift+I", () => {
-		if (_devMode)
-			BrowserWindow.getFocusedWindow().webContents.openDevTools({ mode: "detach" });
+		if (_devMode) {
+			const currentWindow = BrowserWindow.getFocusedWindow();
+			if (currentWindow)
+				currentWindow.webContents.openDevTools({ mode: "detach" });
+		}
 		return;
 	});
 });
