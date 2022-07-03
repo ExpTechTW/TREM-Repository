@@ -1,10 +1,8 @@
 if (!fs.existsSync(`${localStorage["config"]}/Log`))
 	fs.mkdirSync(`${localStorage["config"]}/Log`);
 
-
 if (!fs.existsSync(`${localStorage["config"]}/Log/TREM.log`))
 	fs.writeFileSync(`${localStorage["config"]}/Log/TREM.log`, "", "utf8");
-
 
 let Dump = fs.readFileSync(`${localStorage["config"]}/Log/TREM.log`).toString();
 
