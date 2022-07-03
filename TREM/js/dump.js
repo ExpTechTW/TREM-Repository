@@ -6,14 +6,15 @@ if (!fs.existsSync(`${localStorage["config"]}/Log/TREM.log`))
 
 let Dump = fs.readFileSync(`${localStorage["config"]}/Log/TREM.log`).toString();
 
-function dump(msg, type) {
+function dump(msg, type, err) {
 	if (type == undefined) type = "Info";
 	const now = new Date();
 	const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1);
 	const list = Dump.split("\n");
 	if (list.length > 1000) Dump = "";
-	Dump = `[${now}] ${type} >> ${msg}\n` + Dump;
-	console.log(`[${now}] ${type} >> ${msg}`);
+	Dump = `[${nowTime}] ${type} >> ${msg}\n` + Dump;
+	console.log(`[${nowTime}] ${type} >> ${msg}`);
+	if (err) console.error(err);
 	fs.writeFileSync(`${localStorage["config"]}/Log/TREM.log`, Dump, "utf8");
 }
 

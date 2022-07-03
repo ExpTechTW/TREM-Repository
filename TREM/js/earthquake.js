@@ -551,11 +551,13 @@ async function init() {
                                                         " " + NOW.getHours() +
                                                         ":" + NOW.getMinutes() +
                                                         ":" + NOW.getSeconds();
-													Report = NOW.getTime();
-													ReportGET({
-														Max  : All[0]["intensity"],
-														Time : Now,
-													});
+														Report = NOW.getTime();
+														ReportGET({
+															Max  : All[0]["intensity"],
+															Time : Now,
+														});
+													}
+													PGAtag = All[0]["intensity"];
 												}
 												clear();
 												function clear() {
