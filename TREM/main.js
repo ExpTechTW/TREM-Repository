@@ -61,14 +61,15 @@ function createWindow() {
 	});
 }
 
-async function createWindow1() {
-	if (SettingWindow != null) await SettingWindow.close();
+function createSettingWindow() {
+	if (SettingWindow) return SettingWindow.focus();
 	SettingWindow = new BrowserWindow({
 		title          : "TREM | 設定",
 		height         : 600,
 		width          : 1000,
 		minHeight      : 600,
 		minWidth       : 800,
+		show           : false,
 		webPreferences : {
 			nodeIntegration  : true,
 			contextIsolation : false,
@@ -77,14 +78,11 @@ async function createWindow1() {
 	require("@electron/remote/main").enable(SettingWindow.webContents);
 	SettingWindow.loadFile("./page/setting.html");
 	SettingWindow.setMenu(null);
-	SettingWindow.hide();
-	SettingWindow.on("close", (event) => {
-		if (app.quitting)
-			SettingWindow = null;
-		else {
-			event.preventDefault();
-			SettingWindow.hide();
-		}
+	SettingWindow.on("ready-to-show", () => {
+		SettingWindow.show();
+	});
+	SettingWindow.on("close", () => {
+		SettingWindow = null;
 	});
 }
 
@@ -146,16 +144,13 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => app.quitting = true);
 
-ipcMain.on("createChildWindow", (event, arg) => {
-	createWindow1();
-});
-
-ipcMain.on("openChildWindow", (event, arg) => {
-	SettingWindow.show();
+ipcMain.on("openChildWindow", async (event, arg) => {
+	await createSettingWindow();
 });
 
 ipcMain.on("closeChildWindow", (event, arg) => {
-	SettingWindow.hide();
+	if (SettingWindow)
+		SettingWindow.close();
 });
 
 ipcMain.on("reset", (event, arg) => {
