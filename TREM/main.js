@@ -1,5 +1,5 @@
 const { BrowserWindow, Menu, Tray, app, globalShortcut, ipcMain, nativeImage } = require("electron");
-const fs = require("node:fs");
+const fs = require("fs");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
 
