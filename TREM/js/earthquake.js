@@ -5,7 +5,7 @@ const {
 	NOTIFICATION_SERVICE_ERROR,
 	NOTIFICATION_SERVICE_STARTED,
 	START_NOTIFICATION_SERVICE,
-} = require("electron-fcm-push-receiver/src/letants");
+} = require("electron-fcm-push-receiver/src/constants");
 const WebSocket = require("ws");
 const { ipcRenderer } = require("electron");
 
@@ -164,7 +164,7 @@ let Sspeed = 4;
 let Pspeed = 7;
 let Server = [];
 let PAlert = {};
-let location = {};
+let Location;
 let station = {};
 let PGAjson = {};
 let MainClock = null;
@@ -249,7 +249,7 @@ setInterval(() => {
 	if (config["location.city"]["value"] != Check["city"] || config["location.town"]["value"] != Check["town"]) {
 		Check["city"] = config["location.city"]["value"];
 		Check["town"] = config["location.town"]["value"];
-		Loc();
+		setUserLocationMarker();
 	}
 	if (err != "")
 		time.style.color = "red";
@@ -258,10 +258,10 @@ setInterval(() => {
 		time.innerText = NOW.format("YYYY/MM/DD HH:mm:ss");
 	}
 	if (Object.keys(Tsunami).length != 0)
-		if (NOW.getTime() - Tsunami["Time"] > 240000) {
-			map.removeLayer(Tsunami["Cross"]);
-			delete Tsunami["Cross"];
-			delete Tsunami["Time"];
+		if (NOW.getTime() - Tsunami.Time > 240000) {
+			map.removeLayer(Tsunami.Cross);
+			delete Tsunami.Cross;
+			delete Tsunami.Time;
 			focus();
 		}
 
@@ -269,12 +269,10 @@ setInterval(() => {
 		Report = NOW.getTime();
 		ReportGET({});
 	}
-}, 100);
+}, 200);
 
 function init() {
 	let MAP = document.getElementById("map");
-
-	MAP.style.height = window.innerHeight;
 
 	map = L.map("map", {
 		attributionControl : false,
@@ -336,7 +334,7 @@ function init() {
 		fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/locations.json")
 			.then((response) => response.json())
 			.then((res) => {
-				location = res;
+				Location = res;
 				fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")
 					.then((response) => response.json())
 					.then((res1) => {
@@ -349,14 +347,14 @@ function init() {
 								dump("Get PGA-Location File");
 								if (config["earthquake.Real-time"]["value"]) {
 									dump("Start PGA Timer");
-									main();
+									PGAMain();
 								}
 							});
 					});
 			});
-	}, 600000);
+	}, 600_000);
 
-	function main() {
+	function PGAMain() {
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
 			let data = {
@@ -467,7 +465,7 @@ function init() {
 							let list = PAlert.data[index]["loc"].split(" ");
 							let city = list[0];
 							let town = list[1];
-							let ReportMark = L.marker([location[city][town][1], location[city][town][2]], { icon: myIcon });
+							let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
 							map.addLayer(ReportMark);
 							Station[PAlert.data[index]["loc"]] = ReportMark;
 							if (PAlert.data[index]["intensity"] > pga[PAlert.data[index]["TREM"]]["Intensity"]) pga[PAlert.data[index]["TREM"]]["Intensity"] = PAlert.data[index]["intensity"];
@@ -663,23 +661,24 @@ function initEventHandle() {
 // #endregion
 
 // #region 用戶所在位置
-function Loc() {
-	fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")
-		.then((response) => response.json())
-		.then(async (loc) => {
-			dump("Get Location File");
-			Lat = loc[config["location.city"]["value"]][config["location.town"]["value"]][1];
-			Long = loc[config["location.city"]["value"]][config["location.town"]["value"]][2];
-			if (marker != null) map.removeLayer(marker);
-			let myIcon = L.icon({
-				iconUrl  : "./image/here.png",
-				iconSize : [20, 20],
-			});
-			marker = L.marker([Lat, Long], { icon: myIcon });
-			map.addLayer(marker);
-			marker.setZIndexOffset(1);
-			focus([Lat, Long], 7.5);
-		});
+async function setUserLocationMarker() {
+	if (!Location) {
+		Location = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")).json();
+		dump("Get Location File");
+	}
+
+	Lat = Location[config["location.city"]["value"]][config["location.town"]["value"]][1];
+	Long = Location[config["location.city"]["value"]][config["location.town"]["value"]][2];
+	if (marker != null) map.removeLayer(marker);
+	let myIcon = L.icon({
+		iconUrl  : "./image/here.png",
+		iconSize : [20, 20],
+	});
+	marker = L.marker([Lat, Long], { icon: myIcon });
+	map.addLayer(marker);
+	marker.setZIndexOffset(1);
+	focus([Lat, Long], 7.5);
+
 }
 // #endregion
 
