@@ -1,26 +1,26 @@
 input.input-field {
-    background-color: rgb(var(--md3-surface-variant));
+    background-color: rgb(var(--md-sys-color-surface-variant));
     border-radius: 6px 6px 0 0;
     padding: 0 16px;
     height: 50px;
-    color: rgb(var(--md3-on-surface));
+    color: rgb(var(--md-sys-color-on-surface));
     font-size: 16px;
     font-family: 'Noto Sans TC', sans-serif;
     border: none;
-    border-bottom: 2px solid rgb(var(--md3-on-surface-variant));
+    border-bottom: 2px solid rgb(var(--md-sys-color-on-surface-variant));
     outline: none;
 }
 
 input.input-field::placeholder {
-    color: rgb(var(--md3-on-surface-variant));
+    color: rgb(var(--md-sys-color-on-surface-variant));
     font-size: 16px;
     font-family: 'Noto Sans TC', sans-serif;
 }
 
 input.input-field:focus {
-    border-bottom: 2px solid rgb(var(--md3-primary));
+    border-bottom: 2px solid rgb(var(--md-sys-color-primary));
 }
 
 input.input-field:focus-visible {
-    outline: 2px solid rgb(var(--md3-primary));
+    outline: 2px solid rgb(var(--md-sys-color-primary));
 }

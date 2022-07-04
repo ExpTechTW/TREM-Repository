@@ -7,8 +7,9 @@
 body {
     all: unset;
     display: flex;
-    background-color: rgb(var(--md3-background));
+    background-color: rgb(var(--md-sys-color-background));
     overflow: hidden;
+    transition: background-color .1s ease-in-out;
 }
 
 #nav-rail {
@@ -22,7 +23,9 @@ body {
     margin: 0;
     border-radius: 0;
 }
-
+#nav-rail.hide + #view .view #map {
+    border-radius: 0;
+}
 #togglenav_btn {
     z-index: 25565;
     position: absolute;
@@ -52,9 +55,10 @@ body {
 
 #map {
     border-radius: 16px 0;
-    background: rgb(var(--md3-surface));
+    background: rgb(var(--md-sys-color-surface));
     height: 100%;
     outline: none;
+    transition: border-radius .5s ease-in-out;
 }
 
 #nav-rail > button {
@@ -71,9 +75,9 @@ body {
     top: 0;
     height: 100%;
     width: 100%;
-    background-color: rgb(var(--md3-background));
+    background-color: rgb(var(--md-sys-color-background));
     font-family: 'Noto Sans TC', sans-serif;
-    color:  rgb(var(--md3-on-background));
+    color:  rgb(var(--md-sys-color-on-background));
 }
 
 #time {
@@ -214,13 +218,13 @@ body {
     padding: 2px 0 24px 16px;
     margin-right: 12px;
     line-height: 26px;
-    font-size: 24px;
+    font-size: 28px;
 }
 
 #alert-time {
     position: absolute;
     left: 132px;
-    top: 37px;
+    top: 38px;
     font-weight: 300;
     font-size: 15px;
     line-height: 26px;

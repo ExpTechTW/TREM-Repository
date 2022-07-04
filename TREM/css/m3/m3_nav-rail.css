@@ -17,20 +17,20 @@
 }
 
 .nav-rail .nav-rail-button:hover {
-    background-color: rgba(var(--md3-on-surface), .08);
+    background-color: rgba(var(--md-sys-color-on-surface), .08);
 }
 
 .nav-rail .nav-rail-button:focus {
-    background-color: rgba(var(--md3-on-surface), .12);
+    background-color: rgba(var(--md-sys-color-on-surface), .12);
 }
 
 .nav-rail .nav-rail-button:active {
-    background-color: rgba(var(--md3-on-surface), .12);
+    background-color: rgba(var(--md-sys-color-on-surface), .12);
 }
 
 .nav-rail .nav-rail-button span {
     width: 54px;
     line-height: 54px;
     text-align: center;
-    color: rgb(var(--md3-on-surface-variant));
+    color: rgb(var(--md-sys-color-on-surface-variant));
 }

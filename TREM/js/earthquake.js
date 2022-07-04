@@ -119,6 +119,14 @@ let Config = {
 		"type"  : "SelectBox",
 		"value" : "歸仁區",
 	},
+	"theme.color": {
+		"type"  : "ColorBox",
+		"value" : "#6750A4",
+	},
+	"theme.dark": {
+		"type"  : "CheckBox",
+		"value" : true,
+	},
 };
 // #endregion
 
@@ -231,11 +239,12 @@ let config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.j
 try {
 	dump({ level: 0, message: "Initializing", origin: "Initialization" });
 	for (let index = 0; index < Object.keys(Config).length; index++)
-		if (config[Object.keys(Config)[index]] == undefined) {
+		if (config[Object.keys(Config)[index]] == undefined)
 			config[Object.keys(Config)[index]] = Config[Object.keys(Config)[index]];
-			fs.writeFileSync(`${localStorage["config"]}/Data/config.json`, JSON.stringify(config), "utf8");
-		}
+	console.debug(config);
+	fs.writeFileSync(`${localStorage["config"]}/Data/config.json`, JSON.stringify(config), "utf8");
 
+	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
 	init();
 } catch (error) {
 	alert("錯誤!! 請到 TREM 官方 Discord 回報");
@@ -1068,6 +1077,13 @@ ipcMain.on("testEEW", () => {
 		.catch((error) => {
 			dump({ level: 2, message: error, origin: "Verbose" });
 		});
+});
+ipcMain.on("updateTheme", () => {
+	console.log("updateTheme");
+	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
+});
+ipcMain.on("updateSetting", () => {
+	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
 });
 // #endregion
 

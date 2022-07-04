@@ -9,7 +9,8 @@
 @import url("../css/disable_scrollbar.css");
 
 body {
-    background-color: rgb(var(--md3-background));
+    background-color: rgb(var(--md-sys-color-background));
+    transition: background-color .1s ease-in-out;
 }
 
 .main {
@@ -32,33 +33,33 @@ body {
     line-height: 48px;
     margin: 0 12px;
     border-radius: 48px;
-    transition: background .1s ease-in-out,
+    transition: background-color .1s ease-in-out,
     outline .1s ease-in-out;
 }
 
 .nav > div:not(.active):hover {
-    background-color: rgba(var(--md3-on-surface), .08);
+    background-color: rgba(var(--md-sys-color-on-surface), .08);
 }
 
 .nav > div:not(.active):focus {
-    background-color: rgba(var(--md3-on-surface), .12);
+    background-color: rgba(var(--md-sys-color-on-surface), .12);
 }
 .nav > div:focus-visible {
-    background-color: rgba(var(--md3-on-surface), .12);
-    outline: 2px solid rgb(var(--md3-primary));
+    background-color: rgba(var(--md-sys-color-on-surface), .12);
+    outline: 2px solid rgb(var(--md-sys-color-primary));
 }
 
 .nav > div:not(.active):active {
-    background-color: rgba(var(--md3-on-secondary-container), .12);
+    background-color: rgba(var(--md-sys-color-on-secondary-container), .12);
 }
 
 .nav > div.active {
-    background-color: rgb(var(--md3-secondary-container));
+    background-color: rgb(var(--md-sys-color-secondary-container));
 }
 
 .nav > div span {
     margin: 0 20px;
-    color: rgb(var(--md3-on-background));
+    color: rgb(var(--md-sys-color-on-background));
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 300;
     white-space: nowrap;
@@ -70,7 +71,7 @@ body {
 }
 
 .headline-medium {
-    color: rgb(var(--md3-on-surface));
+    color: rgb(var(--md-sys-color-on-surface));
     font-size: 36px !important;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 400;
@@ -93,7 +94,7 @@ body {
 .control-title {
     user-select: none;
     margin: 10px 0;
-    color: rgb(var(--md3-primary));
+    color: rgb(var(--md-sys-color-primary));
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 24px;
     font-weight: 400;
@@ -134,14 +135,14 @@ body {
 }
 
 .option-label .option-label-title {
-    color: rgb(var(--md3-on-background));
+    color: rgb(var(--md-sys-color-on-background));
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 20px;
     font-weight: 500;
 }
 
 .option-label .option-label-description {
-    color: rgba(var(--md3-on-background), .6);
+    color: rgba(var(--md-sys-color-on-background), .6);
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 14px;
     line-height: 20px;
@@ -149,9 +150,22 @@ body {
     white-space: pre-line;
 }
 
+.color-input {
+	opacity: 0;
+	display: block;
+	width: 32px;
+	height: 32px;
+	border: none;
+}
+
+.color-input-wrapper {
+    border-radius: 8px;
+}
+
 code {
     user-select: text;
-    background-color: #000;
+    background-color: rgb(var(--md-sys-color-surface-variant));
+    color: rgb(var(--md-sys-color-on-surface-variant));
     padding: 5px;
     border-radius: 5px;
     font-family: 'Consolas', monospace;
@@ -169,19 +183,19 @@ code {
 }
 
 .external-link {
-    color: rgb(var(--md3-primary));
+    color: rgb(var(--md-sys-color-primary));
     text-decoration: underline;
     cursor: pointer;
 }
 
 .external-link:hover {
-    color: rgb(var(--md3-on-secondary-container));
+    color: rgb(var(--md-sys-color-on-secondary-container));
     text-decoration: underline;
     cursor: pointer;
 }
 
 .external-link .icon {
-    color: rgb(var(--md3-primary));
+    color: rgb(var(--md-sys-color-primary));
 }
 
 .external-link .material-icons {
@@ -191,5 +205,5 @@ code {
 }
 
 ::selection {
-    background-color: rgb(var(--md3-outline));
+    background-color: rgb(var(--md-sys-color-outline));
 }

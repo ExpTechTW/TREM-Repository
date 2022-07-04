@@ -4,7 +4,7 @@ button.flat-button {
     width: fit-content;
     height: 40px;
     padding: 0 12px;
-    color: rgb(var(--md3-primary));
+    color: rgb(var(--md-sys-color-primary));
     line-height: 40px;
     font-size: 14px;
     font-family: 'Noto Sans TC', sans-serif;
@@ -14,9 +14,9 @@ button.flat-button {
 }
 
 button.flat-button:hover {
-    background-color: rgba(var(--md3-primary), .08);
+    background-color: rgba(var(--md-sys-color-primary), .08);
 }
 
 button.flat-button:focus-visible {
-    outline: 2px solid rgb(var(--md3-primary));
+    outline: 2px solid rgb(var(--md-sys-color-primary));
 }

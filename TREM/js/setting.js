@@ -135,6 +135,8 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/st
  * 初始化設定
  */
 function init() {
+	dump({ level: 0, message: "Initializing", origin: "Setting" });
+	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
 	Object.keys(config).forEach(id => {
 		switch (config[id].type) {
 			case "CheckBox": {
@@ -163,6 +165,19 @@ function init() {
 				break;
 			}
 
+			case "ColorBox": {
+				/**
+				 * @type {HTMLSelectElement}
+				 */
+				const element = document.getElementById(id);
+				if (element)
+					element.value = config[id].value;
+				const wrapper = document.getElementById(id.replace(".", "-"));
+				if (element)
+					wrapper.style.backgroundColor = config[id].value;
+				break;
+			}
+
 			default:
 				break;
 		}
@@ -173,15 +188,18 @@ function init() {
  * 儲存設定檔
  */
 function save() {
+	dump({ level: 0, message: "Saving user preference", origin: "Setting" });
 	fs.writeFileSync(`${localStorage.config}/Data/config.json`, JSON.stringify(config), "utf8");
+	ipc.send("updateSetting");
 }
 
-function SelectSave(args) {
-	const select = document.getElementById(args);
+function SelectSave(id) {
+	const select = document.getElementById(id);
 	const value = select.options[select.selectedIndex].value;
-	config[args].value = value;
+	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
+	config[id].value = value;
 	save();
-	if (args == "location.city") {
+	if (id == "location.city") {
 		const town = document.getElementById("location.town");
 		town.replaceChildren();
 
@@ -197,16 +215,29 @@ function SelectSave(args) {
 }
 
 function CheckSave(id) {
-	config[id].value = document.getElementById(id).checked;
+	const value = document.getElementById(id).checked;
+	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
+	config[id].value = value;
 	save();
 	if (id == "GPU.disable")
 		$("#HAReloadButton").fadeIn(100);
+	else if (id == "theme.dark") {
+		setThemeColor(config["theme.color"].value, value);
+		ipc.send("updateTheme");
+	}
 }
 
 function TextSave(id) {
-	config[id].value = document.getElementById(id).value;
+	const value = document.getElementById(id).value;
+	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
+	config[id].value = value;
 	save();
+	if (id == "theme.color") {
+		setThemeColor(value, config["theme.dark"].value);
+		ipc.send("updateTheme");
+	}
 }
+
 
 /**
  * 切換設定分類
@@ -219,6 +250,7 @@ function setList(args, el, event) {
 	if (event instanceof KeyboardEvent && event.key !== "Enter" && event.key !== " ")
 		return;
 
+	dump({ level: 0, message: `Changed view to ${args}`, origin: "Setting" });
 	const currentel = $(".show");
 	const changeel = $(`#${args}`);
 
@@ -318,4 +350,8 @@ const webhook = async () => {
 		}).catch(error => {
 			showDialog("error", "Webhook 測試", `Webhook 發送測試訊息時發生錯誤\n${error}`);
 		});
+};
+
+const colorUpdate = () => {
+	$("#theme-color")[0].style.backgroundColor = $("#theme\\.color")[0].value;
 };

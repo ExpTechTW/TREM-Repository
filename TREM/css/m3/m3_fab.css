@@ -1,6 +1,6 @@
 .fab {
     all: unset;
-    background-color: rgb(var(--md3-primary-container));
+    background-color: rgb(var(--md-sys-color-primary-container));
     width: 24px;
     height: 24px;
     padding: 16px;
@@ -8,11 +8,11 @@
     border-radius: 16px;
 }
 .fab span {
-    color: rgb(var(--md3-on-primary-container));
+    color: rgb(var(--md-sys-color-on-primary-container));
 }
 .fab.secondary {
-    background-color: rgb(var(--md3-secondary-container));
+    background-color: rgb(var(--md-sys-color-secondary-container));
 }
 .fab.secondary span {
-    color: rgb(var(--md3-on-secondary-container));
+    color: rgb(var(--md-sys-color-on-secondary-container));
 }
