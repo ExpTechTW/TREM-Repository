@@ -8,7 +8,11 @@ process.env.Version = "22w27-pre6";
 let MainWindow = null;
 let SettingWindow = null;
 let tray = null;
+let _hide = false;
 let _devMode = false;
+
+if (process.argv.includes("--start")) _hide = true;
+if (process.argv.includes("--dev")) _devMode = true;
 
 if (fs.existsSync(__dirname.replace("trem\\resources\\app", "trem_data")) && fs.existsSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`)) {
 	const config = JSON.parse(fs.readFileSync(`${__dirname.replace("trem\\resources\\app", "trem_data")}/Data/config.json`).toString());
@@ -29,6 +33,7 @@ function createWindow() {
 		minHeight      : 600,
 		maxWidth       : 1280,
 		maxHeight      : 720,
+		show           : !_hide,
 		webPreferences : {
 			preload              : path.join(__dirname, "preload.js"),
 			nodeIntegration      : true,
@@ -49,8 +54,6 @@ function createWindow() {
 	if (process.platform === "win32")
 		app.setAppUserModelId("TREM | 台灣實時地震監測");
 
-	if (process.argv.includes("--start")) MainWindow.hide();
-	if (process.argv.includes("--dev")) _devMode = true;
 	MainWindow.on("close", (event) => {
 		if (app.quitting)
 			MainWindow = null;
@@ -126,7 +129,7 @@ else {
 			else
 				MainWindow.show();
 		});
-		await createWindow();
+		createWindow();
 	});
 }
 
