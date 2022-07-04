@@ -8,13 +8,19 @@ if (!fs.existsSync(`${localStorage["config"]}/Log/TREM.log`))
 
 const path = `${localStorage["config"]}/Log/TREM.log`;
 
-function dump(msg, type, err) {
-	if (type == undefined) type = "Info";
+/**
+ * Dump a message.
+ * @param {DumpData} dumpData
+ * @typedef {object} DumpData
+ * @property {0|1|2|3} level 0: info, 1: warn, 2: error, 3: debug
+ * @property {string} message Dump message.
+ * @property {string} origin Dump origin.
+ */
+function dump(dumpData) {
 	const now = new Date();
 	const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1);
-	const line = `[${nowTime}] ${type} >> ${msg}`;
-	console.log(line);
-	if (err) console.error(err);
+	const line = `[${nowTime}] ${dumpData.origin} >> ${dumpData.message}`;
+	console[["log", "warn", "error", "debug"][dumpData.level]](line);
 	fs.appendFileSync(path, line + "\r\n", "utf8");
 }
 

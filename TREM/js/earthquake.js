@@ -144,7 +144,7 @@ let PGAaudio = false;
 let PGAAudio = false;
 let PGAtag = 0;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
-let err = "";
+let TimerDesynced = false;
 let expected = [];
 let Info = {};
 let Focus = [];
@@ -228,7 +228,7 @@ let config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.j
 
 // #region 初始化
 try {
-	dump("Initialization");
+	dump({ level: 0, message: "Initializing", origin: "Initialization" });
 	for (let index = 0; index < Object.keys(Config).length; index++)
 		if (config[Object.keys(Config)[index]] == undefined) {
 			config[Object.keys(Config)[index]] = Config[Object.keys(Config)[index]];
@@ -238,7 +238,7 @@ try {
 	init();
 } catch (error) {
 	alert("錯誤!! 請到 TREM 官方 Discord 回報");
-	dump(`Initialization > ${error}`, "Error");
+	dump({ level: 2, message: error, origin: "Initialization" });
 }
 let win = BrowserWindow.fromId(process.env.window * 1);
 win.setAlwaysOnTop(false);
@@ -251,7 +251,7 @@ setInterval(() => {
 		Check["town"] = config["location.town"]["value"];
 		setUserLocationMarker();
 	}
-	if (err != "")
+	if (TimerDesynced)
 		time.style.color = "red";
 	else {
 		time.style.color = "white";
@@ -339,22 +339,21 @@ function init() {
 					.then((response) => response.json())
 					.then((res1) => {
 						station = res1;
-						dump("Get Station File");
+						dump({ level: 0, message: "Get Station File", origin: "Location" });
 						fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/pga.json")
 							.then((response) => response.json())
 							.then((res2) => {
 								PGAjson = res2;
-								dump("Get PGA-Location File");
-								if (config["earthquake.Real-time"]["value"]) {
-									dump("Start PGA Timer");
+								dump({ level: 0, message: "Get PGA Location File", origin: "Location" });
+								if (config["earthquake.Real-time"]["value"])
 									PGAMain();
-								}
 							});
 					});
 			});
 	}, 600_000);
 
 	function PGAMain() {
+		dump({ level: 0, message: "Start PGA Timer", origin: "PGATimer" });
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
 			let data = {
@@ -600,7 +599,7 @@ function init() {
 					}
 				})
 				.catch((error) => {
-					dump(`PGA Timer > ${error}`, "Error", error);
+					dump({ level: 2, message: error, origin: "PGATimer" });
 				});
 		}, 500);
 	}
@@ -628,7 +627,7 @@ function createWebSocket() {
 
 function initEventHandle() {
 	ws.onclose = function() {
-		err = "1";
+		TimerDesynced = true;
 		reconnect();
 	};
 
@@ -637,7 +636,7 @@ function initEventHandle() {
 	};
 
 	ws.onopen = async function() {
-		err = "";
+		TimerDesynced = false;
 		ws.send(JSON.stringify({
 			"APIkey"        : "https://github.com/ExpTechTW",
 			"Function"      : "earthquakeService",
@@ -645,7 +644,7 @@ function initEventHandle() {
 			"FormatVersion" : 3,
 			"UUID"          : localStorage["UUID"],
 		}));
-		dump("connected to API Server | UUID[" + localStorage["UUID"] + "]");
+		dump({ level: 0, message: `Connected to API Server (${localStorage["UUID"]})`, origin: "WebSocket" });
 	};
 
 	ws.onmessage = async function(evt) {
@@ -664,7 +663,7 @@ function initEventHandle() {
 async function setUserLocationMarker() {
 	if (!Location) {
 		Location = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")).json();
-		dump("Get Location File");
+		dump({ level: 0, message: "Get Location File", origin: "Location" });
 	}
 
 	Lat = Location[config["location.city"]["value"]][config["location.town"]["value"]][1];
@@ -727,10 +726,10 @@ async function playNextAudio() {
 	audioDOM.src = path;
 	audioDOM.playbackRate = 1.1;
 	if (path.startsWith("./audio/1/") && config["eew.audio"]["value"]) {
-		dump(`Playing Audio > ${path}`);
+		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
 		await audioDOM.play();
 	} else if (!path.startsWith("./audio/1/")) {
-		dump(`Playing Audio > ${path}`);
+		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
 		await audioDOM.play();
 
 	}
@@ -749,7 +748,7 @@ function ReportGET(eew) {
 
 	axios.post("https://exptech.mywire.org:1015", data)
 		.then((response) => {
-			dump("Get Report");
+			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 			if (response.data["state"] == "Warn") {
 				alert("API 速度限制\n短時間內訪問太多次伺服器\n請稍後再試");
 				app.exit();
@@ -757,7 +756,7 @@ function ReportGET(eew) {
 			ReportList(response.data, eew);
 		})
 		.catch((error) => {
-			dump(`Get Report > ${error}`, "Error");
+			dump({ level: 2, message: error, origin: "EQReportFetcher" });
 		});
 }
 // #endregion
@@ -1060,6 +1059,7 @@ ipcMain.on("testEEW", (event, arg) => {
 // #region local
 if (localStorage["test"] != undefined) {
 	delete localStorage["test"];
+	dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 	let data = {
 		"APIkey"        : "https://github.com/ExpTechTW",
 		"Function"      : "earthquake",
@@ -1069,10 +1069,10 @@ if (localStorage["test"] != undefined) {
 		"Addition"      : "TW",
 	};
 	if (config["accept.eew.jp"]["value"]) delete data["Addition"];
-	dump(err);
+	dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 	axios.post("https://exptech.mywire.org:1015", data)
 		.catch((error) => {
-			dump(`Test Mode > ${error}`, "Error");
+			dump({ level: 2, message: error, origin: "Verbose" });
 		});
 }
 // #endregion
@@ -1081,11 +1081,11 @@ if (localStorage["test"] != undefined) {
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
 	localStorage["UUID"] = token;
 	createWebSocket();
-	dump(`FCM Service Started >> ${token}`);
+	dump({ level: 0, message: `Service Started (${token})`, origin: "FCM" });
 });
 
 ipcRenderer.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
-	dump(`FCM Error >> ${error}`, "Error");
+	dump({ level: 2, message: error, origin: "FCM" });
 });
 
 ipcRenderer.on(NOTIFICATION_RECEIVED, (_, Notification) => {
@@ -1113,10 +1113,10 @@ function FCMdata(data) {
 	if (Server.includes(json.TimeStamp)) return;
 	Server.push(json.TimeStamp);
 	if (json.TimeStamp != undefined)
-		dump(`Server >> ${NOW.getTime() - json.TimeStamp}ms`);
+		dump({ level: 0, message: `${NOW.getTime() - json.TimeStamp}ms`, origin: "API" });
 
 	if (json.Function == "tsunami") {
-		dump("Got tsunami form API Server");
+		dump({ level: 0, message: "Got Tsunami Warning", origin: "API" });
 		if (config["report.show"]["value"]) {
 			win.show();
 			if (config["report.cover"]["value"]) win.setAlwaysOnTop(true);
@@ -1142,7 +1142,7 @@ function FCMdata(data) {
 	} if (json.Function == "palert")
 		PAlert = json.Data;
 	else if (json.Function == "report") {
-		dump("Got Report form API Server");
+		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
 		if (config["report.show"]["value"]) {
 			win.show();
 			if (config["report.cover"]["value"]) win.setAlwaysOnTop(true);
@@ -1154,7 +1154,7 @@ function FCMdata(data) {
 		});
 		if (config["report.audio"]["value"]) audioPlay("./audio/Notify.wav");
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && config["accept.eew.jp"]["value"])) {
-		dump("Got EEW form API Server");
+		dump({ level: 0, message: "Got EEW", origin: "API" });
 		handler();
 
 		async function handler() {
@@ -1184,13 +1184,13 @@ function FCMdata(data) {
 
 				msg["embeds"][0]["image"]["url"] = `http://150.117.110.118/TREM/${json.ID}/0.png`;
 				msg["embeds"][0]["footer"] = {
-					"text"     : `ExpTech Studio ${Now} ${err}`,
+					"text"     : `ExpTech Studio ${Now}`,
 					"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 				};
-				dump("Post Webhook");
+				dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
 				axios.post(config["webhook.url"]["value"], msg)
 					.catch((error) => {
-						dump(`Webhook > ${error}`, "Error");
+						dump({ level: 2, message: error, origin: "Webhook" });
 					});
 			}
 			let value = 0;
@@ -1230,7 +1230,7 @@ function FCMdata(data) {
 			}
 			let Intensity = IntensityN(level);
 			if (Intensity < Number(config["eew.Intensity"]["value"])) {
-				err = "";
+				TimerDesynced = false;
 				return;
 			}
 			map1.removeLayer(geojson);
@@ -1415,7 +1415,7 @@ function FCMdata(data) {
 				}, 1000);
 
 
-			EarthquakeList[json.ID]["Timer"] = setInterval(async () => {
+			EarthquakeList[json.ID]["Timer"] = setInterval(() => {
 				if (config["shock.p"]["value"]) {
 					if (EarthquakeList[json.ID]["Pcircle"] != null)
 						map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
@@ -1510,7 +1510,7 @@ function FCMdata(data) {
 						Catch.style.height = "0%";
 						Catch = document.getElementById("box-4");
 						Catch.style.height = "0%";
-						err = "";
+						TimerDesynced = false;
 						audioList = [];
 						INFO = [];
 						win.setAlwaysOnTop(false);
