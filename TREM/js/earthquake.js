@@ -1058,7 +1058,6 @@ ipcMain.on("testEEW", () => {
 		"APIkey"        : "https://github.com/ExpTechTW",
 		"Function"      : "earthquake",
 		"Type"          : "test",
-		"Test"          : true,
 		"FormatVersion" : 3,
 		"UUID"          : localStorage["UUID"],
 		"Addition"      : "TW",
