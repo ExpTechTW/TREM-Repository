@@ -53,6 +53,7 @@ body {
 #map {
     border-radius: 16px 0;
     background: rgb(var(--md3-surface));
+    height: 100%;
     outline: none;
 }
 
