@@ -3,10 +3,9 @@ const fs = require("node:fs");
 if (!fs.existsSync(`${localStorage["config"]}/Log`))
 	fs.mkdirSync(`${localStorage["config"]}/Log`);
 
-if (!fs.existsSync(`${localStorage["config"]}/Log/TREM.log`))
-	fs.writeFileSync(`${localStorage["config"]}/Log/TREM.log`, "", "utf8");
+const latestLog = `${localStorage["config"]}/Log/latest.log`;
+fs.writeFileSync(latestLog, "", { encoding: "utf8", flag: "w" });
 
-const path = `${localStorage["config"]}/Log/TREM.log`;
 
 /**
  * Dump a message.
@@ -21,7 +20,7 @@ function dump(dumpData) {
 	const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1);
 	const line = `[${nowTime}] ${dumpData.origin} >> ${dumpData.message}`;
 	console[["log", "warn", "error", "debug"][dumpData.level]](line);
-	fs.appendFileSync(path, line + "\r\n", "utf8");
+	fs.appendFileSync(latestLog, line + "\r\n", "utf8");
 }
 
 function dumpUpload() {
@@ -30,7 +29,7 @@ function dumpUpload() {
 		"Function"      : "data",
 		"Type"          : "TREM-Dump",
 		"FormatVersion" : 1,
-		"Value"         : fs.readFileSync(path).toString(),
+		"Value"         : fs.readFileSync(latestLog).toString(),
 		"UUID"          : localStorage["UUID"],
 	};
 	axios.post("https://exptech.mywire.org:1015", msg)

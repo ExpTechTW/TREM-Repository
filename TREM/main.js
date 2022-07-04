@@ -117,7 +117,13 @@ else {
 			{
 				label : "強制關閉",
 				type  : "normal",
-				click : () => app.exit(0),
+				click : () => {
+					const now = new Date();
+					const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1).replace(/:+|\.+/g, "-");
+					if (fs.existsSync(path.join(__dirname, "Log", "latest.log")))
+						fs.renameSync(path.join(__dirname, "Log", "latest.log"), path.join(__dirname, "Log", `${nowTime}.log`));
+					app.exit(0);
+				},
 			},
 		]);
 		tray.setToolTip("TREM | 台灣實時地震監測");
