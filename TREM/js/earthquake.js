@@ -699,47 +699,41 @@ function focus(Loc, size, args) {
 // #endregion
 
 // #region 音頻播放
-async function audioPlay(src) {
+let AudioT;
+let audioDOM = new Audio();
+audioDOM.addEventListener("ended", () => {
+	audioLock = false;
+});
+
+function audioPlay(src) {
 	audioList.push(src);
-
-	let AudioT = setInterval(async () => {
-		if (audioLock == false) {
-			audioLock = true;
-			if (audioList.length != 0)
-				Audio(audioList[0]);
-			else {
-				audioLock = false;
-				clearInterval(AudioT);
-				AudioT = null;
+	if (!AudioT)
+		AudioT = setInterval(async () => {
+			if (!audioLock) {
+				audioLock = true;
+				if (audioList.length)
+					await playNextAudio();
+				else {
+					clearInterval(AudioT);
+					audioLock = false;
+					AudioT = null;
+				}
 			}
-		}
-	}, 0);
+		}, 0);
+}
 
-	function Audio(src) {
-		audioLock = true;
-		audioList.splice(audioList.indexOf(src), 1);
-		let audioDOM = document.getElementById("audio-player");
-		audioDOM.src = src;
-		audioDOM.playbackRate = 1.1;
-		if (src.startsWith("./audio/1/") && config["eew.audio"]["value"]) {
-			dump(`Playing Audio > ${src}`);
-			var promise = audioDOM.play();
-			promise.then(resolve => {
-				audioDOM.addEventListener("ended", () => {
-					audioLock = false;
-				});
-			}).catch(reject => {
-			});
-		} else if (!src.startsWith("./audio/1/")) {
-			dump(`Playing Audio > ${src}`);
-			var promise = audioDOM.play();
-			promise.then(resolve => {
-				audioDOM.addEventListener("ended", () => {
-					audioLock = false;
-				});
-			}).catch(reject => {
-			});
-		}
+async function playNextAudio() {
+	audioLock = true;
+	const path = audioList.shift();
+	audioDOM.src = path;
+	audioDOM.playbackRate = 1.1;
+	if (path.startsWith("./audio/1/") && config["eew.audio"]["value"]) {
+		dump(`Playing Audio > ${path}`);
+		await audioDOM.play();
+	} else if (!path.startsWith("./audio/1/")) {
+		dump(`Playing Audio > ${path}`);
+		await audioDOM.play();
+
 	}
 }
 // #endregion
