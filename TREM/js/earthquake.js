@@ -645,7 +645,7 @@ function initEventHandle() {
 		reconnect();
 	};
 
-	ws.onopen = async function() {
+	ws.onopen = function() {
 		TimerDesynced = false;
 		ws.send(JSON.stringify({
 			"APIkey"        : "https://github.com/ExpTechTW",
@@ -657,8 +657,9 @@ function initEventHandle() {
 		dump({ level: 0, message: `Connected to API Server (${localStorage["UUID"]})`, origin: "WebSocket" });
 	};
 
-	ws.onmessage = async function(evt) {
+	ws.onmessage = function(evt) {
 		let json = JSON.parse(evt.data);
+		dump({ level: 3, message: `(onMessage) Received ${json.Function ?? json.response}`, origin: "WebSocket" });
 		if (json.Function == "NTP") {
 			lifeTime = new Date().getTime();
 			TimeNow(json.Full);
@@ -1392,6 +1393,8 @@ function FCMdata(data) {
 			else
 				classString += "eew-pred";
 
+			_eewTest = false;
+
 			let find = -1;
 			for (let index = 0; index < INFO.length; index++)
 				if (INFO[index]["ID"] == json.ID) {
@@ -1490,10 +1493,6 @@ function FCMdata(data) {
 							Catch.style.display = "none";
 						}, 30000);
 					}
-					if (_eewTest) {
-						dump({ level: 0, message: "EEW Test Over", origin: "EEW" });
-						_eewTest == false;
-					}
 					if (EarthquakeList[json.ID]["Scircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
 					if (EarthquakeList[json.ID]["Pcircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
 					map.removeLayer(EarthquakeList[json.ID]["Cross"]);
@@ -1517,7 +1516,6 @@ function FCMdata(data) {
 						$("#alert-box").removeClass("show");
 						ITimer = null;
 						focus([Lat, Long], 7.5);
-						roll.style.height = "100%";
 						eew.style.height = "0%";
 						Catch = document.getElementById("PS");
 						Catch.style.height = "0%";
