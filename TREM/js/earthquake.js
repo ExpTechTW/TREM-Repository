@@ -168,6 +168,7 @@ let Location;
 let station = {};
 let PGAjson = {};
 let MainClock = null;
+let _eewTest = false;
 // #endregion
 
 // #region override Date.format()
@@ -1050,20 +1051,14 @@ function color(Intensity) {
 // #endregion
 
 // #region IPC
-ipcMain.on("testEEW", (event, arg) => {
-	localStorage.test = true;
-	window.location.href = "./index.html";
-});
-// #endregion
-
-// #region local
-if (localStorage["test"] != undefined) {
-	delete localStorage["test"];
+ipcMain.on("testEEW", () => {
+	_eewTest = true;
 	dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 	let data = {
 		"APIkey"        : "https://github.com/ExpTechTW",
 		"Function"      : "earthquake",
 		"Type"          : "test",
+		"Test"          : true,
 		"FormatVersion" : 3,
 		"UUID"          : localStorage["UUID"],
 		"Addition"      : "TW",
@@ -1074,7 +1069,7 @@ if (localStorage["test"] != undefined) {
 		.catch((error) => {
 			dump({ level: 2, message: error, origin: "Verbose" });
 		});
-}
+});
 // #endregion
 
 // #region FCM
@@ -1373,7 +1368,7 @@ function FCMdata(data) {
 			let classString = "alert-box ";
 
 			// AlertBox: 種類
-			if (json.Test)
+			if (json.Test || _eewTest)
 				classString += "eew-test";
 			else if (json.Alert)
 				classString += "eew-alert";
@@ -1480,6 +1475,10 @@ function FCMdata(data) {
 							Catch.style.display = "none";
 						}, 30000);
 					}
+					if (_eewTest) {
+						dump({ level: 0, message: "EEW Test Over", origin: "EEW" });
+						_eewTest == false;
+					}
 					if (EarthquakeList[json.ID]["Scircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
 					if (EarthquakeList[json.ID]["Pcircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
 					map.removeLayer(EarthquakeList[json.ID]["Cross"]);
@@ -1500,6 +1499,7 @@ function FCMdata(data) {
 					if (Object.keys(EarthquakeList).length == 0) {
 						clearInterval(t);
 						clearInterval(ITimer);
+						$("#alert-box").removeClass("show");
 						ITimer = null;
 						focus([Lat, Long], 7.5);
 						roll.style.height = "100%";
