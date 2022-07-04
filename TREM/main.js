@@ -96,7 +96,7 @@ else {
 	app.on("second-instance", (event, argv, cwd) => {
 		MainWindow.show();
 	});
-	app.whenReady().then(async () => {
+	app.whenReady().then(() => {
 		const iconPath = path.join(__dirname, "TREM.ico");
 		tray = new Tray(nativeImage.createFromPath(iconPath));
 		const contextMenu = Menu.buildFromTemplate([
@@ -148,7 +148,11 @@ app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") app.quit();
 });
 
-app.on("before-quit", () => app.quitting = true);
+app.on("before-quit", () => {
+	app.quitting = true;
+	if (tray)
+		tray.destroy();
+});
 
 ipcMain.on("openChildWindow", async (event, arg) => {
 	await createSettingWindow();
