@@ -371,6 +371,7 @@ body {
     font-weight: 600;
     font-size: 32px;
     height: 30px;
+    line-height: 28px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -387,6 +388,7 @@ body {
     margin-left: 4px;
     font-weight: 600;
     font-size: 28px;
+    height: 30px;
     line-height: 30px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
