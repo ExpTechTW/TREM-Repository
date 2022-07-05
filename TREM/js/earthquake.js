@@ -1268,7 +1268,6 @@ async function FCMdata(data) {
 		let eew = document.getElementById("map-1");
 		eew.style.height = "50%";
 		if (json.ID != Info["Notify"]) {
-			PNG1 = 0;
 			if (config["eew.show"]["value"]) {
 				win.show();
 				if (config["eew.cover"]["value"]) win.setAlwaysOnTop(true);
@@ -1372,11 +1371,10 @@ async function FCMdata(data) {
 		if (config["shock.smoothing"]["value"]) speed = 0;
 		if (EarthquakeList[json.ID]["Timer"] != undefined) clearInterval(EarthquakeList[json.ID]["Timer"]);
 		if (EarthquakeList["ITimer"] != undefined) clearInterval(EarthquakeList["ITimer"]);
-		PNG = NOW.getTime();
 
-		let classString = "alert-box ";
 
 		// AlertBox: 種類
+		let classString = "alert-box ";
 		if (json.Test || _eewTest)
 			classString += "eew-test";
 		else if (json.Alert)

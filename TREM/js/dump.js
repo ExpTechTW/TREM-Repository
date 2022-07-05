@@ -6,7 +6,6 @@ if (!fs.existsSync(`${localStorage["config"]}/Log`))
 const latestLog = `${localStorage["config"]}/Log/latest.log`;
 fs.writeFileSync(latestLog, "", { encoding: "utf8", flag: "w" });
 
-
 /**
  * Dump a message.
  * @param {DumpData} dumpData
