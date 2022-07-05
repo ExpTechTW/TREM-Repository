@@ -241,7 +241,7 @@ try {
 	for (let index = 0; index < Object.keys(Config).length; index++)
 		if (config[Object.keys(Config)[index]] == undefined)
 			config[Object.keys(Config)[index]] = Config[Object.keys(Config)[index]];
-	console.debug(config);
+
 	fs.writeFileSync(`${localStorage["config"]}/Data/config.json`, JSON.stringify(config), "utf8");
 
 	// eslint-disable-next-line no-undef
@@ -583,6 +583,8 @@ function init() {
 				});
 		}, 500);
 	}
+
+	$("#load").fadeOut(500);
 }
 // #endregion
 
@@ -956,7 +958,6 @@ function ReportList(Data, eew) {
 			});
 			roll.appendChild(Div);
 		}
-		$("#load").fadeOut(100);
 		let set = document.getElementById("box-8");
 		set.style.visibility = "visible";
 		if (eew.report != undefined) {

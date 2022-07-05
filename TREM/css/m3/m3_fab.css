@@ -16,3 +16,6 @@
 .fab.secondary span {
     color: rgb(var(--md-sys-color-on-secondary-container));
 }
+.fab.elevate {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
