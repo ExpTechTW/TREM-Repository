@@ -584,7 +584,8 @@ function init() {
 		}, 500);
 	}
 
-	$("#load").fadeOut(500);
+	$("#loading").text("歡迎");
+	$("#load").delay(1000).fadeOut(1000);
 }
 // #endregion
 
