@@ -294,8 +294,11 @@ body {
 .alert-box.eew-test .alert-box-body, .alert-box.eew-test .alert-notch {
     border-color: #0165CC;
 }
-.alert-box.one .alert-box-body {
-    background-color: #808080;
+.alert-box.eew-cancel .alert-box-body, .alert-box.eew-cancel .alert-notch {
+    border-color: #666;
+}
+.alert-box.one .alert-box-body, .alert-box.eew-cancel .alert-notch {
+    background-color: #666;
 }
 .alert-box.two .alert-box-body, .alert-box.eew-test .alert-notch {
     background-color: #0165CC;
@@ -366,6 +369,9 @@ body {
 }
 .alert-box.eew-test .alert-notch #alert-type:empty:before {
     content: "\6e2c\8a66\5831";
+}
+.alert-box.eew-cancel .alert-notch #alert-type:empty:before {
+    content: "\5df2\53d6\6d88";
 }
 .alert-timer {
     font-weight: 600;
