@@ -321,7 +321,7 @@ body {
                 color .1s ease-in-out;
 }
 
-#rt-intensity {
+.rt-intensity-container span:last-child {
     font-weight: 500;
     font-size: 42px;
     line-height: 40px;
@@ -381,31 +381,31 @@ body {
 .rt-intensity-container.seven {
     background-color: #68009E;
 }
-.alert-box.one .alert-box-body #alert-intensity::before, .rt-intensity-container.one #rt-intensity::before {
+.alert-box.one .alert-box-body #alert-intensity::before, .rt-intensity-container.one span:last-child::before {
     content: "1";
 }
-.alert-box.two .alert-box-body #alert-intensity::before, .rt-intensity-container.two #rt-intensity::before {
+.alert-box.two .alert-box-body #alert-intensity::before, .rt-intensity-container.two span:last-child::before {
     content: "2";
 }
-.alert-box.three .alert-box-body #alert-intensity::before, .rt-intensity-container.three #rt-intensity::before {
+.alert-box.three .alert-box-body #alert-intensity::before, .rt-intensity-container.three span:last-child::before {
     content: "3";
 }
-.alert-box.four .alert-box-body #alert-intensity::before, .rt-intensity-container.four #rt-intensity::before {
+.alert-box.four .alert-box-body #alert-intensity::before, .rt-intensity-container.four span:last-child::before {
     content: "4";
 }
-.alert-box.five .alert-box-body #alert-intensity::before, .rt-intensity-container.five #rt-intensity::before {
+.alert-box.five .alert-box-body #alert-intensity::before, .rt-intensity-container.five span:last-child::before {
     content: "5";
 }
-.alert-box.six .alert-box-body #alert-intensity::before, .rt-intensity-container.six #rt-intensity::before {
+.alert-box.six .alert-box-body #alert-intensity::before, .rt-intensity-container.six span:last-child::before {
     content: "6";
 }
-.alert-box.seven .alert-box-body #alert-intensity::before, .rt-intensity-container.seven #rt-intensity::before {
+.alert-box.seven .alert-box-body #alert-intensity::before, .rt-intensity-container.seven span:last-child::before {
     content: "7";
 }
 .alert-box.five.strong .alert-box-body #alert-intensity::before,
 .alert-box.six.strong .alert-box-body #alert-intensity::before,
-.rt-intensity-container.five.strong #rt-intensity::before,
-.rt-intensity-container.six.strong #rt-intensity::before {
+.rt-intensity-container.five.strong span:last-child::before,
+.rt-intensity-container.six.strong span:last-child::before {
     padding-right: 16px;
 }
 .alert-box.five.strong .alert-box-body #alert-intensity::after,
@@ -416,8 +416,8 @@ body {
     left: 80px;
     font-size: 32px;
 }
-.rt-intensity-container.five.strong #rt-intensity::after,
-.rt-intensity-container.six.strong #rt-intensity::after {
+.rt-intensity-container.five.strong span:last-child::after,
+.rt-intensity-container.six.strong span:last-child::after {
     content: "+";
     position: absolute;
     top: 26px;
