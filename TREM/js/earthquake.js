@@ -400,7 +400,12 @@ function init() {
 							":" + now.getMinutes() +
 							":" + now.getSeconds();
 						let Catch = document.getElementById("box-7");
-						if (Object.keys(Json)[index] == config["Real-time.station"]["value"]) Catch.innerHTML = `<font color="white" size="2"><b>${station[Object.keys(Json)[index]]["Loc"]}</b></font><br><font color="white" size="2"><b>${Now}</b> </font><br><font color="white" size="2"><b>震度: ${Intensity}</b> </font><font color="white" size="2"><b> PGA: ${amount}</b></font>`;
+						if (Object.keys(Json)[index] == config["Real-time.station"]["value"]) {
+							document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]]["Loc"];
+							document.getElementById("rt-station-time").innerText = Now;
+							document.getElementById("rt-station-intensity").innerText = Intensity;
+							document.getElementById("rt-station-pga").innerText = amount;
+						}
 						map.addLayer(ReportMark);
 						Station[Object.keys(Json)[index]] = ReportMark;
 						if (pga[station[Object.keys(Json)[index]]["PGA"]] == undefined && Intensity != "NA")

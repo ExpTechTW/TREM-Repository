@@ -466,3 +466,54 @@ body {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
+
+#rt-station {
+    z-index: 1000;
+    user-select: none;
+    background-color: rgb(var(--md-sys-color-surface));
+    color: rgb(var(--md-sys-color-on-surface));
+    z-index: 1000;
+    position: absolute;
+    margin: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    opacity: .75;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+#rt-station-name {
+    font-weight: 500;
+}
+
+#rt-station-time::before {
+    content: "\6642\9593";
+    font-weight: 400;
+    padding-right: 8px;
+}
+
+#rt-station-intensity::before {
+    content: "\9707\5ea6";
+    font-weight: 400;
+    padding-right: 8px;
+}
+
+#rt-station-intensity::after {
+    content: "\7d1a";
+    padding-left: 4px;
+}
+
+#rt-station-pga::before {
+    content: "PGA";
+    font-weight: 400;
+    padding-right: 8px;
+}
+
+#rt-station-pga::after {
+    content: "gal";
+    padding-left: 4px;
+}
