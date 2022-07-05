@@ -142,7 +142,6 @@ let MarkList = [];
 let EarthquakeList = {};
 let marker = null;
 let map;
-let map1;
 let Station = {};
 let PGA = {};
 let Pga = {};
@@ -171,7 +170,7 @@ let Report = 0;
 let Sspeed = 4;
 let Pspeed = 7;
 let Server = [];
-let PAlert = {};
+let PAlert = { "data": [{ "loc": "花蓮縣 花蓮市", "intensity": 1, "TREM": 8 }, { "loc": "花蓮縣 鳳林鎮", "intensity": 1, "TREM": 11 }, { "loc": "花蓮縣 吉安鄉", "intensity": 1, "TREM": 8 }, { "loc": "花蓮縣 壽豐鄉", "intensity": 1, "TREM": 11 }], "time": "2022-07-05 14:03:57", "unix": 1657001037000, "timestamp": 1657001090718, "station": 5, "final": false, "evt": "20220705140357" };
 let Location;
 let station = {};
 let PGAjson = {};
@@ -318,8 +317,13 @@ function init() {
 	map.removeControl(map.zoomControl);
 
 	ReportGET({});
+	main();
 
 	setInterval(() => {
+		main();
+	}, 600000);
+
+	function main() {
 		fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/locations.json")
 			.then((response) => response.json())
 			.then((res) => {
@@ -339,9 +343,10 @@ function init() {
 							});
 					});
 			});
-	}, 600_000);
+	}
 
 	function PGAMain() {
+		console.log(1);
 		dump({ level: 0, message: "Start PGA Timer", origin: "PGATimer" });
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
@@ -359,6 +364,7 @@ function init() {
 						delete Station[Object.keys(Station)[index]];
 						index--;
 					}
+					console.log("22222222");
 					if (response.data["state"] != "Success") return;
 					let Json = response.data["response"];
 					let All = [];
@@ -437,9 +443,11 @@ function init() {
 							delete Pga[Object.keys(Json)[index]];
 
 					}
+					console.log("11111111111111");
+					console.log(PAlert.data);
 					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
-							if (NOW.getTime() - PAlert.timestamp > 30000) break;
+							// if (NOW.getTime() - PAlert.timestamp > 30000) break;
 							if (pga[PAlert.data[index]["TREM"]] == undefined)
 								pga[PAlert.data[index]["TREM"]] = {
 									"Intensity" : 0,
@@ -951,7 +959,6 @@ function ReportList(Data, eew) {
                 <b><font color="white" size="5">M${DATA["magnitudeValue"]}</font></b>
                 </div>
             </div>`;
-
 			Div.style.backgroundColor = color(DATA["data"][0]["areaIntensity"]);
 			ReportCache[DATA["originTime"]] = Data["response"][index];
 			Div.addEventListener("click", () => {
