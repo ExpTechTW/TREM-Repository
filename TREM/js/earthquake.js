@@ -1036,7 +1036,7 @@ function IntensityN(level) {
 
 // #region color
 function color(Intensity) {
-	let Carr = ["#808080", "#0165CC", "#01BB02", "#EBC000", "#FF8400", "#E06300", "#FF0000", "#B50000", "#68009E"];
+	let Carr = ["#666666", "#0165CC", "#01BB02", "#EBC000", "#FF8400", "#E06300", "#FF0000", "#B50000", "#68009E"];
 	if (Intensity == 0) return Carr[0];
 	return Carr[Intensity - 1];
 }
@@ -1235,7 +1235,7 @@ async function FCMdata(data) {
 						opacity     : 0.8,
 						color       : "#8E8E8E",
 						dashArray   : "",
-						fillOpacity : 1,
+						fillOpacity : 0.8,
 						fillColor   : "transparent",
 					};
 
@@ -1244,7 +1244,7 @@ async function FCMdata(data) {
 					opacity     : 0.8,
 					color       : "#8E8E8E",
 					dashArray   : "",
-					fillOpacity : 1,
+					fillOpacity : 0.8,
 					fillColor   : color(GC[name]),
 				};
 			},
