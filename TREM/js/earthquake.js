@@ -321,7 +321,7 @@ function init() {
 
 	setInterval(() => {
 		main();
-	}, 600000);
+	}, 300000);
 
 	function main() {
 		fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/locations.json")
@@ -564,15 +564,17 @@ function init() {
 								Time : Now,
 							});
 						}
+						PGAtag = All[0]["intensity"];
+					}
 
-						// clear
-						let Catch = document.getElementById("box-6");
-						Catch.replaceChildren();
-						let count = 0;
-						for (let Index = 0; Index < All.length; Index++, count++) {
-							if (!PGAaudio || count >= 10) break;
-							const Div = document.createElement("DIV");
-							Div.innerHTML =
+					// clear
+					let Catch = document.getElementById("box-6");
+					Catch.replaceChildren();
+					let count = 0;
+					for (let Index = 0; Index < All.length; Index++, count++) {
+						if (!PGAaudio || count >= 10) break;
+						const Div = document.createElement("DIV");
+						Div.innerHTML =
 								`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
 									<div class="left" style="width: 30%;text-align: center;">
 										<b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
@@ -581,9 +583,8 @@ function init() {
 									<b><font color="white" size="2">${All[Index]["loc"].replace(" ", "<br>")}</font></b>
 									</div>
 								</div>`;
-							Div.style.backgroundColor = color(All[Index]["intensity"]);
-							Catch.appendChild(Div);
-						}
+						Div.style.backgroundColor = color(All[Index]["intensity"]);
+						Catch.appendChild(Div);
 					}
 				})
 				.catch((error) => {
