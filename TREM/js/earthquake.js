@@ -244,6 +244,7 @@ try {
 	console.debug(config);
 	fs.writeFileSync(`${localStorage["config"]}/Data/config.json`, JSON.stringify(config), "utf8");
 
+	// eslint-disable-next-line no-undef
 	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
 	init();
 } catch (error) {
@@ -660,10 +661,9 @@ function initEventHandle() {
 	ws.onmessage = function(evt) {
 		let json = JSON.parse(evt.data);
 		dump({ level: 3, message: `(onMessage) Received ${json.Function ?? json.response}`, origin: "WebSocket" });
-		if (json.Function == "NTP") {
-			lifeTime = new Date().getTime();
+		if (json.Function == "NTP")
 			TimeNow(json.Full);
-		} else
+		else
 			FCMdata(evt.data);
 
 	};
@@ -773,7 +773,8 @@ function ReportGET(eew) {
 // #endregion
 
 // #region Report 點擊
-async function ReportClick(time) {
+// eslint-disable-next-line no-shadow
+function ReportClick(time) {
 	if (ReportMarkID == time) {
 		ReportMarkID = null;
 		for (let index = 0; index < MarkList.length; index++)
@@ -802,15 +803,17 @@ async function ReportClick(time) {
 					else {
 						for (let Index = 0; Index < Json["Intensity"].length; Index++)
 							for (let index = 0; index < Json["Intensity"][Index]["station"].length; index++) {
+								// eslint-disable-next-line no-shadow
 								let Station = Json["Intensity"][Index]["station"][index];
 								let Intensity = Station["stationIntensity"]["$t"];
 								if (Station["stationIntensity"]["unit"] == "強") Intensity += "+";
 								if (Station["stationIntensity"]["unit"] == "弱") Intensity += "-";
-								var myIcon = L.icon({
+								let myIcon = L.icon({
 									iconUrl  : `./image/${IntensityI(Intensity)}.png`,
 									iconSize : [20, 20],
 								});
 								let ReportMark = L.marker([Station["stationLat"]["$t"], Station["stationLon"]["$t"]], { icon: myIcon });
+								// eslint-disable-next-line no-shadow
 								let PGA = "";
 								if (Station["pga"] != undefined) PGA = `<br>PGA<br>垂直向: ${Station["pga"]["vComponent"]}<br>東西向: ${Station["pga"]["ewComponent"]}<br>南北向: ${Station["pga"]["nsComponent"]}<br><a onclick="openURL('${Station["waveImageURI"]}')">震波圖</a>`;
 								ReportMark.bindPopup(`站名: ${Station["stationName"]}<br>代號: ${Station["stationCode"]}<br>經度: ${Station["stationLon"]["$t"]}<br>緯度: ${Station["stationLat"]["$t"]}<br>震央距: ${Station["distance"]["$t"]}<br>方位角: ${Station["azimuth"]["$t"]}<br>震度: ${Intensity}<br>${PGA}`);
@@ -821,7 +824,7 @@ async function ReportClick(time) {
 
 
 						focus([Number(Json.NorthLatitude), Number(Json.EastLongitude)], 7.5, true);
-						var myIcon = L.icon({
+						let myIcon = L.icon({
 							iconUrl  : "./image/star.png",
 							iconSize : [25, 25],
 						});
@@ -893,7 +896,7 @@ let openURL = url => {
 // #endregion
 
 // #region Report list
-async function ReportList(Data, eew) {
+function ReportList(Data, eew) {
 	clear();
 	function clear() {
 		let roll = document.getElementById("rolllist");
@@ -907,11 +910,11 @@ async function ReportList(Data, eew) {
 
 	}
 
-	async function add() {
+	function add() {
 		let roll = document.getElementById("rolllist");
 		for (let index = 0; index < Data["response"].length; index++) {
 			let DATA = Data["response"][index];
-			var Div = document.createElement("DIV");
+			let Div = document.createElement("DIV");
 			let Level = IntensityI(DATA["data"][0]["areaIntensity"]);
 			let msg = "";
 			if (DATA["location"].includes("("))
@@ -935,7 +938,7 @@ async function ReportList(Data, eew) {
                     </div>
                     </div>`;
 					roll.appendChild(Div);
-					var Div = document.createElement("DIV");
+					Div = document.createElement("DIV");
 					Div.innerHTML =
                         `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
                     <div class="left" style="width:20%; text-align: center;">
@@ -1016,6 +1019,7 @@ function setting() {
 function PGAcount(Scale, distance, Si) {
 	let S = Si ?? 1;
 	if (!config["earthquake.siteEffect"]["value"]) S = 1;
+	// eslint-disable-next-line no-shadow
 	let PGA = (1.657 * Math.pow(Math.E, (1.533 * Scale)) * Math.pow(distance, -1.607) * S).toFixed(3);
 	return PGA >= 800 ? "7" :
 		PGA <= 800 && PGA > 440 ? "6+" :
