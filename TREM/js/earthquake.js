@@ -578,22 +578,16 @@ function init() {
 								Time : Now,
 							});
 						}
-						clear();
-						function clear() {
-							let Catch = document.getElementById("box-6");
-							if (Catch.childNodes.length != 0) {
-								Catch.childNodes.forEach((childNodes) => {
-									Catch.removeChild(childNodes);
-								});
-								clear();
-							} else {
-								let count = 0;
-								let Div;
-								for (let Index = 0; Index < All.length; Index++) {
-									if (!PGAaudio || count >= 10) break;
-									Div = document.createElement("DIV");
-									Div.innerHTML =
-									`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
+
+						// clear
+						let Catch = document.getElementById("box-6");
+						Catch.replaceChildren();
+						let count = 0;
+						for (let Index = 0; Index < All.length; Index++, count++) {
+							if (!PGAaudio || count >= 10) break;
+							const Div = document.createElement("DIV");
+							Div.innerHTML =
+								`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
 									<div class="left" style="width: 30%;text-align: center;">
 										<b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
 									</div>
@@ -601,11 +595,8 @@ function init() {
 									<b><font color="white" size="2">${All[Index]["loc"].replace(" ", "<br>")}</font></b>
 									</div>
 								</div>`;
-									Div.style.backgroundColor = color(All[Index]["intensity"]);
-									Catch.appendChild(Div);
-									count++;
-								}
-							}
+							Div.style.backgroundColor = color(All[Index]["intensity"]);
+							Catch.appendChild(Div);
 						}
 					}
 				})
