@@ -283,17 +283,10 @@ setInterval(() => {
 }, 200);
 
 function init() {
-	let MAP = document.getElementById("map");
-
 	map = L.map("map", {
 		attributionControl : false,
 		closePopupOnClick  : false,
 	}).setView([23, 121], 7.5);
-
-	map1 = L.map("map-1", {
-		attributionControl : false,
-		closePopupOnClick  : false,
-	}).setView([23.608428, 120.799168], 7);
 
 	geojson = L.geoJson(statesData, {
 		style: {
@@ -323,8 +316,6 @@ function init() {
 	}).addTo(map);
 
 	map.removeControl(map.zoomControl);
-	let eew = document.getElementById("map-1");
-	eew.style.height = "0%";
 
 	ReportGET({});
 
@@ -1252,8 +1243,6 @@ async function FCMdata(data) {
 		map.addLayer(geojson);
 		let roll = document.getElementById("rolllist");
 		roll.style.height = "35%";
-		let eew = document.getElementById("map-1");
-		eew.style.height = "50%";
 		if (json.ID != Info["Notify"]) {
 			if (config["eew.show"]["value"]) {
 				win.show();
@@ -1452,7 +1441,6 @@ async function FCMdata(data) {
 					$("#alert-box").removeClass("show");
 					ITimer = null;
 					focus([Lat, Long], 7.5);
-					eew.style.height = "0%";
 					document.getElementById("PS").style.height = "0%";
 					document.getElementById("box-5").style.height = "0%";
 					document.getElementById("box-4").style.height = "0%";
