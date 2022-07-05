@@ -5,6 +5,8 @@ const { shell } = require("@electron/remote");
 let Loc;
 let config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
 
+setThemeColor(config["theme.color"].value, config["theme.dark"].value);
+
 document.getElementById("title").innerText = `TREM | 設定 | ${process.env.Version}`;
 document.getElementById("ver").innerText = `TREM 版本號: ${process.env.Version}`;
 document.getElementById("uuid").innerText = `UUID: ${localStorage["UUID"]}`;
@@ -136,7 +138,6 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/st
  */
 function init() {
 	dump({ level: 0, message: "Initializing", origin: "Setting" });
-	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
 	Object.keys(config).forEach(id => {
 		switch (config[id].type) {
 			case "CheckBox": {
