@@ -1523,14 +1523,12 @@ function updateText() {
 	Catch = document.getElementById("PS");
 	Catch.style.backgroundColor = INFO[TINFO]["PS"];
 
-	let num = Math.round((INFO[TINFO]["distance"] - ((NOW.getTime() - INFO[TINFO]["Time"]) / 1000) * Sspeed) / Sspeed);
-	if (num <= 0) num = "抵達";
-	Catch = document.getElementById("Ss");
-	Catch.innerHTML = `<b>${num}</b>`;
-	num = Math.round((INFO[TINFO]["distance"] - ((NOW.getTime() - INFO[TINFO]["Time"]) / 1000) * Pspeed) / Pspeed);
-	if (num <= 0) num = "抵達";
-	Catch = document.getElementById("Ps");
-	Catch.innerHTML = `<b>${num}</b>`;
+	let num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Sspeed) / Sspeed);
+	if (num <= 0) num = "";
+	document.getElementById("alert-s").innerText = `${num}`;
+	num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Pspeed) / Pspeed);
+	if (num <= 0) num = "";
+	document.getElementById("alert-p").innerText = `${num}`;
 	Catch = document.getElementById("PS");
 	Catch.style.height = "15%";
 

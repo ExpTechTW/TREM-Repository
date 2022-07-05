@@ -132,7 +132,7 @@ body {
     left: 50%;
     bottom: -100px;
     height: 48px;
-    width: 600px;
+    width: 640px;
     opacity: 0;
     transform: translateX(-50%);
     pointer-events: none;
@@ -146,7 +146,7 @@ body {
 .alert-box-body {
     z-index: 1001;
     height: 48px;
-    width: 600px;
+    width: 640px;
     display: flex;
     align-items: center;
     padding: 12px;
@@ -159,7 +159,7 @@ body {
                 border .1s ease-in-out;
 }
 
-.alert-box .alert-box-body > span {
+.alert-box .alert-box-body > * {
     color: white;
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -214,8 +214,7 @@ body {
 
 #alert-location {
     flex: 1;
-    border-left: 1px solid white;
-    padding: 2px 0 24px 16px;
+    padding: 2px 0 20px 16px;
     margin-right: 12px;
     line-height: 26px;
     font-size: 28px;
@@ -264,6 +263,22 @@ body {
     font-weight: 500;
     font-size: 20px;
     margin-left: 4px;
+}
+.alert-box-body > .alert-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border-left: 1px solid white;
+}
+.alert-box-body > .alert-item ~ .alert-item {
+    flex: unset;
+    border-left: unset;
+    width: 72px;
+    align-items: center;
+    margin-top: 4px;
+}
+.alert-box-body > div.alert-item:last-of-type {
+    margin-right: 6px;
 }
 
 .alert {
@@ -339,7 +354,7 @@ body {
 .alert-box.seven .alert-box-body #alert-intensity::before {
     content: "7";
 }
-.alert-box.four > .alert-box-body span {
+.alert-box.four > .alert-box-body > * {
     color: black;
     border-color: black !important;
 }
@@ -351,4 +366,28 @@ body {
 }
 .alert-box.eew-test .alert-notch #alert-type:empty:before {
     content: "\6e2c\8a66\5831";
+}
+.alert-timer {
+    font-weight: 600;
+    font-size: 32px;
+    height: 30px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.alert-timer::after {
+    content: "\79d2";
+    position: relative;
+    vertical-align: 2px;
+    font-weight: 500;
+    font-size: 16px;
+    margin-left: 4px;
+}
+.alert-timer:empty:after {
+    content: "\62b5\9054";
+    margin-left: 4px;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 30px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
