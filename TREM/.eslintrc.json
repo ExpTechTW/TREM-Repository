@@ -16,6 +16,7 @@
 		"fs": "readonly",
 		"geojson": "writable",
 		"statesData": "readonly",
+		"setThemeColor": "readonly",
 		"$": "readonly"
 	},
 	"rules": {
