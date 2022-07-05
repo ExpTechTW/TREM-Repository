@@ -297,12 +297,12 @@ function init() {
 
 	geojson = L.geoJson(statesData, {
 		style: {
-			weight    : 1,
-			opacity   : 0.8,
+			weight    : 0.8,
+			opacity   : 0.3,
 			color     : "#8E8E8E",
 			fillColor : "transparent",
 		},
-	}).addTo(map1);
+	}).addTo(map);
 
 	map.on("click", (e) => {
 		if (ReportMarkID != null) {
@@ -321,19 +321,6 @@ function init() {
 		zoomOffset : -1,
 		minZoom    : 2,
 	}).addTo(map);
-
-	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
-		maxZoom    : 14,
-		id         : "mapbox/dark-v10",
-		tileSize   : 512,
-		zoomOffset : -1,
-		minZoom    : 2,
-	}).addTo(map1);
-
-	map1.dragging.disable();
-	map1.scrollWheelZoom.disable();
-	map1.doubleClickZoom.disable();
-	map1.removeControl(map1.zoomControl);
 
 	map.removeControl(map.zoomControl);
 	let eew = document.getElementById("map-1");
@@ -1238,7 +1225,7 @@ async function FCMdata(data) {
 			TimerDesynced = false;
 			return;
 		}
-		map1.removeLayer(geojson);
+		map.removeLayer(geojson);
 		geojson = L.geoJson(statesData, {
 			style: (feature) => {
 				let name = feature.properties.COUNTY + feature.properties.TOWN;
@@ -1262,7 +1249,7 @@ async function FCMdata(data) {
 				};
 			},
 		});
-		map1.addLayer(geojson);
+		map.addLayer(geojson);
 		let roll = document.getElementById("rolllist");
 		roll.style.height = "35%";
 		let eew = document.getElementById("map-1");
@@ -1352,20 +1339,11 @@ async function FCMdata(data) {
 			iconSize : [30, 30],
 		});
 		let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
-		let Cross1 = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
 		if (EarthquakeList[json.ID]["Cross"] != undefined)
 			map.removeLayer(EarthquakeList[json.ID]["Cross"]);
-
-		if (EarthquakeList[json.ID]["Cross1"] != undefined)
-			map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
-
-
 		EarthquakeList[json.ID]["Cross"] = Cross;
-		EarthquakeList[json.ID]["Cross1"] = Cross1;
 		map.addLayer(Cross);
-		map1.addLayer(Cross1);
 		Cross.setZIndexOffset(6000);
-		Cross1.setZIndexOffset(6000);
 		let Loom = 0;
 		let speed = 1000;
 		if (config["shock.smoothing"]["value"]) speed = 0;
@@ -1423,10 +1401,6 @@ async function FCMdata(data) {
 			if (config["shock.p"]["value"]) {
 				if (EarthquakeList[json.ID]["Pcircle"] != null)
 					map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
-
-				if (EarthquakeList[json.ID]["Pcircle1"] != null)
-					map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
-
 				let km = Math.sqrt(Math.pow((NOW.getTime() - json.Time) * Pspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2));
 				if (km > 0) {
 					EarthquakeList[json.ID]["Pcircle"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
@@ -1434,41 +1408,22 @@ async function FCMdata(data) {
 						fillColor : "transparent",
 						radius    : km,
 					});
-					EarthquakeList[json.ID]["Pcircle1"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
-						color     : "#6FB7B7",
-						fillColor : "transparent",
-						radius    : km,
-					});
 					map.addLayer(EarthquakeList[json.ID]["Pcircle"]);
-					map1.addLayer(EarthquakeList[json.ID]["Pcircle1"]);
 				}
 			}
 			if (EarthquakeList[json.ID]["Scircle"] != null)
 				map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
-
-			if (EarthquakeList[json.ID]["Scircle1"] != null)
-				map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
-
 			let km = Math.pow((NOW.getTime() - json.Time) * Sspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2);
 			if (km > 0) {
 				let KM = Math.sqrt(km);
-
 				let Scircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 					color       : json.Alert ? "red" : "orange",
 					fillColor   : "#F8E7E7",
 					fillOpacity : 0.1,
 					radius      : KM,
 				});
-				let Scircle1 = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
-					color       : json.Alert ? "red" : "orange",
-					fillColor   : "#F8E7E7",
-					fillOpacity : 0.1,
-					radius      : KM,
-				});
 				EarthquakeList[json.ID]["Scircle"] = Scircle;
-				EarthquakeList[json.ID]["Scircle1"] = Scircle1;
 				map.addLayer(Scircle);
-				map1.addLayer(Scircle1);
 			}
 			if (NOW.getTime() - json.TimeStamp > 240000 || json.Cancel && EarthquakeList[json.ID] != undefined) {
 				if (json.Cancel) {
@@ -1481,9 +1436,6 @@ async function FCMdata(data) {
 				if (EarthquakeList[json.ID]["Scircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
 				if (EarthquakeList[json.ID]["Pcircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
 				map.removeLayer(EarthquakeList[json.ID]["Cross"]);
-				if (EarthquakeList[json.ID]["Scircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
-				if (EarthquakeList[json.ID]["Pcircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
-				map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
 				for (let index = 0; index < INFO.length; index++)
 					if (INFO[index]["ID"] == json.ID) {
 						TINFO = 0;
