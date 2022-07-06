@@ -176,6 +176,7 @@ let station = {};
 let PGAjson = {};
 let MainClock = null;
 let _eewTest = false;
+let geojson = null;
 // #endregion
 
 // #region override Date.format()
@@ -287,7 +288,7 @@ function init() {
 		closePopupOnClick  : false,
 	}).setView([23, 121], 7.5);
 
-	geojson = L.geoJson(statesData, {
+	L.geoJson(statesData, {
 		style: {
 			weight    : 0.8,
 			opacity   : 0.3,
@@ -569,7 +570,7 @@ function init() {
 						if (!PGAaudio || count >= 10) break;
 						const Div = document.createElement("DIV");
 						Div.innerHTML =
-								`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
+							`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
 									<div class="left" style="width: 30%;text-align: center;">
 										<b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
 									</div>
@@ -779,7 +780,7 @@ async function ReportClick(time) {
 					else {
 						for (let Index = 0; Index < json["Intensity"].length; Index++)
 							for (let index = 0; index < json["Intensity"][Index]["station"].length; index++) {
-							// eslint-disable-next-line no-shadow
+								// eslint-disable-next-line no-shadow
 								let Station = json["Intensity"][Index]["station"][index];
 								let Intensity = Station["stationIntensity"]["$t"];
 								if (Station["stationIntensity"]["unit"] == "強") Intensity += "+";
@@ -903,7 +904,7 @@ function ReportList(Data, eew) {
 				if (eew.Time != undefined && eew.report == undefined) {
 					Div.style.backgroundColor = color(eew.Max);
 					Div.innerHTML =
-                        `<div class="background" style="display: flex; align-items:center; padding:5%;padding-right: 1vh;">
+						`<div class="background" style="display: flex; align-items:center; padding:5%;padding-right: 1vh;">
                     <div class="left" style="width:30%; text-align: center">
                         <font color="white" size="3">最大震度</font><br><b><font color="white" size="7">${IntensityI(eew.Max)}</font></b>
                     </div>
@@ -915,7 +916,7 @@ function ReportList(Data, eew) {
 					roll.appendChild(Div);
 					Div = document.createElement("DIV");
 					Div.innerHTML =
-                        `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
+						`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
                     <div class="left" style="width:20%; text-align: center;">
                         <b><font color="white" size="6">${Level}</font></b>
                     </div>
@@ -929,7 +930,7 @@ function ReportList(Data, eew) {
                     </div>`;
 				} else
 					Div.innerHTML =
-                        `<div class="background" style="display: flex; align-items:center; padding:2%;padding-right: 1vh;">
+						`<div class="background" style="display: flex; align-items:center; padding:2%;padding-right: 1vh;">
                     <div class="left" style="width:30%; text-align: center;">
                         <font color="white" size="3">最大震度</font><br><b><font color="white" size="7">${Level}</font></b>
                     </div>
@@ -942,7 +943,7 @@ function ReportList(Data, eew) {
 
 			else
 				Div.innerHTML =
-                    `<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
+					`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
                 <div class="left" style="width:20%; text-align: center;">
                     <b><font color="white" size="6">${Level}</font></b>
                 </div>
@@ -1154,11 +1155,11 @@ async function FCMdata(data) {
 		if (config["webhook.url"]["value"] != "" && json.ID != Info["webhook"] && localStorage["UUID"] != "e6471ff7-8a1f-4299-bb7f-f2220f5eb6e8") {
 			Info["webhook"] = json.ID;
 			let Now = NOW.getFullYear() +
-                    "/" + (NOW.getMonth() + 1) +
-                    "/" + NOW.getDate() +
-                    " " + NOW.getHours() +
-                    ":" + NOW.getMinutes() +
-                    ":" + NOW.getSeconds();
+				"/" + (NOW.getMonth() + 1) +
+				"/" + NOW.getDate() +
+				" " + NOW.getHours() +
+				":" + NOW.getMinutes() +
+				":" + NOW.getSeconds();
 			let msg = config["webhook.body"]["value"];
 			msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
 			if (json.Function == "earthquake")
@@ -1222,7 +1223,7 @@ async function FCMdata(data) {
 			TimerDesynced = false;
 			return;
 		}
-		map.removeLayer(geojson);
+		if (geojson != null) map.removeLayer(geojson);
 		geojson = L.geoJson(statesData, {
 			style: (feature) => {
 				let name = feature.properties.COUNTY + feature.properties.TOWN;
@@ -1451,11 +1452,12 @@ async function FCMdata(data) {
 					ITimer = null;
 					focus([Lat, Long], 7.5);
 					document.getElementById("PS").style.height = "0%";
-					document.getElementById("box-5").style.height = "0%";
-					document.getElementById("box-4").style.height = "0%";
+					// document.getElementById("box-5").style.height = "0%";
+					// document.getElementById("box-4").style.height = "0%";
 					TimerDesynced = false;
 					audioList = [];
 					INFO = [];
+					map.removeLayer(geojson);
 					win.setAlwaysOnTop(false);
 					for (let index = 0; index < expected.length; index++)
 						map.removeLayer(expected[index]);
