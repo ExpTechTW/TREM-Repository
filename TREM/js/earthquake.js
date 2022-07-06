@@ -947,8 +947,6 @@ function ReportList(Data, eew) {
 			});
 			roll.appendChild(Div);
 		}
-		let set = document.getElementById("box-8");
-		set.style.visibility = "visible";
 		if (eew.report != undefined) {
 			ReportClick(Data["response"][0]["originTime"]);
 			setTimeout(() => {

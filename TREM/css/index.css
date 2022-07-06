@@ -111,13 +111,13 @@ body {
     right: 0;
     margin: 4px 12px 0 0;
     overflow-y: scroll;
-    height: 95%;
+    height: 99%;
     width: 25%;
     white-space: nowrap;
     transition: height .4s ease-in-out;
 }
 #nav-rail.hide + #view .main #rolllist {
-    height: 56%;
+    height: 99%;
 }
 #rolllist > div {
     border-radius: 16px;
