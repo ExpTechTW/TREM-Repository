@@ -392,15 +392,9 @@ function init() {
 						let ReportMark = L.marker([station[Object.keys(Json)[index]]["Lat"], station[Object.keys(Json)[index]]["Long"]], { icon: myIcon });
 						let Level = IntensityI(Intensity);
 						let now = new Date(Sdata["Time"]);
-						let Now = (now.getMonth() + 1) +
-							"/" + now.getDate() +
-							" " + now.getHours() +
-							":" + now.getMinutes() +
-							":" + now.getSeconds();
-						let Catch = document.getElementById("box-7");
 						if (Object.keys(Json)[index] == config["Real-time.station"]["value"]) {
 							document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]]["Loc"];
-							document.getElementById("rt-station-time").innerText = Now;
+							document.getElementById("rt-station-time").innerText = now.format("MM/DD HH:mm:ss");
 							document.getElementById("rt-station-intensity").innerText = Intensity;
 							document.getElementById("rt-station-pga").innerText = amount;
 						}
