@@ -278,6 +278,10 @@ function reset() {
 	});
 }
 
+function openLogFolder() {
+	shell.openPath(app.getPath("logs"));
+}
+
 const restart = () => {
 	ipc.send("restart");
 };

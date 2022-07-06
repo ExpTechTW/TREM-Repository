@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-const { BrowserWindow, app, ipcMain, shell } = require("@electron/remote");
+const { BrowserWindow, ipcMain, shell } = require("@electron/remote");
 const {
 	NOTIFICATION_RECEIVED,
 	NOTIFICATION_SERVICE_ERROR,

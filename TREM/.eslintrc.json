@@ -10,6 +10,7 @@
 	},
 	"plugins": ["require-sort"],
 	"globals": {
+		"app": "readonly",
 		"axios": "readonly",
 		"dump": "readonly",
 		"L": "readonly",

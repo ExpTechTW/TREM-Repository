@@ -1,9 +1,9 @@
+const { app } = require("@electron/remote");
 const fs = require("node:fs");
+const { join } = require("node:path");
 
-if (!fs.existsSync(`${localStorage["config"]}/Log`))
-	fs.mkdirSync(`${localStorage["config"]}/Log`);
-
-const latestLog = `${localStorage["config"]}/Log/latest.log`;
+const latestLog = join(app.getPath("logs"), "latest.log");
+console.log(latestLog);
 fs.writeFileSync(latestLog, "", { encoding: "utf8", flag: "w" });
 
 /**
@@ -35,10 +35,9 @@ function dumpUpload() {
 		.then((response) => {
 			if (response.data.response == "Speed limit")
 				alert("Dump 發送限制\n稍等 5 分鐘後再次嘗試");
-			else {
+			else
 				alert("Dump 發送成功");
-				fs.writeFileSync(`${localStorage["dirname"]}/Log/TREM.log`, "", "utf8");
-			}
+
 		})
 		.catch((error) => {
 			alert("Dump 發送失敗\nError > " + error);

@@ -120,8 +120,8 @@ else {
 				click : () => {
 					const now = new Date();
 					const nowTime = (new Date(now.getTime() - (now.getTimezoneOffset() * 60000))).toISOString().slice(0, -1).replace(/:+|\.+/g, "-");
-					if (fs.existsSync(path.join(__dirname, "Log", "latest.log")))
-						fs.renameSync(path.join(__dirname, "Log", "latest.log"), path.join(__dirname, "Log", `${nowTime}.log`));
+					if (fs.existsSync(path.join(app.getPath("logs"), "latest.log")))
+						fs.renameSync(path.join(app.getPath("logs"), "latest.log"), path.join(app.getPath("logs"), `${nowTime}.log`));
 					app.exit(0);
 				},
 			},
