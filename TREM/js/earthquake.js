@@ -1143,7 +1143,9 @@ async function FCMdata(data) {
 		if (config["report.audio"]["value"]) audioPlay("./audio/Notify.wav");
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && config["accept.eew.jp"]["value"])) {
 		dump({ level: 0, message: "Got EEW", origin: "API" });
-
+		$("#mainView_btn")[0].click();
+		const navState = !$("#nav-rail").hasClass("hide");
+		toggleNav(false);
 		// handler
 		Info["ID"] = json.ID;
 		if (EarthquakeList[json.ID] == undefined) EarthquakeList[json.ID] = {};
@@ -1442,7 +1444,10 @@ async function FCMdata(data) {
 				if (Object.keys(EarthquakeList).length == 0) {
 					clearInterval(t);
 					clearInterval(ITimer);
+					// hide eew alert
 					$("#alert-box").removeClass("show");
+					// restore navrail state
+					toggleNav(navState);
 					ITimer = null;
 					focus([Lat, Long], 7.5);
 					document.getElementById("PS").style.height = "0%";

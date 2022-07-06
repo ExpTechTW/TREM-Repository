@@ -18,6 +18,7 @@
 		"geojson": "writable",
 		"statesData": "readonly",
 		"setThemeColor": "readonly",
+		"toggleNav": "readonly",
 		"$": "readonly"
 	},
 	"rules": {
