@@ -1258,7 +1258,6 @@ async function FCMdata(data) {
 			},
 		});
 		map.addLayer(geojson);
-		// roll.style.height = "35%";
 		if (json.ID != Info["Notify"]) {
 			if (config["eew.show"]["value"]) {
 				win.show();
@@ -1301,7 +1300,7 @@ async function FCMdata(data) {
 		let _time = -1;
 		let Stamp = 0;
 		if (json.ID != Info["Alert"]) {
-			focus([Number(json.NorthLatitude), Number(json.EastLongitude)], 7.5);
+			focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 7.5);
 			Info["Alert"] = json.ID;
 			Info["AlertS"] = value;
 			if (t != null) clearInterval(t);
@@ -1475,15 +1474,15 @@ async function FCMdata(data) {
 			if (config["map.autoZoom"]["value"]) {
 				if ((NOW.getTime() - json.Time) * Pspeed > 250000 && Loom < 250000) {
 					Loom = 250000;
-					focus([Number(json.NorthLatitude), Number(json.EastLongitude)], 7);
+					focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 7);
 				}
 				if ((NOW.getTime() - json.Time) * Pspeed > 500000 && Loom < 500000) {
 					Loom = 500000;
-					focus([Number(json.NorthLatitude), Number(json.EastLongitude)], 6.5);
+					focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 6.5);
 				}
 				if ((NOW.getTime() - json.Time) * Pspeed > 750000 && Loom < 750000) {
 					Loom = 750000;
-					focus([Number(json.NorthLatitude), Number(json.EastLongitude)], 6);
+					focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 6);
 				}
 			}
 		}, speed);
