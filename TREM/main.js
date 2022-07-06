@@ -29,8 +29,8 @@ function createWindow() {
 		title          : "TREM | 台灣實時地震監測",
 		width          : 1280,
 		height         : 720,
-		minWidth       : 800,
-		minHeight      : 600,
+		minWidth       : 1280,
+		minHeight      : 720,
 		/*
 		maxWidth       : 1280,
 		maxHeight      : 720,
