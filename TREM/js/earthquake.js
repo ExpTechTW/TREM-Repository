@@ -346,7 +346,6 @@ function init() {
 	}
 
 	function PGAMain() {
-		console.log(1);
 		dump({ level: 0, message: "Start PGA Timer", origin: "PGATimer" });
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
@@ -364,7 +363,6 @@ function init() {
 						delete Station[Object.keys(Station)[index]];
 						index--;
 					}
-					console.log("22222222");
 					if (response.data["state"] != "Success") return;
 					let Json = response.data["response"];
 					let All = [];
@@ -448,17 +446,14 @@ function init() {
 							delete Pga[Object.keys(Json)[index]];
 
 					}
-					console.log("11111111111111");
-					console.log(PAlert.data);
 					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
-							// if (NOW.getTime() - PAlert.timestamp > 30000) break;
+							if (NOW.getTime() - PAlert.timestamp > 30000) break;
 							if (pga[PAlert.data[index]["TREM"]] == undefined)
 								pga[PAlert.data[index]["TREM"]] = {
 									"Intensity" : 0,
 									"Time"      : 0,
 								};
-
 							let myIcon = L.icon({
 								iconUrl  : `./image/${PAlert.data[index]["intensity"]}.png`,
 								iconSize : [15, 15],
@@ -1257,7 +1252,7 @@ async function FCMdata(data) {
 		});
 		map.addLayer(geojson);
 		let roll = document.getElementById("rolllist");
-		roll.style.height = "35%";
+		// roll.style.height = "35%";
 		if (json.ID != Info["Notify"]) {
 			if (config["eew.show"]["value"]) {
 				win.show();
