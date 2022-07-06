@@ -127,6 +127,15 @@ else {
 					app.exit(0);
 				},
 			},
+			{
+				label : "重新啟動",
+				type  : "normal",
+				click : () => {
+					app.relaunch();
+					if (SettingWindow != null) SettingWindow.close();
+					app.quit();
+				},
+			},
 		]);
 		tray.setToolTip("TREM | 台灣實時地震監測");
 		tray.setContextMenu(contextMenu);
