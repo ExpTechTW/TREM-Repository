@@ -31,8 +31,11 @@ function createWindow() {
 		height         : 720,
 		minWidth       : 800,
 		minHeight      : 600,
+		/*
 		maxWidth       : 1280,
 		maxHeight      : 720,
+		*/
+		resizable      : true,
 		show           : !_hide,
 		webPreferences : {
 			preload              : path.join(__dirname, "preload.js"),
@@ -42,7 +45,6 @@ function createWindow() {
 			backgroundThrottling : false,
 			nativeWindowOpen     : true,
 		},
-		resizable: false,
 	});
 	require("@electron/remote/main").initialize();
 	require("@electron/remote/main").enable(MainWindow.webContents);

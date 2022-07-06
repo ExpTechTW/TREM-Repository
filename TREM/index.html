@@ -25,9 +25,9 @@
         <div id="footer">Powered by ExpTech</div>
     </div>
     <button id="togglenav_btn" class="fab secondary elevate" onclick="toggleNav()">
-        <span class="material-symbols-rounded">first_page</span>
+        <span class="material-symbols-rounded">start</span>
     </button>
-    <div id="nav-rail" class="nav-rail">
+    <div id="nav-rail" class="nav-rail hide">
         <button id="mainView_btn" class="nav-rail-button" onclick="changeView('main', this, event)">
             <span class="material-symbols-rounded">map</span>
         </button>
@@ -79,9 +79,9 @@
                 <div class="alert-notch">
                     <span id="alert-type"></span>
                     <span id="alert-provider"></span>
+                    <span id="alert-number"></span>
                 </div>
                 <div class="alert-box-body">
-                    <span id="alert-number"></span>
                     <span id="alert-intensity"></span>
                     <div class="alert-item">
                         <span id="alert-location"></span>
@@ -108,6 +108,9 @@
                 <span id="rt-station-time"></span>
                 <span id="rt-station-intensity"></span>
                 <span id="rt-station-pga"></span>
+            </div>
+            <div id="rt-list">
+                <span id="intensity-3"></span>
             </div>
             <div id="map">
                 <div id="box-6" class="box-6"></div>

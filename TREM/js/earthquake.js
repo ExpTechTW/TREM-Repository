@@ -373,16 +373,16 @@ function init() {
 						let amount = 0;
 						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"]);
 						if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue;
-						let Intensity = NOW.getTime() - Sdata["TimeStamp"] > 5000 ? "NA" :
-							amount >= 800 ? 9 :
-								amount >= 440 ? 8 :
-									amount >= 250 ? 7 :
-										amount >= 140 ? 6 :
-											amount >= 80 ? 5 :
-												amount >= 25 ? 4 :
-													amount >= 8 ? 3 :
-														amount >= 5 ? 2 :
-															amount >= 3.5 ? 1 :
+						let Intensity = (NOW.getTime() - Sdata["TimeStamp"] > 5000) ? "NA" :
+							(amount >= 800) ? 9 :
+								(amount >= 440) ? 8 :
+									(amount >= 250) ? 7 :
+										(amount >= 140) ? 6 :
+											(amount >= 80) ? 5 :
+												(amount >= 25) ? 4 :
+													(amount >= 8) ? 3 :
+														(amount >= 5) ? 2 :
+															(amount >= 3.5) ? 1 :
 																0;
 						let size = 15;
 						if (Intensity == 0) size = 5;
@@ -499,20 +499,11 @@ function init() {
 						focus();
 					}
 					if (Object.keys(PGA).length == 0) PGAaudio = false;
+
 					if (PGAaudio) {
-						let Catch = document.getElementById("intensity-2");
-						Catch.style.height = "auto";
-						Catch = document.getElementById("intensity-3");
-						Catch.innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`;
-						Catch = document.getElementById("box-3");
-						Catch.style.backgroundColor = color(MAXPGA["intensity"]);
+						// document.getElementById("intensity-3").innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`;
+
 					} else {
-						let Catch = document.getElementById("intensity-2");
-						Catch.style.height = "0%";
-						Catch = document.getElementById("intensity-3");
-						Catch.innerHTML = "";
-						Catch = document.getElementById("box-3");
-						Catch.style.backgroundColor = "gray";
 						PGAAudio = false;
 						PGAtag = 0;
 						PGALimit = 0;
@@ -563,27 +554,23 @@ function init() {
 					}
 
 					// clear
-					let Catch = document.getElementById("box-6");
-					Catch.replaceChildren();
+					let list = [];
 					let count = 0;
 					for (let Index = 0; Index < All.length; Index++, count++) {
 						if (!PGAaudio || count >= 10) break;
-						const Div = document.createElement("DIV");
-						Div.innerHTML =
-							`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
-									<div class="left" style="width: 30%;text-align: center;">
-										<b><font color="white" size="4">${IntensityI(All[Index]["intensity"])}</font></b>
-									</div>
-									<div class="right">
-									<b><font color="white" size="2">${All[Index]["loc"].replace(" ", "<br>")}</font></b>
-									</div>
-								</div>`;
-						Div.style.backgroundColor = color(All[Index]["intensity"]);
-						Catch.appendChild(Div);
+						const container = document.createElement("DIV");
+						container.className = IntensityToClassString(All[Index]["intensity"]);
+						const location = document.createElement("span");
+						location.innerText = All[Index]["loc"];
+						container.appendChild(document.createElement("span"));
+						container.appendChild(location);
+						list.push(container);
 					}
+					document.getElementById("rt-list").replaceChildren(...list);
 				})
 				.catch((error) => {
 					dump({ level: 2, message: error, origin: "PGATimer" });
+					console.error(error);
 				});
 		}, 500);
 	}
@@ -872,10 +859,10 @@ let openURL = url => {
 // #endregion
 
 // #region Report list
+let roll = document.getElementById("rolllist");
 function ReportList(Data, eew) {
 	clear();
 	function clear() {
-		let roll = document.getElementById("rolllist");
 		if (roll.childNodes.length != 0) {
 			roll.childNodes.forEach((childNodes) => {
 				roll.removeChild(childNodes);
@@ -887,7 +874,6 @@ function ReportList(Data, eew) {
 	}
 
 	function add() {
-		let roll = document.getElementById("rolllist");
 		for (let index = 0; index < Data["response"].length; index++) {
 			let DATA = Data["response"][index];
 			let Div = document.createElement("DIV");
@@ -1030,6 +1016,21 @@ function IntensityN(level) {
 }
 // #endregion
 
+// #region Intensity >> Class String
+function IntensityToClassString(level) {
+	return (level == 9) ? "seven" :
+		(level == 8) ? "six strong" :
+			(level == 7) ? "six" :
+				(level == 6) ? "five strong" :
+					(level == 5) ? "five" :
+						(level == 4) ? "four" :
+							(level == 3) ? "three" :
+								(level == 2) ? "two" :
+									(level == 1) ? "one" :
+										"zero";
+}
+// #endregion
+
 // #region color
 function color(Intensity) {
 	let Carr = ["#666666", "#0165CC", "#01BB02", "#EBC000", "#FF8400", "#E06300", "#FF0000", "#B50000", "#68009E"];
@@ -1144,9 +1145,14 @@ async function FCMdata(data) {
 		if (config["report.audio"]["value"]) audioPlay("./audio/Notify.wav");
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && config["accept.eew.jp"]["value"])) {
 		dump({ level: 0, message: "Got EEW", origin: "API" });
+
+		// switch to main view
 		$("#mainView_btn")[0].click();
+		// remember navrail state
 		const navState = !$("#nav-rail").hasClass("hide");
-		toggleNav(false);
+		// hide navrail so the view goes fullscreen
+		if (navState) toggleNav(false);
+
 		// handler
 		Info["ID"] = json.ID;
 		if (EarthquakeList[json.ID] == undefined) EarthquakeList[json.ID] = {};
@@ -1248,7 +1254,6 @@ async function FCMdata(data) {
 			},
 		});
 		map.addLayer(geojson);
-		let roll = document.getElementById("rolllist");
 		// roll.style.height = "35%";
 		if (json.ID != Info["Notify"]) {
 			if (config["eew.show"]["value"]) {
@@ -1449,6 +1454,7 @@ async function FCMdata(data) {
 					$("#alert-box").removeClass("show");
 					// restore navrail state
 					toggleNav(navState);
+
 					ITimer = null;
 					focus([Lat, Long], 7.5);
 					document.getElementById("PS").style.height = "0%";
@@ -1487,28 +1493,9 @@ async function FCMdata(data) {
 // #endregion
 
 function updateText() {
-	let intensity = INFO[TINFO].alert_intensity;
-	let intensity_str = (intensity == 9)
-		? " seven"
-		: (intensity == 8)
-			? " six strong"
-			: (intensity == 7)
-				? " six"
-				: (intensity == 6)
-					? " five strong"
-					: (intensity == 5)
-						? " five"
-						: (intensity == 4)
-							? " four"
-							: (intensity == 3)
-								? " three"
-								: (intensity == 2)
-									? " two"
-									: " one";
-
-	$("#alert-box")[0].className = INFO[TINFO].alert_type + intensity_str;
+	$("#alert-box")[0].className = `${INFO[TINFO].alert_type} ${IntensityToClassString(INFO[TINFO].alert_intensity)}`;
 	$("#alert-provider").text(INFO[TINFO].alert_provider);
-	$("#alert-number").text(`#${INFO[TINFO].alert_number}`);
+	$("#alert-number").text(`${INFO[TINFO].alert_number}`);
 	$("#alert-location").text(INFO[TINFO].alert_location);
 	$("#alert-time").text(INFO[TINFO].alert_time.format("YYYY/MM/DD HH:mm:ss"));
 	$("#alert-magnitude").text(INFO[TINFO].alert_magnitude);
@@ -1537,7 +1524,6 @@ function updateText() {
 		Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
 	else
 		Catch.innerHTML = "";
-
 
 	if (TINFO + 1 >= INFO.length)
 		TINFO = 0;
