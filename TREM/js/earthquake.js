@@ -170,7 +170,7 @@ let Report = 0;
 let Sspeed = 4;
 let Pspeed = 7;
 let Server = [];
-let PAlert = { "data": [{ "loc": "花蓮縣 花蓮市", "intensity": 1, "TREM": 8 }, { "loc": "花蓮縣 鳳林鎮", "intensity": 1, "TREM": 11 }, { "loc": "花蓮縣 吉安鄉", "intensity": 1, "TREM": 8 }, { "loc": "花蓮縣 壽豐鄉", "intensity": 1, "TREM": 11 }], "time": "2022-07-05 14:03:57", "unix": 1657001037000, "timestamp": 1657001090718, "station": 5, "final": false, "evt": "20220705140357" };
+let PAlert = {};
 let Location;
 let station = {};
 let PGAjson = {};
@@ -1194,7 +1194,7 @@ async function FCMdata(data) {
 		let res = await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json");
 		let location = await res.json();
 		let GC = {};
-		let level = "";
+		let level;
 		let MaxIntensity = 0;
 		if (expected.length != 0)
 			for (let index = 0; index < expected.length; index++)
@@ -1379,6 +1379,7 @@ async function FCMdata(data) {
 			alert_intensity : MaxIntensity,
 			alert_location  : json.Location ?? "未知區域",
 			alert_time      : new Date(json.Time),
+			alert_local     : IntensityN(level),
 			alert_magnitude : json.Scale,
 			alert_depth     : json.Depth,
 			alert_provider  : json.Unit,
@@ -1386,7 +1387,6 @@ async function FCMdata(data) {
 			"intensity-1"   : `<font color="white" size="7"><b>${IntensityI(MaxIntensity)}</b></font>`,
 			"time-1"        : `<font color="white" size="2"><b>${json["UTC+8"]}</b></font>`,
 			"info-1"        : `<font color="white" size="4"><b>M ${json.Scale} </b></font><font color="white" size="3"><b> 深度: ${json.Depth} km</b></font>`,
-			"level"         : `<b>${level}</b>`,
 			"PS"            : color(IntensityN(level)),
 			"distance"      : distance,
 		};
@@ -1494,6 +1494,7 @@ async function FCMdata(data) {
 
 function updateText() {
 	$("#alert-box")[0].className = `${INFO[TINFO].alert_type} ${IntensityToClassString(INFO[TINFO].alert_intensity)}`;
+	$("#alert-local")[0].className = `alert-item ${IntensityToClassString(INFO[TINFO].alert_local)}`;
 	$("#alert-provider").text(INFO[TINFO].alert_provider);
 	$("#alert-number").text(`${INFO[TINFO].alert_number}`);
 	$("#alert-location").text(INFO[TINFO].alert_location);
