@@ -116,9 +116,6 @@ body {
     white-space: nowrap;
     transition: height .4s ease-in-out;
 }
-#nav-rail.hide + #view .main #rolllist {
-    height: 99%;
-}
 #rolllist > div {
     border-radius: 16px;
     padding: 4px;
