@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
 
-process.env.Version = "22w28-pre1";
+process.env.Version = "22w28-pre2";
 
 let MainWindow = null;
 let SettingWindow = null;
@@ -29,13 +29,7 @@ function createWindow() {
 		title          : "TREM | 台灣實時地震監測",
 		width          : 1280,
 		height         : 720,
-		minWidth       : 1280,
-		minHeight      : 720,
-		/*
-		maxWidth       : 1280,
-		maxHeight      : 720,
-		*/
-		resizable      : true,
+		resizable      : false,
 		show           : !_hide,
 		webPreferences : {
 			preload              : path.join(__dirname, "preload.js"),

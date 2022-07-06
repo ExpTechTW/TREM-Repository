@@ -86,18 +86,6 @@
             </div>
             <div id="map"></div>
         </div>
-
-        <div class="view info" id="report">
-            <div id="PS"
-                style="border:4px red solid;height: 0%;text-align: center;padding: 3%;display: flex;align-items: center;justify-content: center;overflow: hidden;">
-                <font id="level" color="white" size="7" style="margin-right: 5%;"><b></b></font>
-            </div>
-        </div>
-    </div>
-
-    <div class="alert" id="alert">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        <div id="alert-body" style="padding: 3%;">強震即時警報 測試報</div>
     </div>
 
     <audio id="audio-player">
@@ -110,10 +98,7 @@
         crossorigin=""></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="./js/.GeoJson.js"></script>
-    <script src="./js/dump.js"></script>
     <script src="./js/ui.js"></script>
-    <script src="./js/earthquake.js"></script>
-    <!--
     <script>
         const bytenode = require('bytenode')
         const fs = require('fs')
@@ -125,7 +110,6 @@
         bytenode.runBytecodeFile(__dirname + '/js/dump.jar')
         bytenode.runBytecodeFile(__dirname + '/js/earthquake.jar')
     </script>
-    -->
 </body>
 
 </html>

@@ -704,7 +704,6 @@ async function playNextAudio() {
 	} else if (!path.startsWith("./audio/1/")) {
 		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
 		await audioDOM.play();
-
 	}
 }
 // #endregion
@@ -1306,7 +1305,8 @@ async function FCMdata(data) {
 			if (t != null) clearInterval(t);
 			t = setInterval(() => {
 				value = Math.round((distance - ((NOW.getTime() - json.Time) / 1000) * Sspeed) / Sspeed);
-				if (Stamp != value && audioList.length == 0 && !audioLock) {
+				if (Stamp != value && !audioLock) {
+					audioList = [];
 					Stamp = value;
 					if (_time >= 0) {
 						audioPlay("./audio/1/ding.wav");
@@ -1388,7 +1388,6 @@ async function FCMdata(data) {
 			"intensity-1"   : `<font color="white" size="7"><b>${IntensityI(MaxIntensity)}</b></font>`,
 			"time-1"        : `<font color="white" size="2"><b>${json["UTC+8"]}</b></font>`,
 			"info-1"        : `<font color="white" size="4"><b>M ${json.Scale} </b></font><font color="white" size="3"><b> 深度: ${json.Depth} km</b></font>`,
-			"PS"            : color(IntensityN(level)),
 			"distance"      : distance,
 		};
 		updateText();
@@ -1457,7 +1456,6 @@ async function FCMdata(data) {
 					$(roll).fadeIn(200);
 					ITimer = null;
 					focus([Lat, Long], 7.5);
-					document.getElementById("PS").style.height = "0%";
 					TimerDesynced = false;
 					audioList = [];
 					INFO = [];
@@ -1501,24 +1499,15 @@ function updateText() {
 	$("#alert-depth").text(INFO[TINFO].alert_depth);
 	$("#alert-box").addClass("show");
 
-
-	let Catch = document.getElementById("title-1");
-	Catch = document.getElementById("level");
-	Catch.innerHTML = INFO[TINFO]["level"];
-	Catch = document.getElementById("PS");
-	Catch.style.backgroundColor = INFO[TINFO]["PS"];
-
 	let num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Sspeed) / Sspeed);
 	if (num <= 0) num = "";
 	document.getElementById("alert-s").innerText = `${num}`;
 	num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Pspeed) / Pspeed);
 	if (num <= 0) num = "";
 	document.getElementById("alert-p").innerText = `${num}`;
-	Catch = document.getElementById("PS");
-	Catch.style.height = "15%";
 
 	let Num = Math.round(((NOW.getTime() - INFO[TINFO]["Time"]) * 4 / 10) / INFO[TINFO]["Depth"]);
-	Catch = document.getElementById("box-10");
+	let Catch = document.getElementById("box-10");
 	if (Num <= 100)
 		Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
 	else
