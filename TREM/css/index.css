@@ -211,7 +211,8 @@ body {
     flex: 1;
     height: min-content;
     font-weight: 500;
-    line-height: 32px;
+    line-height: 30px;
+    font-size: 20px;
 }
 
 #alert-number {
@@ -448,10 +449,10 @@ body {
 .alert-box.eew-test .alert-box-body, .alert-box.eew-test .alert-notch {
     border-color: #0165CC;
 }
-.alert-box.eew-cancel .alert-box-body, .alert-box.eew-cancel .alert-notch {
+.alert-box.eew-cancel .alert-box-body, .alert-box.eew-cancel .alert-notch, .alert-box.eew-history .alert-box-body, .alert-box.eew-history .alert-notch {
     border-color: #666;
 }
-.alert-box.one .alert-box-body, .alert-box.eew-cancel .alert-notch,
+.alert-box.one .alert-box-body, .alert-box.eew-cancel .alert-notch, .alert-box.eew-history .alert-notch,
 .rt-intensity-container.one,
 #alert-local.one,
 #rt-list div.one {
@@ -643,6 +644,9 @@ body {
 }
 .alert-box.eew-cancel .alert-notch #alert-type:empty:before {
     content: "\5df2\53d6\6d88";
+}
+.alert-box.eew-history .alert-notch #alert-type:empty:before {
+    content: "\6b77\53f2\91cd\64ad";
 }
 
 #rt-station {
