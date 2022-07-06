@@ -1154,6 +1154,8 @@ async function FCMdata(data) {
 		const navState = !$("#nav-rail").hasClass("hide");
 		// hide navrail so the view goes fullscreen
 		if (navState) toggleNav(false);
+		// hide report to make screen clean
+		$(roll).fadeOut(200);
 
 		// handler
 		Info["ID"] = json.ID;
@@ -1452,6 +1454,8 @@ async function FCMdata(data) {
 					clearInterval(ITimer);
 					// hide eew alert
 					$("#alert-box").removeClass("show");
+					// restore reports
+					$(roll).fadeIn(200);
 					ITimer = null;
 					focus([Lat, Long], 7.5);
 					document.getElementById("PS").style.height = "0%";
