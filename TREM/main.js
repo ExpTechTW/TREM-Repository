@@ -117,6 +117,15 @@ else {
 				},
 			},
 			{
+				label : "重新啟動",
+				type  : "normal",
+				click : () => {
+					app.relaunch();
+					if (SettingWindow != null) SettingWindow.close();
+					app.quit();
+				},
+			},
+			{
 				label : "強制關閉",
 				type  : "normal",
 				click : () => {
@@ -125,15 +134,6 @@ else {
 					if (fs.existsSync(path.join(app.getPath("logs"), "latest.log")))
 						fs.renameSync(path.join(app.getPath("logs"), "latest.log"), path.join(app.getPath("logs"), `${nowTime}.log`));
 					app.exit(0);
-				},
-			},
-			{
-				label : "重新啟動",
-				type  : "normal",
-				click : () => {
-					app.relaunch();
-					if (SettingWindow != null) SettingWindow.close();
-					app.quit();
 				},
 			},
 		]);
