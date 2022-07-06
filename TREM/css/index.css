@@ -287,7 +287,7 @@ body {
 .alert-box-body > .alert-item ~ .alert-item {
     flex: unset;
     border-left: unset;
-    width: 72px;
+    width: 84px;
     align-items: center;
     margin-top: 4px;
 }
