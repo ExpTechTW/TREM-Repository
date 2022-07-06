@@ -175,7 +175,6 @@ let Location;
 let station = {};
 let PGAjson = {};
 let MainClock = null;
-let _eewTest = false;
 let geojson = null;
 // #endregion
 
@@ -661,11 +660,11 @@ function focus(Loc, size, args) {
 		Focus[0] = Loc[0];
 		Focus[1] = Loc[1];
 		Focus[2] = size;
-		map.setView([Loc[0], Loc[1]], size);
+		map.setView([Loc[0], Loc[1] + 0.9], size);
 	} else if (Loc != undefined)
-		map.setView([Loc[0], Loc[1]], size);
+		map.setView([Loc[0], Loc[1] + 0.9], size);
 	else
-		map.setView([Focus[0], Focus[1]], Focus[2]);
+		map.setView([Focus[0], Focus[1] + 0.9], Focus[2]);
 
 }
 // #endregion
@@ -1041,7 +1040,18 @@ function color(Intensity) {
 
 // #region IPC
 ipcMain.on("testEEW", () => {
-	_eewTest = true;
+	localStorage["Test"] = true;
+	ipcRenderer.send("restart");
+});
+ipcMain.on("updateTheme", () => {
+	console.log("updateTheme");
+	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
+});
+ipcMain.on("updateSetting", () => {
+	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
+});
+if (localStorage["Test"] != undefined) {
+	delete localStorage["Test"];
 	dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 	let data = {
 		"APIkey"        : "https://github.com/ExpTechTW",
@@ -1057,14 +1067,7 @@ ipcMain.on("testEEW", () => {
 		.catch((error) => {
 			dump({ level: 2, message: error, origin: "Verbose" });
 		});
-});
-ipcMain.on("updateTheme", () => {
-	console.log("updateTheme");
-	setThemeColor(config["theme.color"].value, config["theme.dark"].value);
-});
-ipcMain.on("updateSetting", () => {
-	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
-});
+}
 // #endregion
 
 // #region FCM
@@ -1354,16 +1357,14 @@ async function FCMdata(data) {
 
 		// AlertBox: 種類
 		let classString = "alert-box ";
-		if (json.Test || _eewTest)
+		if (json.Test != undefined && json.Test == null)
+			classString += "eew-history";
+		else if (json.Test)
 			classString += "eew-test";
 		else if (json.Alert)
 			classString += "eew-alert";
-		else if (json.Test != undefined && json.Test == null)
-			classString += "eew-history";
 		else
 			classString += "eew-pred";
-
-		_eewTest = false;
 
 		let find = -1;
 		for (let index = 0; index < INFO.length; index++)
@@ -1452,14 +1453,9 @@ async function FCMdata(data) {
 					clearInterval(ITimer);
 					// hide eew alert
 					$("#alert-box").removeClass("show");
-					// restore navrail state
-					toggleNav(navState);
-
 					ITimer = null;
 					focus([Lat, Long], 7.5);
 					document.getElementById("PS").style.height = "0%";
-					// document.getElementById("box-5").style.height = "0%";
-					// document.getElementById("box-4").style.height = "0%";
 					TimerDesynced = false;
 					audioList = [];
 					INFO = [];

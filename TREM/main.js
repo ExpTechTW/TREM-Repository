@@ -177,6 +177,6 @@ ipcMain.on("reset", (event, arg) => {
 
 ipcMain.on("restart", () => {
 	app.relaunch();
-	SettingWindow.close();
+	if (SettingWindow != null) SettingWindow.close();
 	app.quit();
 });
