@@ -1048,24 +1048,25 @@ ipcMain.on("updateTheme", () => {
 ipcMain.on("updateSetting", () => {
 	config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
 });
-if (localStorage["Test"] != undefined) {
-	delete localStorage["Test"];
-	dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
-	let data = {
-		"APIkey"        : "https://github.com/ExpTechTW",
-		"Function"      : "earthquake",
-		"Type"          : "test",
-		"FormatVersion" : 3,
-		"UUID"          : localStorage["UUID"],
-		"Addition"      : "TW",
-	};
-	if (config["accept.eew.jp"]["value"]) delete data["Addition"];
-	dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-	axios.post("https://exptech.mywire.org:1015", data)
-		.catch((error) => {
-			dump({ level: 2, message: error, origin: "Verbose" });
-		});
-}
+if (localStorage["Test"] != undefined)
+	setTimeout(() => {
+		delete localStorage["Test"];
+		dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
+		let data = {
+			"APIkey"        : "https://github.com/ExpTechTW",
+			"Function"      : "earthquake",
+			"Type"          : "test",
+			"FormatVersion" : 3,
+			"UUID"          : localStorage["UUID"],
+			"Addition"      : "TW",
+		};
+		if (config["accept.eew.jp"]["value"]) delete data["Addition"];
+		dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
+		axios.post("https://exptech.mywire.org:1015", data)
+			.catch((error) => {
+				dump({ level: 2, message: error, origin: "Verbose" });
+			});
+	}, 1000);
 // #endregion
 
 // #region FCM
@@ -1355,7 +1356,7 @@ async function FCMdata(data) {
 
 		// AlertBox: 種類
 		let classString = "alert-box ";
-		if (json.Test != undefined && json.Test == null)
+		if (json.Replay)
 			classString += "eew-history";
 		else if (json.Test)
 			classString += "eew-test";
