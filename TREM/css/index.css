@@ -149,6 +149,7 @@ body {
     pointer-events: none;
     transition: bottom .2s ease-in-out,
                 opacity .2s ease-in-out;
+    white-space: nowrap;
 }
 .alert-box.show {
     bottom: 60px;
@@ -184,7 +185,7 @@ body {
 .alert-notch {
     position: absolute;
     bottom: 0;
-    height: 80px;
+    height: 76px;
     width: 640px;
     display: flex;
     padding: 4px 12px 0 12px;
@@ -208,7 +209,7 @@ body {
     flex: 1;
     height: min-content;
     font-weight: 500;
-    line-height: 30px;
+    line-height: 27px;
     font-size: 20px;
 }
 
@@ -243,7 +244,6 @@ body {
     margin-right: 12px;
     line-height: 24px;
     font-size: 26px;
-    white-space: nowrap;
 }
 
 #alert-time {
