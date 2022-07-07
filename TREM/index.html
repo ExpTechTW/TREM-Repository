@@ -107,9 +107,11 @@
         if (!fs.existsSync(localStorage["config"])) {
             fs.mkdirSync(localStorage["config"])
         }
-        bytenode.runBytecodeFile(__dirname + '/js/dump.jar')
-        bytenode.runBytecodeFile(__dirname + '/js/earthquake.jar')
+        //bytenode.runBytecodeFile(__dirname + '/js/dump.jar')
+        //bytenode.runBytecodeFile(__dirname + '/js/earthquake.jar')
     </script>
+    <script src="./js/dump.js"></script>
+    <script src="./js/earthquake.js"></script>
 </body>
 
 </html>
