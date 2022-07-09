@@ -1195,7 +1195,7 @@ async function FCMdata(data) {
 			else if (json.Function == "JP_earthquake")
 				msg = msg.replace("%Government%", "日本氣象廳");
 			else if (json.Function == "CN_earthquake")
-				msg = msg.replace("%Government%", "成都高新減災研究所");
+				msg = msg.replace("%Government%", "福建省地震局");
 
 			msg = JSON.parse(msg);
 			msg["username"] = "TREM | 台灣實時地震監測";
