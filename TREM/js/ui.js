@@ -1,4 +1,3 @@
-const $ = require("jquery");
 const toggleNav = state => {
 	if (state == undefined) {
 		$("#nav-rail").toggleClass("hide");

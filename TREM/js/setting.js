@@ -1,4 +1,3 @@
-const $ = require("jquery");
 const ipc = require("electron").ipcRenderer;
 const { shell } = require("@electron/remote");
 
