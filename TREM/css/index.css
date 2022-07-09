@@ -61,6 +61,15 @@ body {
     transition: border-radius .5s ease-in-out;
 }
 
+#map-tw {
+    user-select: none;
+    z-index: 1000;
+    position: absolute;
+    right: 0;
+    margin: 4px 12px 0 0;
+    border-radius: 16px;
+}
+
 #nav-rail > button {
     align-self: flex-end;
 }
@@ -143,7 +152,7 @@ body {
     left: 50%;
     bottom: -100px;
     height: 48px;
-    width: 672px;
+    width: 712px;
     opacity: 0;
     transform: translateX(-50%);
     pointer-events: none;
@@ -158,7 +167,7 @@ body {
 .alert-box-body {
     z-index: 1001;
     height: 48px;
-    width: 640px;
+    width: 680px;
     display: flex;
     align-items: center;
     padding: 12px;
@@ -347,7 +356,7 @@ body {
 .alert-box-body > .alert-item ~ .alert-item {
     flex: unset;
     border-left: unset;
-    width: 70px;
+    width: 76px;
     align-items: center;
     margin-top: 4px;
 }
