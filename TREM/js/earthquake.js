@@ -1361,10 +1361,15 @@ async function FCMdata(data) {
 			iconSize : [30, 30],
 		});
 		let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
+		let Cross1 = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
 		if (EarthquakeList[json.ID]["Cross"] != undefined)
 			map.removeLayer(EarthquakeList[json.ID]["Cross"]);
 		EarthquakeList[json.ID]["Cross"] = Cross;
 		map.addLayer(Cross);
+		if (EarthquakeList[json.ID]["Cross1"] != undefined)
+			map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
+		EarthquakeList[json.ID]["Cross1"] = Cross1;
+		map1.addLayer(Cross1);
 		Cross.setZIndexOffset(6000);
 		let Loom = 0;
 		let speed = 1000;
@@ -1420,6 +1425,8 @@ async function FCMdata(data) {
 			if (config["shock.p"]["value"]) {
 				if (EarthquakeList[json.ID]["Pcircle"] != null)
 					map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
+				if (EarthquakeList[json.ID]["Pcircle1"] != null)
+					map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
 				let km = Math.sqrt(Math.pow((NOW.getTime() - json.Time) * Pspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2));
 				if (km > 0) {
 					EarthquakeList[json.ID]["Pcircle"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
@@ -1427,22 +1434,36 @@ async function FCMdata(data) {
 						fillColor : "transparent",
 						radius    : km,
 					});
+					EarthquakeList[json.ID]["Pcircle1"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+						color     : "#6FB7B7",
+						fillColor : "transparent",
+						radius    : km,
+					});
 					map.addLayer(EarthquakeList[json.ID]["Pcircle"]);
+					map1.addLayer(EarthquakeList[json.ID]["Pcircle1"]);
 				}
 			}
 			if (EarthquakeList[json.ID]["Scircle"] != null)
 				map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
+			if (EarthquakeList[json.ID]["Scircle1"] != null)
+				map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
 			let km = Math.pow((NOW.getTime() - json.Time) * Sspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2);
 			if (km > 0) {
 				let KM = Math.sqrt(km);
-				let Scircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+				EarthquakeList[json.ID]["Scircle"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 					color       : json.Alert ? "red" : "orange",
 					fillColor   : "#F8E7E7",
 					fillOpacity : 0.1,
 					radius      : KM,
 				});
-				EarthquakeList[json.ID]["Scircle"] = Scircle;
-				map.addLayer(Scircle);
+				EarthquakeList[json.ID]["Scircle1"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+					color       : json.Alert ? "red" : "orange",
+					fillColor   : "#F8E7E7",
+					fillOpacity : 0.1,
+					radius      : KM,
+				});
+				map.addLayer(EarthquakeList[json.ID]["Scircle"]);
+				map1.addLayer(EarthquakeList[json.ID]["Scircle1"]);
 			}
 			if (NOW.getTime() - json.TimeStamp > 240000 || json.Cancel && EarthquakeList[json.ID] != undefined) {
 				if (json.Cancel) {
