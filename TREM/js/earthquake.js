@@ -142,6 +142,7 @@ let MarkList = [];
 let EarthquakeList = {};
 let marker = null;
 let map;
+let map1;
 let Station = {};
 let PGA = {};
 let Pga = {};
@@ -287,6 +288,16 @@ function init() {
 		closePopupOnClick  : false,
 	}).setView([23, 121], 7.5);
 
+	map1 = L.map("map-tw", {
+		attributionControl : false,
+		closePopupOnClick  : false,
+	}).setView([23.608428, 120.799168], 7);
+
+	map1.dragging.disable();
+	map1.scrollWheelZoom.disable();
+	map1.doubleClickZoom.disable();
+	map1.removeControl(map1.zoomControl);
+
 	L.geoJson(statesData, {
 		style: {
 			weight    : 0.8,
@@ -294,7 +305,7 @@ function init() {
 			color     : "#8E8E8E",
 			fillColor : "transparent",
 		},
-	}).addTo(map);
+	}).addTo(map1);
 
 	map.on("click", (e) => {
 		if (ReportMarkID != null) {
@@ -305,6 +316,14 @@ function init() {
 			focus();
 		}
 	});
+
+	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+		maxZoom    : 14,
+		id         : "mapbox/dark-v10",
+		tileSize   : 512,
+		zoomOffset : -1,
+		minZoom    : 2,
+	}).addTo(map1);
 
 	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
 		maxZoom    : 14,
@@ -1232,7 +1251,7 @@ async function FCMdata(data) {
 			TimerDesynced = false;
 			return;
 		}
-		if (geojson != null) map.removeLayer(geojson);
+		if (geojson != null) map1.removeLayer(geojson);
 		geojson = L.geoJson(statesData, {
 			style: (feature) => {
 				let name = feature.properties.COUNTY + feature.properties.TOWN;
@@ -1256,7 +1275,7 @@ async function FCMdata(data) {
 				};
 			},
 		});
-		map.addLayer(geojson);
+		map1.addLayer(geojson);
 		if (json.ID != Info["Notify"]) {
 			if (config["eew.show"]["value"]) {
 				win.show();
@@ -1306,7 +1325,6 @@ async function FCMdata(data) {
 			t = setInterval(() => {
 				value = Math.round((distance - ((NOW.getTime() - json.Time) / 1000) * Sspeed) / Sspeed);
 				if (Stamp != value && !audioLock) {
-					audioList = [];
 					Stamp = value;
 					if (_time >= 0) {
 						audioPlay("./audio/1/ding.wav");
