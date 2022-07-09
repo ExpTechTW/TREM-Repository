@@ -1475,7 +1475,10 @@ async function FCMdata(data) {
 				}
 				if (EarthquakeList[json.ID]["Scircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
 				if (EarthquakeList[json.ID]["Pcircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
+				if (EarthquakeList[json.ID]["Scircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
+				if (EarthquakeList[json.ID]["Pcircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
 				map.removeLayer(EarthquakeList[json.ID]["Cross"]);
+				map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
 				for (let index = 0; index < INFO.length; index++)
 					if (INFO[index]["ID"] == json.ID) {
 						TINFO = 0;
