@@ -272,12 +272,20 @@ function init() {
 												(amount >= 25) ? 4 :
 													(amount >= 8) ? 3 :
 														(amount >= 5) ? 2 :
-															(amount >= 3.5) ? 1 :
+															(amount >= 4) ? 1 :
 																0;
 						let size = 15;
-						if (Intensity == 0) size = 5;
+						let Image = `./image/$${Intensity}.png`;
+						if (Intensity == 0) {
+							size = 10;
+							Image = "./image/0-1.png";
+							if (amount > 2.5) Image = "./image/0-2.png";
+							if (amount > 2.8) Image = "./image/0-3.png";
+							if (amount > 3) Image = "./image/0-4.png";
+							if (amount > 3.5) Image = "./image/0-5.png";
+						}
 						let myIcon = L.icon({
-							iconUrl  : `./image/$${Intensity}.png`,
+							iconUrl  : Image,
 							iconSize : [size, size],
 						});
 						let ReportMark = L.marker([station[Object.keys(Json)[index]].Lat, station[Object.keys(Json)[index]].Long], { icon: myIcon });
@@ -290,6 +298,7 @@ function init() {
 							document.getElementById("rt-station-pga").innerText = amount;
 						}
 						map.addLayer(ReportMark);
+						ReportMark.setZIndexOffset(1000);
 						Station[Object.keys(Json)[index]] = ReportMark;
 						if (pga[station[Object.keys(Json)[index]].PGA] == undefined && Intensity != "NA")
 							pga[station[Object.keys(Json)[index]].PGA] = {
@@ -303,7 +312,7 @@ function init() {
 								"intensity" : Intensity,
 							});
 							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
-							if (amount >= 3.5)
+							if (amount >= 4)
 								if (Pga[Object.keys(Json)[index]]) {
 									if (amount > 8 && PGALimit == 0) {
 										PGALimit = 1;
