@@ -8,10 +8,6 @@ const {
 } = require("electron-fcm-push-receiver/src/constants");
 const WebSocket = require("ws");
 
-// #region config
-
-// #endregion
-
 // #region 變數
 let t = null;
 let Lat = 25.0421407;
@@ -103,13 +99,6 @@ Date.prototype.format =
 				: ret;
 		});
 	};
-// #endregion
-
-// #region 設定檔
-/*
-if (!fs.existsSync(configPath))
-	fs.mkdirSync(configPath);
-*/
 // #endregion
 
 // #region 初始化
@@ -465,7 +454,7 @@ function init() {
 					dump({ level: 2, message: error, origin: "PGATimer" });
 					console.error(error);
 				});
-		}, 500);
+		}, 1000);
 	}
 
 	$("#loading").text("歡迎");
@@ -591,7 +580,7 @@ function playNextAudio() {
 	audioLock = true;
 	const path = audioList.shift();
 	audioDOM.src = path;
-	audioDOM.playbackRate = 1.1;
+	audioDOM.playbackRate = 1.15;
 	if (path.startsWith("./audio/1/") && CONFIG["eew.audio"].value) {
 		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
 		audioDOM.play();
