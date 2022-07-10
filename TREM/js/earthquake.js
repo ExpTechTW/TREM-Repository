@@ -129,9 +129,9 @@ let time = document.getElementById("time");
 document.title = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
 
 setInterval(() => {
-	if (CONFIG["location.city"]["value"] != Check["city"] || CONFIG["location.town"]["value"] != Check["town"]) {
-		Check["city"] = CONFIG["location.city"]["value"];
-		Check["town"] = CONFIG["location.town"]["value"];
+	if (CONFIG["location.city"].value != Check.city || CONFIG["location.town"].value != Check.town) {
+		Check.city = CONFIG["location.city"].value;
+		Check.town = CONFIG["location.town"].value;
 		setUserLocationMarker();
 	}
 	if (TimerDesynced)
@@ -229,7 +229,7 @@ function init() {
 							.then((res2) => {
 								PGAjson = res2;
 								dump({ level: 0, message: "Get PGA Location File", origin: "Location" });
-								if (CONFIG["earthquake.Real-time"]["value"])
+								if (CONFIG["earthquake.Real-time"].value)
 									PGAMain();
 							});
 					});
@@ -255,7 +255,7 @@ function init() {
 						index--;
 					}
 					if (response.data["state"] != "Success") return;
-					let Json = response.data["response"];
+					let Json = response.data.response;
 					let All = [];
 					MAXPGA = { pga: 0, station: "NA", level: 0 };
 					for (let index = 0; index < Object.keys(Json).length; index++) {
@@ -263,7 +263,7 @@ function init() {
 						let amount = 0;
 						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"]);
 						if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue;
-						let Intensity = (NOW.getTime() - Sdata["TimeStamp"] > 5000) ? "NA" :
+						let Intensity = (NOW.getTime() - Sdata.TimeStamp > 5000) ? "NA" :
 							(amount >= 800) ? 9 :
 								(amount >= 440) ? 8 :
 									(amount >= 250) ? 7 :
@@ -280,29 +280,29 @@ function init() {
 							iconUrl  : `./image/$${Intensity}.png`,
 							iconSize : [size, size],
 						});
-						let ReportMark = L.marker([station[Object.keys(Json)[index]]["Lat"], station[Object.keys(Json)[index]]["Long"]], { icon: myIcon });
+						let ReportMark = L.marker([station[Object.keys(Json)[index]].Lat, station[Object.keys(Json)[index]].Long], { icon: myIcon });
 						let Level = IntensityI(Intensity);
-						let now = new Date(Sdata["Time"]);
-						if (Object.keys(Json)[index] == CONFIG["Real-time.station"]["value"]) {
-							document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]]["Loc"];
+						let now = new Date(Sdata.Time);
+						if (Object.keys(Json)[index] == CONFIG["Real-time.station"].value) {
+							document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]].Loc;
 							document.getElementById("rt-station-time").innerText = now.format("MM/DD HH:mm:ss");
 							document.getElementById("rt-station-intensity").innerText = Intensity;
 							document.getElementById("rt-station-pga").innerText = amount;
 						}
 						map.addLayer(ReportMark);
 						Station[Object.keys(Json)[index]] = ReportMark;
-						if (pga[station[Object.keys(Json)[index]]["PGA"]] == undefined && Intensity != "NA")
-							pga[station[Object.keys(Json)[index]]["PGA"]] = {
+						if (pga[station[Object.keys(Json)[index]].PGA] == undefined && Intensity != "NA")
+							pga[station[Object.keys(Json)[index]].PGA] = {
 								"Intensity" : Intensity,
 								"Time"      : 0,
 							};
 
 						if (Intensity != "NA" && Intensity != 0) {
 							All.push({
-								"loc"       : station[Object.keys(Json)[index]]["Loc"],
+								"loc"       : station[Object.keys(Json)[index]].Loc,
 								"intensity" : Intensity,
 							});
-							if (Intensity > pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"]) pga[station[Object.keys(Json)[index]]["PGA"]]["Intensity"] = Intensity;
+							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
 							if (amount >= 3.5)
 								if (Pga[Object.keys(Json)[index]]) {
 									if (amount > 8 && PGALimit == 0) {
@@ -312,20 +312,20 @@ function init() {
 										PGALimit = 2;
 										audioPlay("./audio/PGA2.wav");
 									}
-									pga[station[Object.keys(Json)[index]]["PGA"]]["Time"] = NOW.getTime();
+									pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 								} else
 									Pga[Object.keys(Json)[index]] = true;
 
 
-							if (MAXPGA["pga"] < amount && Level != "NA") {
-								MAXPGA["pga"] = amount;
-								MAXPGA["station"] = Object.keys(Json)[index];
-								MAXPGA["level"] = Level;
-								MAXPGA["lat"] = station[Object.keys(Json)[index]]["Lat"];
-								MAXPGA["long"] = station[Object.keys(Json)[index]]["Long"];
-								MAXPGA["loc"] = station[Object.keys(Json)[index]]["Loc"];
-								MAXPGA["intensity"] = Intensity;
-								MAXPGA["ms"] = NOW.getTime() - Sdata["TimeStamp"];
+							if (MAXPGA.pga < amount && Level != "NA") {
+								MAXPGA.pga = amount;
+								MAXPGA.station = Object.keys(Json)[index];
+								MAXPGA.level = Level;
+								MAXPGA.lat = station[Object.keys(Json)[index]].Lat;
+								MAXPGA.long = station[Object.keys(Json)[index]].Long;
+								MAXPGA.loc = station[Object.keys(Json)[index]].Loc;
+								MAXPGA.intensity = Intensity;
+								MAXPGA.ms = NOW.getTime() - Sdata.TimeStamp;
 							}
 						} else
 							delete Pga[Object.keys(Json)[index]];
@@ -334,32 +334,32 @@ function init() {
 					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
 							if (NOW.getTime() - PAlert.timestamp > 30000) break;
-							if (pga[PAlert.data[index]["TREM"]] == undefined)
-								pga[PAlert.data[index]["TREM"]] = {
+							if (pga[PAlert.data[index].TREM] == undefined)
+								pga[PAlert.data[index].TREM] = {
 									"Intensity" : 0,
 									"Time"      : 0,
 								};
 							let myIcon = L.icon({
-								iconUrl  : `./image/${PAlert.data[index]["intensity"]}.png`,
+								iconUrl  : `./image/${PAlert.data[index].intensity}.png`,
 								iconSize : [15, 15],
 							});
-							let list = PAlert.data[index]["loc"].split(" ");
+							let list = PAlert.data[index].loc.split(" ");
 							let city = list[0];
 							let town = list[1];
 							let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
 							map.addLayer(ReportMark);
-							Station[PAlert.data[index]["loc"]] = ReportMark;
-							if (PAlert.data[index]["intensity"] > pga[PAlert.data[index]["TREM"]]["Intensity"]) pga[PAlert.data[index]["TREM"]]["Intensity"] = PAlert.data[index]["intensity"];
-							pga[PAlert.data[index]["TREM"]]["Time"] = NOW.getTime();
+							Station[PAlert.data[index].loc] = ReportMark;
+							if (PAlert.data[index].intensity > pga[PAlert.data[index].TREM].Intensity) pga[PAlert.data[index].TREM].Intensity = PAlert.data[index].intensity;
+							pga[PAlert.data[index].TREM].Time = NOW.getTime();
 							All.push({
-								"loc"       : PAlert.data[index]["loc"],
-								"intensity" : PAlert.data[index]["intensity"],
+								"loc"       : PAlert.data[index].loc,
+								"intensity" : PAlert.data[index].intensity,
 							});
-							if (IntensityN(MAXPGA["level"]) < PAlert.data[index]["intensity"]) {
-								MAXPGA["pga"] = "";
-								MAXPGA["level"] = IntensityI(PAlert.data[index]["intensity"]);
-								MAXPGA["loc"] = PAlert.data[index]["loc"];
-								MAXPGA["intensity"] = PAlert.data[index]["intensity"];
+							if (IntensityN(MAXPGA.level) < PAlert.data[index].intensity) {
+								MAXPGA.pga = "";
+								MAXPGA.level = IntensityI(PAlert.data[index].intensity);
+								MAXPGA.loc = PAlert.data[index].loc;
+								MAXPGA.intensity = PAlert.data[index].intensity;
 							}
 						}
 					for (let index = 0; index < Object.keys(PGA).length; index++) {
@@ -368,8 +368,8 @@ function init() {
 						index--;
 					}
 					for (let index = 0; index < Object.keys(pga).length; index++) {
-						let Intensity = pga[Object.keys(pga)[index]]["Intensity"];
-						if (NOW.getTime() - pga[Object.keys(pga)[index]]["Time"] > 5000) {
+						let Intensity = pga[Object.keys(pga)[index]].Intensity;
+						if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 5000) {
 							delete pga[Object.keys(pga)[index]];
 							index--;
 						} else {
@@ -391,7 +391,7 @@ function init() {
 					if (Object.keys(PGA).length == 0) PGAaudio = false;
 
 					if (PGAaudio) {
-						// document.getElementById("intensity-3").innerHTML = `<font color="white" size="7"><b>${MAXPGA["level"]}</b></font><br><font color="white" size="3"><b>${MAXPGA["pga"]}</b></font>`;
+						// document.getElementById("intensity-3").innerHTML = `<font color="white" size="7"><b>${MAXPGA.level}</b></font><br><font color="white" size="3"><b>${MAXPGA.pga}</b></font>`;
 
 					} else {
 						PGAAudio = false;
@@ -400,9 +400,9 @@ function init() {
 					}
 					if (!PGAAudio && PGAaudio) {
 						if (!win.isVisible())
-							if (CONFIG["Real-time.show"]["value"]) {
+							if (CONFIG["Real-time.show"].value) {
 								win.show();
-								if (CONFIG["Real-time.cover"]["value"]) win.setAlwaysOnTop(true);
+								if (CONFIG["Real-time.cover"].value) win.setAlwaysOnTop(true);
 								win.setAlwaysOnTop(false);
 							}
 
@@ -410,24 +410,24 @@ function init() {
 					}
 					for (let Index = 0; Index < All.length - 1; Index++)
 						for (let index = 0; index < All.length - 1; index++)
-							if (All[index]["intensity"] < All[index + 1]["intensity"]) {
+							if (All[index].intensity < All[index + 1].intensity) {
 								let Temp = All[index + 1];
 								All[index + 1] = All[index];
 								All[index] = Temp;
 							}
 
 
-					if (All.length != 0 && All[0]["intensity"] > PGAtag && Object.keys(pga).length != 0) {
-						if (CONFIG["Real-time.audio"]["value"])
-							if (All[0]["intensity"] >= 5 && PGAtag < 5)
+					if (All.length != 0 && All[0].intensity > PGAtag && Object.keys(pga).length != 0) {
+						if (CONFIG["Real-time.audio"].value)
+							if (All[0].intensity >= 5 && PGAtag < 5)
 								audioPlay("./audio/Shindo2.wav");
-							else if (All[0]["intensity"] >= 2 && PGAtag < 2)
+							else if (All[0].intensity >= 2 && PGAtag < 2)
 								audioPlay("./audio/Shindo1.wav");
 							else if (PGAtag == 0)
 								audioPlay("./audio/Shindo0.wav");
 
 
-						if (All[0]["intensity"] >= 2) {
+						if (All[0].intensity >= 2) {
 							let Now = NOW.getFullYear() +
 								"/" + (NOW.getMonth() + 1) +
 								"/" + NOW.getDate() +
@@ -436,11 +436,11 @@ function init() {
 								":" + NOW.getSeconds();
 							Report = NOW.getTime();
 							ReportGET({
-								Max  : All[0]["intensity"],
+								Max  : All[0].intensity,
 								Time : Now,
 							});
 						}
-						PGAtag = All[0]["intensity"];
+						PGAtag = All[0].intensity;
 					}
 
 					// clear
@@ -449,9 +449,9 @@ function init() {
 					for (let Index = 0; Index < All.length; Index++, count++) {
 						if (!PGAaudio || count >= 10) break;
 						const container = document.createElement("DIV");
-						container.className = IntensityToClassString(All[Index]["intensity"]);
+						container.className = IntensityToClassString(All[Index].intensity);
 						const location = document.createElement("span");
-						location.innerText = All[Index]["loc"];
+						location.innerText = All[Index].loc;
 						container.appendChild(document.createElement("span"));
 						container.appendChild(location);
 						list.push(container);
@@ -506,9 +506,9 @@ function initEventHandle() {
 			"Function"      : "earthquakeService",
 			"Type"          : "subscription-v1",
 			"FormatVersion" : 3,
-			"UUID"          : localStorage["UUID"],
+			"UUID"          : localStorage.UUID,
 		}));
-		dump({ level: 0, message: `Connected to API Server (${localStorage["UUID"]})`, origin: "WebSocket" });
+		dump({ level: 0, message: `Connected to API Server (${localStorage.UUID})`, origin: "WebSocket" });
 	};
 
 	ws.onmessage = function(evt) {
@@ -530,8 +530,8 @@ async function setUserLocationMarker() {
 		dump({ level: 0, message: "Get Location File", origin: "Location" });
 	}
 
-	Lat = Location[CONFIG["location.city"]["value"]][CONFIG["location.town"]["value"]][1];
-	Long = Location[CONFIG["location.city"]["value"]][CONFIG["location.town"]["value"]][2];
+	Lat = Location[CONFIG["location.city"].value][CONFIG["location.town"].value][1];
+	Long = Location[CONFIG["location.city"].value][CONFIG["location.town"].value][2];
 	if (marker != null) map.removeLayer(marker);
 	let myIcon = L.icon({
 		iconUrl  : "./image/here.png",
@@ -589,7 +589,7 @@ async function playNextAudio() {
 	const path = audioList.shift();
 	audioDOM.src = path;
 	audioDOM.playbackRate = 1.1;
-	if (path.startsWith("./audio/1/") && CONFIG["eew.audio"]["value"]) {
+	if (path.startsWith("./audio/1/") && CONFIG["eew.audio"].value) {
 		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
 		await audioDOM.play();
 	} else if (!path.startsWith("./audio/1/")) {
@@ -644,32 +644,32 @@ async function ReportClick(time) {
 			"Function"      : "data",
 			"Type"          : "report",
 			"FormatVersion" : 1,
-			"Value"         : ReportCache[time]["earthquakeNo"],
+			"Value"         : ReportCache[time].earthquakeNo,
 		};
 		if (
-			ReportCache[time]["earthquakeNo"] == 111000
+			ReportCache[time].earthquakeNo == 111000
 			|| await axios.post("https://exptech.mywire.org:1015", body)
 				.then((response) => {
 					let json = response.data.response;
 					if (json == undefined)
 						return true;
 					else {
-						for (let Index = 0; Index < json["Intensity"].length; Index++)
-							for (let index = 0; index < json["Intensity"][Index]["station"].length; index++) {
+						for (let Index = 0; Index < json.Intensity.length; Index++)
+							for (let index = 0; index < json.Intensity[Index].station.length; index++) {
 								// eslint-disable-next-line no-shadow
-								let Station = json["Intensity"][Index]["station"][index];
-								let Intensity = Station["stationIntensity"]["$t"];
-								if (Station["stationIntensity"]["unit"] == "強") Intensity += "+";
-								if (Station["stationIntensity"]["unit"] == "弱") Intensity += "-";
+								let Station = json.Intensity[Index].station[index];
+								let Intensity = Station.stationIntensity.$t;
+								if (Station.stationIntensity.unit == "強") Intensity += "+";
+								if (Station.stationIntensity.unit == "弱") Intensity += "-";
 								let myIcon = L.icon({
 									iconUrl  : `./image/${IntensityI(Intensity)}.png`,
 									iconSize : [20, 20],
 								});
-								let ReportMark = L.marker([Station["stationLat"]["$t"], Station["stationLon"]["$t"]], { icon: myIcon });
+								let ReportMark = L.marker([Station.stationLat.$t, Station.stationLon.$t], { icon: myIcon });
 								// eslint-disable-next-line no-shadow
 								let PGA = "";
-								if (Station["pga"] != undefined) PGA = `<br>PGA<br>垂直向: ${Station["pga"]["vComponent"]}<br>東西向: ${Station["pga"]["ewComponent"]}<br>南北向: ${Station["pga"]["nsComponent"]}<br><a onclick="openURL('${Station["waveImageURI"]}')">震波圖</a>`;
-								ReportMark.bindPopup(`站名: ${Station["stationName"]}<br>代號: ${Station["stationCode"]}<br>經度: ${Station["stationLon"]["$t"]}<br>緯度: ${Station["stationLat"]["$t"]}<br>震央距: ${Station["distance"]["$t"]}<br>方位角: ${Station["azimuth"]["$t"]}<br>震度: ${Intensity}<br>${PGA}`);
+								if (Station.pga != undefined) PGA = `<br>PGA<br>垂直向: ${Station.pga.vComponent}<br>東西向: ${Station.pga.ewComponent}<br>南北向: ${Station.pga.nsComponent}<br><a onclick="openURL('${Station.waveImageURI}')">震波圖</a>`;
+								ReportMark.bindPopup(`站名: ${Station.stationName}<br>代號: ${Station.stationCode}<br>經度: ${Station.stationLon.$t}<br>緯度: ${Station.stationLat.$t}<br>震央距: ${Station["distance"].$t}<br>方位角: ${Station["azimuth"].$t}<br>震度: ${Intensity}<br>${PGA}`);
 								map.addLayer(ReportMark);
 								ReportMark.setZIndexOffset(1000 + index);
 								MarkList.push(ReportMark);
@@ -698,23 +698,23 @@ async function ReportClick(time) {
 				for (let index = 0; index < ReportCache[time].data[Index]["eqStation"].length; index++) {
 					let data = ReportCache[time].data[Index]["eqStation"][index];
 					const myIcon = L.icon({
-						iconUrl  : `./image/${data["stationIntensity"]}.png`,
+						iconUrl  : `./image/${data.stationIntensity}.png`,
 						iconSize : [20, 20],
 					});
-					let level = IntensityI(data["stationIntensity"]);
+					let level = IntensityI(data.stationIntensity);
 					LIST.push({
-						Lat       : Number(data["stationLat"]),
-						Long      : Number(data["stationLon"]),
+						Lat       : Number(data.stationLat),
+						Long      : Number(data.stationLon),
 						Icon      : myIcon,
 						Level     : level,
-						Intensity : Number(data["stationIntensity"]),
+						Intensity : Number(data.stationIntensity),
 						Name      : `${ReportCache[time].data[Index]["areaName"]} ${data["stationName"]}`,
 					});
 				}
 
 			for (let Index = 0; Index < LIST.length - 1; Index++)
 				for (let index = 0; index < LIST.length - 1; index++)
-					if (LIST[index]["Intensity"] > LIST[index + 1]["Intensity"]) {
+					if (LIST[index].Intensity > LIST[index + 1].Intensity) {
 						let Temp = LIST[index];
 						LIST[index] = LIST[index + 1];
 						LIST[index + 1] = Temp;
@@ -722,8 +722,8 @@ async function ReportClick(time) {
 
 
 			for (let index = 0; index < LIST.length; index++) {
-				let ReportMark = L.marker([LIST[index]["Lat"], LIST[index]["Long"]], { icon: LIST[index]["Icon"] });
-				ReportMark.bindPopup(`站名: ${LIST[index]["Name"]}<br>經度: ${LIST[index]["Long"]}<br>緯度: ${LIST[index]["Lat"]}<br>震度: ${LIST[index]["Level"]}`);
+				let ReportMark = L.marker([LIST[index].Lat, LIST[index].Long], { icon: LIST[index].Icon });
+				ReportMark.bindPopup(`站名: ${LIST[index].Name}<br>經度: ${LIST[index].Long}<br>緯度: ${LIST[index].Lat}<br>震度: ${LIST[index].Level}`);
 				map.addLayer(ReportMark);
 				ReportMark.setZIndexOffset(1000 + index);
 				MarkList.push(ReportMark);
@@ -734,7 +734,7 @@ async function ReportClick(time) {
 				iconSize : [25, 25],
 			});
 			let ReportMark = L.marker([Number(ReportCache[time].epicenterLat), Number(ReportCache[time].epicenterLon)], { icon });
-			ReportMark.bindPopup(`編號: ${ReportCache[time]["earthquakeNo"]}<br>經度: ${ReportCache[time]["epicenterLon"]}<br>緯度: ${ReportCache[time]["epicenterLat"]}<br>深度: ${ReportCache[time]["depth"]}<br>規模: ${ReportCache[time]["magnitudeValue"]}<br>位置: ${ReportCache[time]["location"]}<br>時間: ${ReportCache[time]["originTime"]}`);
+			ReportMark.bindPopup(`編號: ${ReportCache[time].earthquakeNo}<br>經度: ${ReportCache[time].epicenterLon}<br>緯度: ${ReportCache[time].epicenterLat}<br>深度: ${ReportCache[time].depth}<br>規模: ${ReportCache[time].magnitudeValue}<br>位置: ${ReportCache[time].location}<br>時間: ${ReportCache[time].originTime}`);
 			map.addLayer(ReportMark);
 			ReportMark.setZIndexOffset(3000);
 			MarkList.push(ReportMark);
@@ -763,18 +763,18 @@ function ReportList(Data, eew) {
 	}
 
 	function add() {
-		for (let index = 0; index < Data["response"].length; index++) {
-			let DATA = Data["response"][index];
+		for (let index = 0; index < Data.response.length; index++) {
+			let DATA = Data.response[index];
 			let Div = document.createElement("DIV");
-			let Level = IntensityI(DATA["data"][0]["areaIntensity"]);
+			let Level = IntensityI(DATA.data[0].areaIntensity);
 			let msg = "";
-			if (DATA["location"].includes("("))
-				msg = DATA["location"].substring(DATA["location"].indexOf("(") + 1, DATA["location"].indexOf(")")).replace("位於", "");
+			if (DATA.location.includes("("))
+				msg = DATA.location.substring(DATA.location.indexOf("(") + 1, DATA.location.indexOf(")")).replace("位於", "");
 			else
-				msg = DATA["location"];
+				msg = DATA.location;
 
 			let star = "";
-			if (DATA["earthquakeNo"] != 111000) star = "✩ ";
+			if (DATA.earthquakeNo != 111000) star = "✩ ";
 			if (index == 0)
 				if (eew.Time != undefined && eew.report == undefined) {
 					Div.style.backgroundColor = color(eew.Max);
@@ -797,10 +797,10 @@ function ReportList(Data, eew) {
                     </div>
                     <div class="middle" style="width:60%;">
                         <b><font color="white" size="4">${star}${msg}</font></b>
-                        <br><font color="white" size="3">${DATA["originTime"]}</font>
+                        <br><font color="white" size="3">${DATA.originTime}</font>
                     </div>
                     <div class="right">
-                    <b><font color="white" size="5">M${DATA["magnitudeValue"]}</font></b>
+                    <b><font color="white" size="5">M${DATA.magnitudeValue}</font></b>
                     </div>
                     </div>`;
 				} else
@@ -811,8 +811,8 @@ function ReportList(Data, eew) {
                     </div>
                     <div class="middle" style="width:60%;">
                         <b><font color="white" size="4">${star}${msg}</font></b>
-                        <br><font color="white" size="2">${DATA["originTime"]}</font>
-                        <br><b><font color="white" size="6">M${DATA["magnitudeValue"]} </font></b><br><font color="white" size="2"> 深度: </font><b><font color="white" size="4">${DATA["depth"]}km</font></b>
+                        <br><font color="white" size="2">${DATA.originTime}</font>
+                        <br><b><font color="white" size="6">M${DATA.magnitudeValue} </font></b><br><font color="white" size="2"> 深度: </font><b><font color="white" size="4">${DATA.depth}km</font></b>
                     </div>
                 </div>`;
 
@@ -824,21 +824,21 @@ function ReportList(Data, eew) {
                 </div>
                 <div class="middle" style="width:60%;">
                     <b><font color="white" size="4">${star}${msg}</font></b>
-                    <br><font color="white" size="3">${DATA["originTime"]}</font>
+                    <br><font color="white" size="3">${DATA.originTime}</font>
                 </div>
                 <div class="right">
-                <b><font color="white" size="5">M${DATA["magnitudeValue"]}</font></b>
+                <b><font color="white" size="5">M${DATA.magnitudeValue}</font></b>
                 </div>
             </div>`;
-			Div.style.backgroundColor = color(DATA["data"][0]["areaIntensity"]);
-			ReportCache[DATA["originTime"]] = Data["response"][index];
+			Div.style.backgroundColor = color(DATA.data[0].areaIntensity);
+			ReportCache[DATA.originTime] = Data.response[index];
 			Div.addEventListener("click", () => {
-				ReportClick(DATA["originTime"]);
+				ReportClick(DATA.originTime);
 			});
 			roll.appendChild(Div);
 		}
 		if (eew.report != undefined) {
-			ReportClick(Data["response"][0]["originTime"]);
+			ReportClick(Data.response[0].originTime);
 			setTimeout(() => {
 				if (ReportMarkID != null) {
 					ReportMarkID = null;
@@ -864,7 +864,7 @@ function setting() {
 // #region PGA
 function PGAcount(Scale, distance, Si) {
 	let S = Si ?? 1;
-	if (!CONFIG["earthquake.siteEffect"]["value"]) S = 1;
+	if (!CONFIG["earthquake.siteEffect"].value) S = 1;
 	// eslint-disable-next-line no-shadow
 	let PGA = (1.657 * Math.pow(Math.E, (1.533 * Scale)) * Math.pow(distance, -1.607) * S).toFixed(3);
 	return PGA >= 800 ? "7" :
@@ -927,26 +927,26 @@ function color(Intensity) {
 
 // #region IPC
 ipcMain.on("testEEW", () => {
-	localStorage["Test"] = true;
+	localStorage.Test = true;
 	ipcRenderer.send("restart");
 });
 ipcMain.on("updateTheme", () => {
 	console.log("updateTheme");
 	setThemeColor(CONFIG["theme.color"].value, CONFIG["theme.dark"].value);
 });
-if (localStorage["Test"] != undefined)
+if (localStorage.Test != undefined)
 	setTimeout(() => {
-		delete localStorage["Test"];
+		delete localStorage.Test;
 		dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
 		let data = {
 			"APIkey"        : "https://github.com/ExpTechTW",
 			"Function"      : "earthquake",
 			"Type"          : "test",
 			"FormatVersion" : 3,
-			"UUID"          : localStorage["UUID"],
+			"UUID"          : localStorage.UUID,
 			"Addition"      : "TW",
 		};
-		if (CONFIG["accept.eew.jp"]["value"]) delete data["Addition"];
+		if (CONFIG["accept.eew.jp"].value) delete data["Addition"];
 		dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
 		axios.post("https://exptech.mywire.org:1015", data)
 			.catch((error) => {
@@ -957,7 +957,7 @@ if (localStorage["Test"] != undefined)
 
 // #region FCM
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
-	localStorage["UUID"] = token;
+	localStorage.UUID = token;
 	createWebSocket();
 	dump({ level: 0, message: `Service Started (${token})`, origin: "FCM" });
 });
@@ -995,9 +995,9 @@ async function FCMdata(data) {
 
 	if (json.Function == "tsunami") {
 		dump({ level: 0, message: "Got Tsunami Warning", origin: "API" });
-		if (CONFIG["report.show"]["value"]) {
+		if (CONFIG["report.show"].value) {
 			win.show();
-			if (CONFIG["report.cover"]["value"]) win.setAlwaysOnTop(true);
+			if (CONFIG["report.cover"].value) win.setAlwaysOnTop(true);
 			win.setAlwaysOnTop(false);
 		}
 		new Notification("海嘯警報", { body: `${json["UTC+8"]} 發生 ${json.Scale} 地震\n\n東經: ${json.EastLongitude} 度\n北緯: ${json.NorthLatitude} 度`, icon: "TREM.ico" });
@@ -1007,31 +1007,31 @@ async function FCMdata(data) {
 			iconSize : [30, 30],
 		});
 		let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
-		if (Tsunami["Cross"] != undefined) map.removeLayer(Tsunami["Cross"]);
-		Tsunami["Cross"] = Cross;
-		Tsunami["Time"] = NOW.getTime();
+		if (Tsunami.Cross != undefined) map.removeLayer(Tsunami.Cross);
+		Tsunami.Cross = Cross;
+		Tsunami.Time = NOW.getTime();
 		map.addLayer(Cross);
-		if (CONFIG["report.show"]["value"]) {
+		if (CONFIG["report.show"].value) {
 			win.show();
-			if (CONFIG["report.cover"]["value"]) win.setAlwaysOnTop(true);
+			if (CONFIG["report.cover"].value) win.setAlwaysOnTop(true);
 			win.setAlwaysOnTop(false);
 		}
-		if (CONFIG["report.audio"]["value"]) audioPlay("./audio/Water.wav");
+		if (CONFIG["report.audio"].value) audioPlay("./audio/Water.wav");
 	} if (json.Function == "palert")
 		PAlert = json.Data;
 	else if (json.Function == "report") {
 		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
-		if (CONFIG["report.show"]["value"]) {
+		if (CONFIG["report.show"].value) {
 			win.show();
-			if (CONFIG["report.cover"]["value"]) win.setAlwaysOnTop(true);
+			if (CONFIG["report.cover"].value) win.setAlwaysOnTop(true);
 			win.setAlwaysOnTop(false);
 		}
-		new Notification("地震報告", { body: `${json["Location"].substring(json["Location"].indexOf("(") + 1, json["Location"].indexOf(")")).replace("位於", "")}\n${json["UTC+8"]}\n發生 M${json.Scale} 有感地震`, icon: "TREM.ico" });
+		new Notification("地震報告", { body: `${json.Location.substring(json.Location.indexOf("(") + 1, json.Location.indexOf(")")).replace("位於", "")}\n${json["UTC+8"]}\n發生 M${json.Scale} 有感地震`, icon: "TREM.ico" });
 		ReportGET({
 			report: true,
 		});
-		if (CONFIG["report.audio"]["value"]) audioPlay("./audio/Notify.wav");
-	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && CONFIG["accept.eew.jp"]["value"])) {
+		if (CONFIG["report.audio"].value) audioPlay("./audio/Notify.wav");
+	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && CONFIG["accept.eew.jp"].value)) {
 		dump({ level: 0, message: "Got EEW", origin: "API" });
 		console.debug(json);
 		// switch to main view
@@ -1044,19 +1044,19 @@ async function FCMdata(data) {
 		$(roll).fadeOut(200);
 
 		// handler
-		Info["ID"] = json.ID;
+		Info.ID = json.ID;
 		if (EarthquakeList[json.ID] == undefined) EarthquakeList[json.ID] = {};
-		EarthquakeList[json.ID]["Time"] = json.Time;
-		EarthquakeList[json.ID]["ID"] = json.ID;
-		if (CONFIG["webhook.url"]["value"] != "" && json.ID != Info["webhook"] && localStorage["UUID"] != "e6471ff7-8a1f-4299-bb7f-f2220f5eb6e8") {
-			Info["webhook"] = json.ID;
+		EarthquakeList[json.ID].Time = json.Time;
+		EarthquakeList[json.ID].ID = json.ID;
+		if (CONFIG["webhook.url"].value != "" && json.ID != Info.webhook && localStorage.UUID != "e6471ff7-8a1f-4299-bb7f-f2220f5eb6e8") {
+			Info.webhook = json.ID;
 			let Now = NOW.getFullYear() +
 				"/" + (NOW.getMonth() + 1) +
 				"/" + NOW.getDate() +
 				" " + NOW.getHours() +
 				":" + NOW.getMinutes() +
 				":" + NOW.getSeconds();
-			let msg = CONFIG["webhook.body"]["value"];
+			let msg = CONFIG["webhook.body"].value;
 			msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
 			if (json.Function == "earthquake")
 				msg = msg.replace("%Government%", "中華民國交通部中央氣象局");
@@ -1066,15 +1066,15 @@ async function FCMdata(data) {
 				msg = msg.replace("%Government%", "福建省地震局");
 
 			msg = JSON.parse(msg);
-			msg["username"] = "TREM | 台灣實時地震監測";
+			msg.username = "TREM | 台灣實時地震監測";
 
-			msg["embeds"][0]["image"]["url"] = `http://150.117.110.118/TREM/${json.ID}/0.png`;
-			msg["embeds"][0]["footer"] = {
+			msg.embeds[0].image.url = `http://150.117.110.118/TREM/${json.ID}/0.png`;
+			msg.embeds[0].footer = {
 				"text"     : `ExpTech Studio ${Now}`,
 				"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
 			};
 			dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
-			axios.post(CONFIG["webhook.url"]["value"], msg)
+			axios.post(CONFIG["webhook.url"].value, msg)
 				.catch((error) => {
 					dump({ level: 2, message: error, origin: "Webhook" });
 				});
@@ -1099,7 +1099,7 @@ async function FCMdata(data) {
 				let Distance = Math.sqrt(Math.pow(Number(json.Depth), 2) + Math.pow(point, 2));
 				let Level = PGAcount(json.Scale, Distance, location[city][town][3]);
 				if (Lat == location[city][town][1] && Long == location[city][town][2]) {
-					if (CONFIG["auto.waveSpeed"]["value"])
+					if (CONFIG["auto.waveSpeed"].value)
 						if (Distance < 50) {
 							Pspeed = 6.5;
 							Sspeed = 3.5;
@@ -1115,7 +1115,7 @@ async function FCMdata(data) {
 			}
 		}
 		let Intensity = IntensityN(level);
-		if (Intensity < Number(CONFIG["eew.Intensity"]["value"])) {
+		if (Intensity < Number(CONFIG["eew.Intensity"].value)) {
 			TimerDesynced = false;
 			return;
 		}
@@ -1144,10 +1144,10 @@ async function FCMdata(data) {
 			},
 		});
 		map1.addLayer(geojson);
-		if (json.ID != Info["Notify"]) {
-			if (CONFIG["eew.show"]["value"]) {
+		if (json.ID != Info.Notify) {
+			if (CONFIG["eew.show"].value) {
 				win.show();
-				if (CONFIG["eew.cover"]["value"]) win.setAlwaysOnTop(true);
+				if (CONFIG["eew.cover"].value) win.setAlwaysOnTop(true);
 			}
 			let Nmsg = "";
 			if (value > 0)
@@ -1157,8 +1157,8 @@ async function FCMdata(data) {
 
 			new Notification("EEW 強震即時警報", { body: `${level.replace("+", "強").replace("-", "弱")}級地震，${Nmsg}\nM ${json.Scale} ${json.Location ?? "未知區域"}`, icon: "TREM.ico" });
 			audioList = [];
-			Info["Notify"] = json.ID;
-			if (CONFIG["eew.audio"]["value"]) audioPlay("./audio/EEW.wav");
+			Info.Notify = json.ID;
+			if (CONFIG["eew.audio"].value) audioPlay("./audio/EEW.wav");
 			audioPlay(`./audio/1/${level.replace("+", "").replace("-", "")}.wav`);
 			if (level.includes("+"))
 				audioPlay("./audio/1/intensity-strong.wav");
@@ -1179,16 +1179,16 @@ async function FCMdata(data) {
 				audioPlay("./audio/1/second.wav");
 			}
 		}
-		if (json.ID != Info["Warn"] && json.Alert) {
-			Info["Warn"] = json.ID;
+		if (json.ID != Info.Warn && json.Alert) {
+			Info.Warn = json.ID;
 			audioPlay("./audio/Alert.wav");
 		}
 		let _time = -1;
 		let Stamp = 0;
-		if (json.ID != Info["Alert"]) {
+		if (json.ID != Info.Alert) {
 			focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 7.5);
-			Info["Alert"] = json.ID;
-			Info["AlertS"] = value;
+			Info.Alert = json.ID;
+			Info.AlertS = value;
 			if (t != null) clearInterval(t);
 			t = setInterval(() => {
 				value = Math.round((distance - ((NOW.getTime() - json.Time) / 1000) * Sspeed) / Sspeed);
@@ -1230,20 +1230,20 @@ async function FCMdata(data) {
 		});
 		let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
 		let Cross1 = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
-		if (EarthquakeList[json.ID]["Cross"] != undefined)
-			map.removeLayer(EarthquakeList[json.ID]["Cross"]);
-		EarthquakeList[json.ID]["Cross"] = Cross;
+		if (EarthquakeList[json.ID].Cross != undefined)
+			map.removeLayer(EarthquakeList[json.ID].Cross);
+		EarthquakeList[json.ID].Cross = Cross;
 		map.addLayer(Cross);
-		if (EarthquakeList[json.ID]["Cross1"] != undefined)
-			map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
-		EarthquakeList[json.ID]["Cross1"] = Cross1;
+		if (EarthquakeList[json.ID].Cross1 != undefined)
+			map1.removeLayer(EarthquakeList[json.ID].Cross1);
+		EarthquakeList[json.ID].Cross1 = Cross1;
 		map1.addLayer(Cross1);
 		Cross.setZIndexOffset(6000);
 		let Loom = 0;
 		let speed = 1000;
-		if (CONFIG["shock.smoothing"]["value"]) speed = 0;
-		if (EarthquakeList[json.ID]["Timer"] != undefined) clearInterval(EarthquakeList[json.ID]["Timer"]);
-		if (EarthquakeList["ITimer"] != undefined) clearInterval(EarthquakeList["ITimer"]);
+		if (CONFIG["shock.smoothing"].value) speed = 0;
+		if (EarthquakeList[json.ID].Timer != undefined) clearInterval(EarthquakeList[json.ID].Timer);
+		if (EarthquakeList.ITimer != undefined) clearInterval(EarthquakeList.ITimer);
 
 
 		// AlertBox: 種類
@@ -1259,7 +1259,7 @@ async function FCMdata(data) {
 
 		let find = -1;
 		for (let index = 0; index < INFO.length; index++)
-			if (INFO[index]["ID"] == json.ID) {
+			if (INFO[index].ID == json.ID) {
 				find = index;
 				break;
 			}
@@ -1289,49 +1289,49 @@ async function FCMdata(data) {
 			}, 1000);
 
 
-		EarthquakeList[json.ID]["Timer"] = setInterval(() => {
-			if (CONFIG["shock.p"]["value"]) {
-				if (EarthquakeList[json.ID]["Pcircle"] != null)
-					map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
-				if (EarthquakeList[json.ID]["Pcircle1"] != null)
-					map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
+		EarthquakeList[json.ID].Timer = setInterval(() => {
+			if (CONFIG["shock.p"].value) {
+				if (EarthquakeList[json.ID].Pcircle != null)
+					map.removeLayer(EarthquakeList[json.ID].Pcircle);
+				if (EarthquakeList[json.ID].Pcircle1 != null)
+					map1.removeLayer(EarthquakeList[json.ID].Pcircle1);
 				let km = Math.sqrt(Math.pow((NOW.getTime() - json.Time) * Pspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2));
 				if (km > 0) {
-					EarthquakeList[json.ID]["Pcircle"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+					EarthquakeList[json.ID].Pcircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 						color     : "#6FB7B7",
 						fillColor : "transparent",
 						radius    : km,
 					});
-					EarthquakeList[json.ID]["Pcircle1"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+					EarthquakeList[json.ID].Pcircle1 = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 						color     : "#6FB7B7",
 						fillColor : "transparent",
 						radius    : km,
 					});
-					map.addLayer(EarthquakeList[json.ID]["Pcircle"]);
-					map1.addLayer(EarthquakeList[json.ID]["Pcircle1"]);
+					map.addLayer(EarthquakeList[json.ID].Pcircle);
+					map1.addLayer(EarthquakeList[json.ID].Pcircle1);
 				}
 			}
-			if (EarthquakeList[json.ID]["Scircle"] != null)
-				map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
-			if (EarthquakeList[json.ID]["Scircle1"] != null)
-				map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
+			if (EarthquakeList[json.ID].Scircle != null)
+				map.removeLayer(EarthquakeList[json.ID].Scircle);
+			if (EarthquakeList[json.ID].Scircle1 != null)
+				map1.removeLayer(EarthquakeList[json.ID].Scircle1);
 			let km = Math.pow((NOW.getTime() - json.Time) * Sspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2);
 			if (km > 0) {
 				let KM = Math.sqrt(km);
-				EarthquakeList[json.ID]["Scircle"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+				EarthquakeList[json.ID].Scircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 					color       : json.Alert ? "red" : "orange",
 					fillColor   : "#F8E7E7",
 					fillOpacity : 0.1,
 					radius      : KM,
 				});
-				EarthquakeList[json.ID]["Scircle1"] = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
+				EarthquakeList[json.ID].Scircle1 = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
 					color       : json.Alert ? "red" : "orange",
 					fillColor   : "#F8E7E7",
 					fillOpacity : 0.1,
 					radius      : KM,
 				});
-				map.addLayer(EarthquakeList[json.ID]["Scircle"]);
-				map1.addLayer(EarthquakeList[json.ID]["Scircle1"]);
+				map.addLayer(EarthquakeList[json.ID].Scircle);
+				map1.addLayer(EarthquakeList[json.ID].Scircle1);
 			}
 			if (NOW.getTime() - json.TimeStamp > 240000 || json.Cancel && EarthquakeList[json.ID] != undefined) {
 				if (json.Cancel) {
@@ -1341,20 +1341,20 @@ async function FCMdata(data) {
 						document.getElementById("alert").style.display = "none";
 					}, 30000);
 				}
-				if (EarthquakeList[json.ID]["Scircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Scircle"]);
-				if (EarthquakeList[json.ID]["Pcircle"] != undefined) map.removeLayer(EarthquakeList[json.ID]["Pcircle"]);
-				if (EarthquakeList[json.ID]["Scircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Scircle1"]);
-				if (EarthquakeList[json.ID]["Pcircle1"] != undefined) map1.removeLayer(EarthquakeList[json.ID]["Pcircle1"]);
-				map.removeLayer(EarthquakeList[json.ID]["Cross"]);
-				map1.removeLayer(EarthquakeList[json.ID]["Cross1"]);
+				if (EarthquakeList[json.ID].Scircle != undefined) map.removeLayer(EarthquakeList[json.ID].Scircle);
+				if (EarthquakeList[json.ID].Pcircle != undefined) map.removeLayer(EarthquakeList[json.ID].Pcircle);
+				if (EarthquakeList[json.ID].Scircle1 != undefined) map1.removeLayer(EarthquakeList[json.ID].Scircle1);
+				if (EarthquakeList[json.ID].Pcircle1 != undefined) map1.removeLayer(EarthquakeList[json.ID].Pcircle1);
+				map.removeLayer(EarthquakeList[json.ID].Cross);
+				map1.removeLayer(EarthquakeList[json.ID].Cross1);
 				for (let index = 0; index < INFO.length; index++)
-					if (INFO[index]["ID"] == json.ID) {
+					if (INFO[index].ID == json.ID) {
 						TINFO = 0;
 						INFO.splice(index, 1);
 						break;
 					}
 
-				clearInterval(EarthquakeList[json.ID]["Timer"]);
+				clearInterval(EarthquakeList[json.ID].Timer);
 				document.getElementById("box-10").innerHTML = "";
 				delete EarthquakeList[json.ID];
 				if (Object.keys(EarthquakeList).length == 0) {
@@ -1379,7 +1379,7 @@ async function FCMdata(data) {
 					focus();
 
 			}
-			if (CONFIG["map.autoZoom"]["value"]) {
+			if (CONFIG["map.autoZoom"].value) {
 				if ((NOW.getTime() - json.Time) * Pspeed > 250000 && Loom < 250000) {
 					Loom = 250000;
 					focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 7);
@@ -1416,7 +1416,7 @@ function updateText() {
 	if (num <= 0) num = "";
 	document.getElementById("alert-p").innerText = `${num}`;
 
-	let Num = Math.round(((NOW.getTime() - INFO[TINFO]["Time"]) * 4 / 10) / INFO[TINFO]["Depth"]);
+	let Num = Math.round(((NOW.getTime() - INFO[TINFO].Time) * 4 / 10) / INFO[TINFO].Depth);
 	let Catch = document.getElementById("box-10");
 	if (Num <= 100)
 		Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
