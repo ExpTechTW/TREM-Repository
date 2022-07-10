@@ -2,9 +2,8 @@ const ipc = require("electron").ipcRenderer;
 const { shell } = require("@electron/remote");
 
 let Loc;
-let config = JSON.parse(fs.readFileSync(`${localStorage["config"]}/Data/config.json`).toString());
 
-setThemeColor(config["theme.color"].value, config["theme.dark"].value);
+setThemeColor(CONFIG["theme.color"].value, CONFIG["theme.dark"].value);
 
 document.getElementById("title").innerText = `TREM | 設定 | ${process.env.Version}`;
 document.getElementById("ver").innerText = `TREM 版本號: ${process.env.Version}`;
@@ -107,11 +106,11 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json"
 			option.value = Object.keys(Loc)[i];
 			city.appendChild(option);
 		}
-		for (let i = 0; i < Object.keys(Loc[config["location.city"].value]).length; i++) {
+		for (let i = 0; i < Object.keys(Loc[CONFIG["location.city"].value]).length; i++) {
 			const town = document.getElementById("location.town");
 			const option = document.createElement("option");
-			option.text = Object.keys(Loc[config["location.city"].value])[i];
-			option.value = Object.keys(Loc[config["location.city"].value])[i];
+			option.text = Object.keys(Loc[CONFIG["location.city"].value])[i];
+			option.value = Object.keys(Loc[CONFIG["location.city"].value])[i];
 			town.appendChild(option);
 		}
 
@@ -137,19 +136,19 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/st
  */
 function init() {
 	dump({ level: 0, message: "Initializing", origin: "Setting" });
-	Object.keys(config).forEach(id => {
-		switch (config[id].type) {
+	Object.keys(CONFIG).forEach(id => {
+		switch (CONFIG[id].type) {
 			case "CheckBox": {
 				const element = document.getElementById(id);
 				if (element)
-					element.checked = config[id].value;
+					element.checked = CONFIG[id].value;
 				break;
 			}
 
 			case "TextBox": {
 				const element = document.getElementById(id);
 				if (element)
-					element.value = config[id].value;
+					element.value = CONFIG[id].value;
 				break;
 			}
 
@@ -160,7 +159,7 @@ function init() {
 				const element = document.getElementById(id);
 				if (element)
 					for (let i = 0; i < element.options.length; i++)
-						if (element.options[i].value == config[id].value)
+						if (element.options[i].value == CONFIG[id].value)
 							element.options[i].selected = true;
 				break;
 			}
@@ -171,10 +170,10 @@ function init() {
 				 */
 				const element = document.getElementById(id);
 				if (element)
-					element.value = config[id].value;
+					element.value = CONFIG[id].value;
 				const wrapper = document.getElementById(id.replace(".", "-"));
 				if (element)
-					wrapper.style.backgroundColor = config[id].value;
+					wrapper.style.backgroundColor = CONFIG[id].value;
 				break;
 			}
 
@@ -184,21 +183,13 @@ function init() {
 	});
 }
 
-/**
- * 儲存設定檔
- */
-function save() {
-	dump({ level: 0, message: "Saving user preference", origin: "Setting" });
-	fs.writeFileSync(`${localStorage.config}/Data/config.json`, JSON.stringify(config), "utf8");
-	ipc.send("updateSetting");
-}
 
 function SelectSave(id) {
 	const select = document.getElementById(id);
 	const value = select.options[select.selectedIndex].value;
-	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
-	config[id].value = value;
-	save();
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
+	CONFIG[id].value = value;
+	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "location.city") {
 		const town = document.getElementById("location.town");
 		town.replaceChildren();
@@ -216,24 +207,24 @@ function SelectSave(id) {
 
 function CheckSave(id) {
 	const value = document.getElementById(id).checked;
-	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
-	config[id].value = value;
-	save();
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
+	CONFIG[id].value = value;
+	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "GPU.disable")
 		$("#HAReloadButton").fadeIn(100);
 	else if (id == "theme.dark") {
-		setThemeColor(config["theme.color"].value, value);
+		setThemeColor(CONFIG["theme.color"].value, value);
 		ipc.send("updateTheme");
 	}
 }
 
 function TextSave(id) {
 	const value = document.getElementById(id).value;
-	dump({ level: 0, message: `Value Changed ${id}: ${config[id].value} -> ${value}`, origin: "Setting" });
-	config[id].value = value;
-	save();
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
+	CONFIG[id].value = value;
+	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "theme.color") {
-		setThemeColor(value, config["theme.dark"].value);
+		setThemeColor(value, CONFIG["theme.dark"].value);
 		ipc.send("updateTheme");
 	}
 }
@@ -271,8 +262,8 @@ function testEEW() {
 
 function reset() {
 	showDialog("warn", "重置設定？", "您確定您真的要重置所有設定嗎\n這個動作將無法挽回", 1, "device_reset", () => {
-		config = {};
-		save();
+		CONFIG = {};
+		ipcRenderer.send("saveSetting", CONFIG);
 		restart();
 	});
 }
@@ -326,10 +317,10 @@ const testAudio = (audioString, el) => {
 };
 
 const webhook = async () => {
-	if (config["webhook.url"].value.length == 0)
+	if (CONFIG["webhook.url"].value.length == 0)
 		return showDialog("error", "Webhook 錯誤", "Webhook 連結為空，無法傳送測試訊息");
 
-	const url = config["webhook.url"].value.match(
+	const url = CONFIG["webhook.url"].value.match(
 		// eslint-disable-next-line no-useless-escape
 		/^https?:\/\/(?:canary|ptb)?\.?discord\.com\/api\/webhooks(?:\/v[0-9]\d*)?\/([^\/]+)\/([^\/]+)/i,
 	);
@@ -347,7 +338,7 @@ const webhook = async () => {
 			.setTimestamp(),
 	];
 
-	await new WebhookClient({ url: config["webhook.url"].value })
+	await new WebhookClient({ url: CONFIG["webhook.url"].value })
 		.send({ embeds, username: "TREM | 台灣實時地震監測", avatarURL: "https://cdn.discordapp.com/attachments/976452418114048051/976469802644291584/received_1354357138388018.webp" })
 		.then(m => {
 			showDialog("success", "Webhook 測試", `Webhook 發送測試訊息成功\n訊息ID：${m.id}\n頻道ID：${m.channel_id}`);

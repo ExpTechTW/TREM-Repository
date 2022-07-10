@@ -1,6 +1,3 @@
-const { app } = require("@electron/remote");
-const { join } = require("node:path");
-
 const latestLog = join(app.getPath("logs"), "latest.log");
 console.log(latestLog);
 fs.writeFileSync(latestLog, "", { encoding: "utf8", flag: "w" });
