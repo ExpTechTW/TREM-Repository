@@ -568,7 +568,7 @@ function audioPlay(src) {
 			if (!audioLock) {
 				audioLock = true;
 				if (audioList.length)
-					await playNextAudio();
+					playNextAudio();
 				else {
 					clearInterval(AudioT);
 					audioLock = false;
@@ -578,17 +578,17 @@ function audioPlay(src) {
 		}, 0);
 }
 
-async function playNextAudio() {
+function playNextAudio() {
 	audioLock = true;
 	const path = audioList.shift();
 	audioDOM.src = path;
 	audioDOM.playbackRate = 1.1;
 	if (path.startsWith("./audio/1/") && CONFIG["eew.audio"].value) {
 		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
-		await audioDOM.play();
+		audioDOM.play();
 	} else if (!path.startsWith("./audio/1/")) {
 		dump({ level: 0, message: `Playing Audio > ${path}`, origin: "Audio" });
-		await audioDOM.play();
+		audioDOM.play();
 	}
 }
 // #endregion
@@ -641,7 +641,7 @@ async function ReportClick(time) {
 			"Value"         : ReportCache[time].earthquakeNo,
 		};
 		if (
-			ReportCache[time].earthquakeNo == 111000
+			ReportCache[time].earthquakeNo.toString().substring(3, 6) == "000"
 			|| await axios.post("https://exptech.mywire.org:1015", body)
 				.then((response) => {
 					let json = response.data.response;
@@ -728,7 +728,9 @@ async function ReportClick(time) {
 				iconSize : [25, 25],
 			});
 			let ReportMark = L.marker([Number(ReportCache[time].epicenterLat), Number(ReportCache[time].epicenterLon)], { icon });
-			ReportMark.bindPopup(`編號: ${ReportCache[time].earthquakeNo}<br>經度: ${ReportCache[time].epicenterLon}<br>緯度: ${ReportCache[time].epicenterLat}<br>深度: ${ReportCache[time].depth}<br>規模: ${ReportCache[time].magnitudeValue}<br>位置: ${ReportCache[time].location}<br>時間: ${ReportCache[time].originTime}`);
+			let Num = "無";
+			if (ReportCache[time].earthquakeNo.toString().substring(3, 6) != "000") Num = ReportCache[time].earthquakeNo;
+			ReportMark.bindPopup(`編號: ${Num}<br>經度: ${ReportCache[time].epicenterLon}<br>緯度: ${ReportCache[time].epicenterLat}<br>深度: ${ReportCache[time].depth}<br>規模: ${ReportCache[time].magnitudeValue}<br>位置: ${ReportCache[time].location}<br>時間: ${ReportCache[time].originTime}`);
 			map.addLayer(ReportMark);
 			ReportMark.setZIndexOffset(3000);
 			MarkList.push(ReportMark);
@@ -768,7 +770,7 @@ function ReportList(Data, eew) {
 				msg = DATA.location;
 
 			let star = "";
-			if (DATA.earthquakeNo != 111000) star = "✩ ";
+			if (DATA.earthquakeNo.toString().substring(3, 6) != "000") star = "✩ ";
 			if (index == 0)
 				if (eew.Time != undefined && eew.report == undefined) {
 					Div.style.backgroundColor = color(eew.Max);
