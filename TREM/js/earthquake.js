@@ -428,16 +428,10 @@ function init() {
 
 
 						if (All[0].intensity >= 2) {
-							let Now = NOW.getFullYear() +
-								"/" + (NOW.getMonth() + 1) +
-								"/" + NOW.getDate() +
-								" " + NOW.getHours() +
-								":" + NOW.getMinutes() +
-								":" + NOW.getSeconds();
 							Report = NOW.getTime();
 							ReportGET({
 								Max  : All[0].intensity,
-								Time : Now,
+								Time : NOW.format("YYYY/MM/DD HH:mm:ss"),
 							});
 						}
 						PGAtag = All[0].intensity;
@@ -1059,11 +1053,11 @@ async function FCMdata(data) {
 			let msg = CONFIG["webhook.body"].value;
 			msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
 			if (json.Function == "earthquake")
-				msg = msg.replace("%Government%", "中華民國交通部中央氣象局");
+				msg = msg.replace("%Provider%", "中華民國交通部中央氣象局");
 			else if (json.Function == "JP_earthquake")
-				msg = msg.replace("%Government%", "日本氣象廳");
+				msg = msg.replace("%Provider%", "日本氣象廳");
 			else if (json.Function == "CN_earthquake")
-				msg = msg.replace("%Government%", "福建省地震局");
+				msg = msg.replace("%Provider%", "福建省地震局");
 
 			msg = JSON.parse(msg);
 			msg.username = "TREM | 台灣實時地震監測";
