@@ -564,7 +564,7 @@ audioDOM.addEventListener("ended", () => {
 function audioPlay(src) {
 	audioList.push(src);
 	if (!AudioT)
-		AudioT = setInterval(async () => {
+		AudioT = setInterval(() => {
 			if (!audioLock) {
 				audioLock = true;
 				if (audioList.length)
