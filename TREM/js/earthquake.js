@@ -294,7 +294,6 @@ function init() {
 								"Intensity" : Intensity,
 								"Time"      : 0,
 							};
-
 						if (Intensity != "NA" && Intensity != 0) {
 							All.push({
 								"loc"       : station[Object.keys(Json)[index]].Loc,
@@ -327,7 +326,6 @@ function init() {
 							}
 						} else
 							delete Pga[Object.keys(Json)[index]];
-
 					}
 					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
@@ -388,10 +386,7 @@ function init() {
 					}
 					if (Object.keys(PGA).length == 0) PGAaudio = false;
 
-					if (PGAaudio) {
-						// document.getElementById("intensity-3").innerHTML = `<font color="white" size="7"><b>${MAXPGA.level}</b></font><br><font color="white" size="3"><b>${MAXPGA.pga}</b></font>`;
-
-					} else {
+					if (!PGAaudio) {
 						PGAAudio = false;
 						PGAtag = 0;
 						PGALimit = 0;
@@ -435,7 +430,6 @@ function init() {
 						PGAtag = All[0].intensity;
 					}
 
-					// clear
 					let list = [];
 					let count = 0;
 					for (let Index = 0; Index < All.length; Index++, count++) {
