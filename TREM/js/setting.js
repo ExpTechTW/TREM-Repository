@@ -3,8 +3,6 @@ const { shell } = require("@electron/remote");
 
 let Loc;
 
-setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
-
 document.getElementById("title").innerText = `TREM | 設定 | ${process.env.Version}`;
 document.getElementById("ver").innerText = `TREM 版本號: ${process.env.Version}`;
 document.getElementById("uuid").innerText = `UUID: ${localStorage["UUID"]}`;

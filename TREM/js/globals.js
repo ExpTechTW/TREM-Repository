@@ -143,6 +143,7 @@ for (let i = 0, k = Object.keys(DEFAULT_CONFIG), n = k.length; i < n; i++)
 	if (typeof CONFIG[k[i]] != typeof DEFAULT_CONFIG[k[i]].value)
 		CONFIG[k[i]] = DEFAULT_CONFIG[k[i]].value;
 ipcRenderer.send("saveSetting", CONFIG);
+setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
 
 ipcMain.on("saveSetting", (event, newSetting) => {
 	dump({ level: 0, message: "Saving user preference", origin: "Setting" });

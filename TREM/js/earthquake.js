@@ -105,8 +105,6 @@ Date.prototype.format =
 try {
 	dump({ level: 0, message: "Initializing", origin: "Initialization" });
 
-	// eslint-disable-next-line no-undef
-	setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
 	init();
 } catch (error) {
 	alert("錯誤!! 請到 TREM 官方 Discord 回報");
