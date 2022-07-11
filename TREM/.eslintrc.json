@@ -24,7 +24,8 @@
 		"toggleNav": "readonly",
 		"$": "readonly",
 		"CONFIG": "writable",
-		"CONFIG_PATH": "readonly"
+		"CONFIG_PATH": "readonly",
+		"DEFAULT_CONFIG": "readonly"
 	},
 	"rules": {
 		"require-sort/require-sort": "warn",
