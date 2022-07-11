@@ -62,17 +62,25 @@ body {
 }
 
 #map-tw {
-    user-select: none;
+    user-select: none !important;
     z-index: 1000;
     position: absolute;
+    opacity: 0;
     top: 0;
-    right: 0;
+    right: -200px;
     height: 360px;
     width: 300px;
     margin: 12px 12px 0 0;
     border-radius: 16px;
+    border: 2px solid rgb(var(--md-sys-color-outline));
     outline: none;
     background: rgb(var(--md-sys-color-surface));
+    transition: opacity .2s ease-in-out;
+}
+
+#map-tw.show {
+    right: 0;
+    opacity: 1;
 }
 
 #nav-rail > button {
@@ -223,7 +231,7 @@ body {
     flex: 1;
     height: min-content;
     font-weight: 500;
-    line-height: 27px;
+    line-height: 30px;
     font-size: 20px;
 }
 
@@ -286,15 +294,14 @@ body {
 #alert-local-intensity {
     font-weight: 500;
     font-size: 30px;
-    font-variant-numeric: tabular-nums;
     line-height: 30px;
+    font-variant-numeric: tabular-nums;
 }
 
 .alert-timer {
     font-weight: 600;
-    font-size: 32px;
-    height: 30px;
-    line-height: 28px;
+    font-size: 30px;
+    line-height: 30px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -364,6 +371,7 @@ body {
     width: 76px;
     align-items: center;
     margin-top: 4px;
+    padding-bottom: 0;
 }
 .alert-box-body > div.alert-item:last-of-type {
     margin-right: 6px;

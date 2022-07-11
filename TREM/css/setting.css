@@ -160,6 +160,7 @@ body {
 
 .color-input-wrapper {
     border-radius: 8px;
+    border: 2px solid rgb(var(--md-sys-color-outline));
 }
 
 code {

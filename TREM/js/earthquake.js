@@ -1272,6 +1272,8 @@ async function FCMdata(data) {
 		if (navState) toggleNav(false);
 		// hide report to make screen clean
 		$(roll).fadeOut(200);
+		// show minimap
+		$("#map-tw").addClass("show");
 
 		updateText();
 
@@ -1354,6 +1356,8 @@ async function FCMdata(data) {
 					clearInterval(ITimer);
 					// hide eew alert
 					$("#alert-box").removeClass("show");
+					// hide minimap
+					$("#map-tw").removeClass("show");
 					// restore reports
 					$(roll).fadeIn(200);
 					ITimer = null;
