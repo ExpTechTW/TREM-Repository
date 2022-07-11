@@ -1022,14 +1022,6 @@ async function FCMdata(data) {
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && CONFIG["accept.eew.jp"].value)) {
 		dump({ level: 0, message: "Got EEW", origin: "API" });
 		console.debug(json);
-		// switch to main view
-		$("#mainView_btn")[0].click();
-		// remember navrail state
-		const navState = !$("#nav-rail").hasClass("hide");
-		// hide navrail so the view goes fullscreen
-		if (navState) toggleNav(false);
-		// hide report to make screen clean
-		$(roll).fadeOut(200);
 
 		// handler
 		Info.ID = json.ID;
@@ -1044,6 +1036,7 @@ async function FCMdata(data) {
 				" " + NOW.getHours() +
 				":" + NOW.getMinutes() +
 				":" + NOW.getSeconds();
+
 			let msg = CONFIG["webhook.body"].value;
 			msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
 			if (json.Function == "earthquake")
@@ -1078,7 +1071,6 @@ async function FCMdata(data) {
 			for (let index = 0; index < expected.length; index++)
 				map.removeLayer(expected[index]);
 
-
 		for (let index = 0; index < Object.keys(location).length; index++) {
 			let city = Object.keys(location)[index];
 			for (let Index = 0; Index < Object.keys(location[city]).length; Index++) {
@@ -1102,11 +1094,13 @@ async function FCMdata(data) {
 				GC[city + town] = Intensity;
 			}
 		}
+
 		let Intensity = IntensityN(level);
 		if (Intensity < Number(CONFIG["eew.Intensity"].value)) {
 			TimerDesynced = false;
 			return;
 		}
+
 		if (geojson != null) map1.removeLayer(geojson);
 		geojson = L.geoJson(statesData, {
 			style: (feature) => {
@@ -1269,6 +1263,16 @@ async function FCMdata(data) {
 			"info-1"        : `<font color="white" size="4"><b>M ${json.Scale} </b></font><font color="white" size="3"><b> 深度: ${json.Depth} km</b></font>`,
 			"distance"      : distance,
 		};
+
+		// switch to main view
+		$("#mainView_btn")[0].click();
+		// remember navrail state
+		const navState = !$("#nav-rail").hasClass("hide");
+		// hide navrail so the view goes fullscreen
+		if (navState) toggleNav(false);
+		// hide report to make screen clean
+		$(roll).fadeOut(200);
+
 		updateText();
 
 		if (ITimer == null)
