@@ -1250,7 +1250,8 @@ async function FCMdata(data) {
 			alert_number    : json.Version,
 			alert_intensity : MaxIntensity,
 			alert_location  : json.Location ?? "未知區域",
-			alert_time      : new Date(json.Time),
+			alert_time      : new Date(json["UTC+8"]),
+			alert_sTime     : new Date(json.Time),
 			alert_local     : IntensityN(level),
 			alert_magnitude : json.Scale,
 			alert_depth     : json.Depth,
@@ -1403,10 +1404,10 @@ function updateText() {
 	$("#alert-depth").text(INFO[TINFO].alert_depth);
 	$("#alert-box").addClass("show");
 
-	let num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Sspeed) / Sspeed);
+	let num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_sTime.getTime()) / 1000) * Sspeed) / Sspeed);
 	if (num <= 0) num = "";
 	document.getElementById("alert-s").innerText = `${num}`;
-	num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_time.getTime()) / 1000) * Pspeed) / Pspeed);
+	num = Math.round((INFO[TINFO].distance - ((NOW.getTime() - INFO[TINFO].alert_sTime.getTime()) / 1000) * Pspeed) / Pspeed);
 	if (num <= 0) num = "";
 	document.getElementById("alert-p").innerText = `${num}`;
 

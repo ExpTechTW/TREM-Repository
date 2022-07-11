@@ -300,7 +300,7 @@ body {
 
 .alert-timer {
     font-weight: 600;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 30px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -371,7 +371,7 @@ body {
     width: 76px;
     align-items: center;
     margin-top: 4px;
-    padding-bottom: 0;
+    padding-bottom: 2px;
 }
 .alert-box-body > div.alert-item:last-of-type {
     margin-right: 6px;
