@@ -9,7 +9,7 @@ const { join } = require("node:path");
  * 設定檔路徑
  * @type {string}
  */
-const CONFIG_PATH = join(app.getPath("userData"), "config");
+const CONFIG_PATH = join(app.getPath("userData"), "settings.json");
 if (!fs.existsSync(CONFIG_PATH))
 	fs.writeFileSync(CONFIG_PATH, "{}", "utf8");
 
@@ -139,16 +139,16 @@ const DEFAULT_CONFIG = {
 };
 
 // Synchronize config
-for (let i = 0, n = Object.keys(DEFAULT_CONFIG).length; i < n; i++)
-	if (CONFIG[Object.keys(DEFAULT_CONFIG)[i]] == undefined)
-		CONFIG[Object.keys(DEFAULT_CONFIG)[i]] = DEFAULT_CONFIG[Object.keys(DEFAULT_CONFIG)[i]];
+for (let i = 0, k = Object.keys(DEFAULT_CONFIG), n = k.length; i < n; i++)
+	if (typeof CONFIG[k[i]] != typeof DEFAULT_CONFIG[k[i]].value)
+		CONFIG[k[i]] = DEFAULT_CONFIG[k[i]].value;
 ipcRenderer.send("saveSetting", CONFIG);
 
 ipcMain.on("saveSetting", (event, newSetting) => {
 	dump({ level: 0, message: "Saving user preference", origin: "Setting" });
 	try {
 		CONFIG = newSetting;
-		fs.writeFileSync(CONFIG_PATH, JSON.stringify(CONFIG), "utf8");
+		fs.writeFileSync(CONFIG_PATH, JSON.stringify(CONFIG, null, 2), "utf8");
 	} catch (error) {
 		dump({ level: 2, message: `Error saving user preference: ${error}`, origin: "Setting" });
 	}

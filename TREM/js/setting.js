@@ -3,7 +3,7 @@ const { shell } = require("@electron/remote");
 
 let Loc;
 
-setThemeColor(CONFIG["theme.color"].value, CONFIG["theme.dark"].value);
+setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
 
 document.getElementById("title").innerText = `TREM | 設定 | ${process.env.Version}`;
 document.getElementById("ver").innerText = `TREM 版本號: ${process.env.Version}`;
@@ -106,11 +106,11 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json"
 			option.value = Object.keys(Loc)[i];
 			city.appendChild(option);
 		}
-		for (let i = 0; i < Object.keys(Loc[CONFIG["location.city"].value]).length; i++) {
+		for (let i = 0; i < Object.keys(Loc[CONFIG["location.city"]]).length; i++) {
 			const town = document.getElementById("location.town");
 			const option = document.createElement("option");
-			option.text = Object.keys(Loc[CONFIG["location.city"].value])[i];
-			option.value = Object.keys(Loc[CONFIG["location.city"].value])[i];
+			option.text = Object.keys(Loc[CONFIG["location.city"]])[i];
+			option.value = Object.keys(Loc[CONFIG["location.city"]])[i];
 			town.appendChild(option);
 		}
 
@@ -137,18 +137,18 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/st
 function init() {
 	dump({ level: 0, message: "Initializing", origin: "Setting" });
 	Object.keys(CONFIG).forEach(id => {
-		switch (CONFIG[id].type) {
+		switch (DEFAULT_CONFIG[id].type) {
 			case "CheckBox": {
 				const element = document.getElementById(id);
 				if (element)
-					element.checked = CONFIG[id].value;
+					element.checked = CONFIG[id];
 				break;
 			}
 
 			case "TextBox": {
 				const element = document.getElementById(id);
 				if (element)
-					element.value = CONFIG[id].value;
+					element.value = CONFIG[id];
 				break;
 			}
 
@@ -159,7 +159,7 @@ function init() {
 				const element = document.getElementById(id);
 				if (element)
 					for (let i = 0; i < element.options.length; i++)
-						if (element.options[i].value == CONFIG[id].value)
+						if (element.options[i].value == CONFIG[id])
 							element.options[i].selected = true;
 				break;
 			}
@@ -170,10 +170,10 @@ function init() {
 				 */
 				const element = document.getElementById(id);
 				if (element)
-					element.value = CONFIG[id].value;
+					element.value = CONFIG[id];
 				const wrapper = document.getElementById(id.replace(".", "-"));
 				if (element)
-					wrapper.style.backgroundColor = CONFIG[id].value;
+					wrapper.style.backgroundColor = CONFIG[id];
 				break;
 			}
 
@@ -187,8 +187,8 @@ function init() {
 function SelectSave(id) {
 	const select = document.getElementById(id);
 	const value = select.options[select.selectedIndex].value;
-	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
-	CONFIG[id].value = value;
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id]} -> ${value}`, origin: "Setting" });
+	CONFIG[id] = value;
 	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "location.city") {
 		const town = document.getElementById("location.town");
@@ -207,24 +207,24 @@ function SelectSave(id) {
 
 function CheckSave(id) {
 	const value = document.getElementById(id).checked;
-	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
-	CONFIG[id].value = value;
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id]} -> ${value}`, origin: "Setting" });
+	CONFIG[id] = value;
 	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "GPU.disable")
 		$("#HAReloadButton").fadeIn(100);
 	else if (id == "theme.dark") {
-		setThemeColor(CONFIG["theme.color"].value, value);
+		setThemeColor(CONFIG["theme.color"], value);
 		ipc.send("updateTheme");
 	}
 }
 
 function TextSave(id) {
 	const value = document.getElementById(id).value;
-	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id].value} -> ${value}`, origin: "Setting" });
-	CONFIG[id].value = value;
+	dump({ level: 0, message: `Value Changed ${id}: ${CONFIG[id]} -> ${value}`, origin: "Setting" });
+	CONFIG[id] = value;
 	ipcRenderer.send("saveSetting", CONFIG);
 	if (id == "theme.color") {
-		setThemeColor(value, CONFIG["theme.dark"].value);
+		setThemeColor(value, CONFIG["theme.dark"]);
 		ipc.send("updateTheme");
 	}
 }
@@ -272,6 +272,10 @@ function openLogFolder() {
 	shell.openPath(app.getPath("logs"));
 }
 
+function openSettingFile() {
+	shell.openPath(CONFIG_PATH);
+}
+
 const restart = () => {
 	ipc.send("restart");
 };
@@ -317,10 +321,10 @@ const testAudio = (audioString, el) => {
 };
 
 const webhook = async () => {
-	if (CONFIG["webhook.url"].value.length == 0)
+	if (CONFIG["webhook.url"].length == 0)
 		return showDialog("error", "Webhook 錯誤", "Webhook 連結為空，無法傳送測試訊息");
 
-	const url = CONFIG["webhook.url"].value.match(
+	const url = CONFIG["webhook.url"].match(
 		// eslint-disable-next-line no-useless-escape
 		/^https?:\/\/(?:canary|ptb)?\.?discord\.com\/api\/webhooks(?:\/v[0-9]\d*)?\/([^\/]+)\/([^\/]+)/i,
 	);
@@ -338,7 +342,7 @@ const webhook = async () => {
 			.setTimestamp(),
 	];
 
-	await new WebhookClient({ url: CONFIG["webhook.url"].value })
+	await new WebhookClient({ url: CONFIG["webhook.url"] })
 		.send({ embeds, username: "TREM | 台灣實時地震監測", avatarURL: "https://cdn.discordapp.com/attachments/976452418114048051/976469802644291584/received_1354357138388018.webp" })
 		.then(m => {
 			showDialog("success", "Webhook 測試", `Webhook 發送測試訊息成功\n訊息ID：${m.id}\n頻道ID：${m.channel_id}`);
