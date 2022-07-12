@@ -112,7 +112,6 @@ try {
 }
 let win = BrowserWindow.fromId(process.env.window * 1);
 win.setAlwaysOnTop(false);
-document.title = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
 const time = document.getElementById("time");
 
 setInterval(() => {
@@ -1036,7 +1035,7 @@ async function FCMdata(data) {
 		ReportGET({
 			report: true,
 		});
-		if (CONFIG["report.audio"]) audioPlay("./audio/Notify.wav");
+		if (CONFIG["report.audio"]) audioPlay("./audio/Report.wav");
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && CONFIG["accept.eew.jp"])) {
 		dump({ level: 0, message: "Got EEW", origin: "API" });
 		console.debug(json);
