@@ -112,8 +112,8 @@ try {
 }
 let win = BrowserWindow.fromId(process.env.window * 1);
 win.setAlwaysOnTop(false);
-let time = document.getElementById("time");
 document.title = `TREM | 台灣實時地震監測 | ${process.env.Version}`;
+const time = document.getElementById("time");
 
 setInterval(() => {
 	if (CONFIG["location.city"] != Check.city || CONFIG["location.town"] != Check.town) {
@@ -122,9 +122,10 @@ setInterval(() => {
 		setUserLocationMarker();
 	}
 	if (TimerDesynced)
-		time.style.color = "red";
+		time.classList.add("desynced");
 	else {
-		time.style.color = "white";
+		if (time.classList.contains("desynced"))
+			time.classList.remove("desynced");
 		time.innerText = NOW.format("YYYY/MM/DD HH:mm:ss");
 	}
 	if (Object.keys(Tsunami).length != 0)
@@ -450,7 +451,7 @@ function init() {
 				});
 		}, 1000);
 	}
-
+	$("#app-version").text(app.getVersion());
 	$("#loading").text("歡迎");
 	$("#load").delay(1000).fadeOut(1000);
 }

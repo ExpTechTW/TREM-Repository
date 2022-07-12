@@ -3,8 +3,7 @@ const { shell } = require("@electron/remote");
 
 let Loc;
 
-document.getElementById("title").innerText = `TREM | 設定 | ${process.env.Version}`;
-document.getElementById("ver").innerText = `TREM 版本號: ${process.env.Version}`;
+document.getElementById("ver").innerText = `TREM 版本號: ${app.getVersion()}`;
 document.getElementById("uuid").innerText = `UUID: ${localStorage["UUID"]}`;
 
 const lockScroll = state => {
