@@ -120,7 +120,7 @@ body {
     pointer-events: none;
     z-index: 1000;
     position: fixed;
-    left: 86px;
+    left: 90px;
     bottom: 22px;
     color: rgb(var(--md-sys-color-on-background));
     font-family: 'Noto Sans TC', 'Noto Sans JP', 'Noto Sans SC', sans-serif;
@@ -139,7 +139,7 @@ body {
     pointer-events: none;
     z-index: 1000;
     position: fixed;
-    left: 86px;
+    left: 90px;
     bottom: 45px;
     color: rgba(var(--md-sys-color-on-background), .6);
     font-family: 'Noto Sans TC', 'Noto Sans JP', 'Noto Sans SC', sans-serif;
