@@ -19,8 +19,8 @@ let ReportMarkID = null;
 let MarkList = [];
 let EarthquakeList = {};
 let marker = null;
-let map;
-let map1;
+let map, mapTW;
+let mapLayer, mapLayerTW;
 let Station = {};
 let PGA = {};
 let Pga = {};
@@ -145,17 +145,19 @@ function init() {
 	map = L.map("map", {
 		attributionControl : false,
 		closePopupOnClick  : false,
+		preferCanvas       : true,
 	}).setView([23, 121], 7.5);
 
-	map1 = L.map("map-tw", {
+	mapTW = L.map("map-tw", {
 		attributionControl : false,
 		closePopupOnClick  : false,
+		preferCanvas       : true,
 	}).setView([23.608428, 120.799168], 7);
 
-	map1.dragging.disable();
-	map1.scrollWheelZoom.disable();
-	map1.doubleClickZoom.disable();
-	map1.removeControl(map1.zoomControl);
+	mapTW.dragging.disable();
+	mapTW.scrollWheelZoom.disable();
+	mapTW.doubleClickZoom.disable();
+	mapTW.removeControl(mapTW.zoomControl);
 
 	L.geoJson(statesData, {
 		style: {
@@ -164,7 +166,7 @@ function init() {
 			color     : "#8E8E8E",
 			fillColor : "transparent",
 		},
-	}).addTo(map1);
+	}).addTo(mapTW);
 
 	map.on("click", (e) => {
 		if (ReportMarkID != null) {
@@ -176,21 +178,21 @@ function init() {
 		}
 	});
 
-	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+	mapLayer = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
 		maxZoom    : 14,
-		id         : "mapbox/dark-v10",
-		tileSize   : 512,
-		zoomOffset : -1,
-		minZoom    : 2,
-	}).addTo(map1);
-
-	L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
-		maxZoom    : 14,
-		id         : "mapbox/dark-v10",
+		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
 		tileSize   : 512,
 		zoomOffset : -1,
 		minZoom    : 2,
 	}).addTo(map);
+
+	mapLayerTW = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+		maxZoom    : 14,
+		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
+		tileSize   : 512,
+		zoomOffset : -1,
+		minZoom    : 2,
+	}).addTo(mapTW);
 
 	map.removeControl(map.zoomControl);
 
@@ -919,6 +921,23 @@ ipcMain.on("testEEW", () => {
 ipcMain.on("updateTheme", () => {
 	console.log("updateTheme");
 	setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
+	map.removeLayer(mapLayer);
+	mapTW.removeLayer(mapLayerTW);
+	mapLayer = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+		maxZoom    : 14,
+		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
+		tileSize   : 512,
+		zoomOffset : -1,
+		minZoom    : 2,
+	}).addTo(map);
+	mapLayerTW = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+		maxZoom    : 14,
+		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
+		tileSize   : 512,
+		zoomOffset : -1,
+		minZoom    : 2,
+	}).addTo(mapTW);
+
 });
 if (localStorage.Test != undefined)
 	setTimeout(() => {
@@ -1099,7 +1118,7 @@ async function FCMdata(data) {
 			return;
 		}
 
-		if (geojson != null) map1.removeLayer(geojson);
+		if (geojson != null) mapTW.removeLayer(geojson);
 		geojson = L.geoJson(statesData, {
 			style: (feature) => {
 				let name = feature.properties.COUNTY + feature.properties.TOWN;
@@ -1123,7 +1142,7 @@ async function FCMdata(data) {
 				};
 			},
 		});
-		map1.addLayer(geojson);
+		mapTW.addLayer(geojson);
 		if (json.ID != Info.Notify) {
 			if (CONFIG["eew.show"]) {
 				win.show();
@@ -1215,9 +1234,9 @@ async function FCMdata(data) {
 		EarthquakeList[json.ID].Cross = Cross;
 		map.addLayer(Cross);
 		if (EarthquakeList[json.ID].Cross1 != undefined)
-			map1.removeLayer(EarthquakeList[json.ID].Cross1);
+			mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
 		EarthquakeList[json.ID].Cross1 = Cross1;
-		map1.addLayer(Cross1);
+		mapTW.addLayer(Cross1);
 		Cross.setZIndexOffset(6000);
 		let Loom = 0;
 		let speed = 1000;
@@ -1287,7 +1306,7 @@ async function FCMdata(data) {
 				if (EarthquakeList[json.ID].Pcircle != null)
 					map.removeLayer(EarthquakeList[json.ID].Pcircle);
 				if (EarthquakeList[json.ID].Pcircle1 != null)
-					map1.removeLayer(EarthquakeList[json.ID].Pcircle1);
+					mapTW.removeLayer(EarthquakeList[json.ID].Pcircle1);
 				let km = Math.sqrt(Math.pow((NOW.getTime() - json.Time) * Pspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2));
 				if (km > 0) {
 					EarthquakeList[json.ID].Pcircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
@@ -1301,13 +1320,13 @@ async function FCMdata(data) {
 						radius    : km,
 					});
 					map.addLayer(EarthquakeList[json.ID].Pcircle);
-					map1.addLayer(EarthquakeList[json.ID].Pcircle1);
+					mapTW.addLayer(EarthquakeList[json.ID].Pcircle1);
 				}
 			}
 			if (EarthquakeList[json.ID].Scircle != null)
 				map.removeLayer(EarthquakeList[json.ID].Scircle);
 			if (EarthquakeList[json.ID].Scircle1 != null)
-				map1.removeLayer(EarthquakeList[json.ID].Scircle1);
+				mapTW.removeLayer(EarthquakeList[json.ID].Scircle1);
 			let km = Math.pow((NOW.getTime() - json.Time) * Sspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2);
 			if (km > 0) {
 				let KM = Math.sqrt(km);
@@ -1324,7 +1343,7 @@ async function FCMdata(data) {
 					radius      : KM,
 				});
 				map.addLayer(EarthquakeList[json.ID].Scircle);
-				map1.addLayer(EarthquakeList[json.ID].Scircle1);
+				mapTW.addLayer(EarthquakeList[json.ID].Scircle1);
 			}
 			if (NOW.getTime() - json.TimeStamp > 240000 || json.Cancel && EarthquakeList[json.ID] != undefined) {
 				if (json.Cancel) {
@@ -1336,10 +1355,10 @@ async function FCMdata(data) {
 				}
 				if (EarthquakeList[json.ID].Scircle != undefined) map.removeLayer(EarthquakeList[json.ID].Scircle);
 				if (EarthquakeList[json.ID].Pcircle != undefined) map.removeLayer(EarthquakeList[json.ID].Pcircle);
-				if (EarthquakeList[json.ID].Scircle1 != undefined) map1.removeLayer(EarthquakeList[json.ID].Scircle1);
-				if (EarthquakeList[json.ID].Pcircle1 != undefined) map1.removeLayer(EarthquakeList[json.ID].Pcircle1);
+				if (EarthquakeList[json.ID].Scircle1 != undefined) mapTW.removeLayer(EarthquakeList[json.ID].Scircle1);
+				if (EarthquakeList[json.ID].Pcircle1 != undefined) mapTW.removeLayer(EarthquakeList[json.ID].Pcircle1);
 				map.removeLayer(EarthquakeList[json.ID].Cross);
-				map1.removeLayer(EarthquakeList[json.ID].Cross1);
+				mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
 				for (let index = 0; index < INFO.length; index++)
 					if (INFO[index].ID == json.ID) {
 						TINFO = 0;
