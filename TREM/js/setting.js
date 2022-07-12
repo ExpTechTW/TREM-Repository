@@ -4,7 +4,7 @@ const { shell } = require("@electron/remote");
 
 let Loc;
 
-document.getElementById("client-version").innerText = `${app.getVersion()}`;
+document.getElementById("client-version").innerText = `${process.env.Version}`;
 document.getElementById("client-os").innerText = `${os.version()} (${os.release()})`;
 document.getElementById("client-uuid").title = `${localStorage["UUID"]}`;
 

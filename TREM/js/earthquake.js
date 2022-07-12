@@ -450,7 +450,7 @@ function init() {
 				});
 		}, 1000);
 	}
-	$("#app-version").text(app.getVersion());
+	$("#app-version").text(process.env.Version);
 	$("#loading").text("歡迎");
 	$("#load").delay(1000).fadeOut(1000);
 }

@@ -9,6 +9,8 @@ let tray = null;
 let _hide = false;
 let _devMode = false;
 
+process.env.Version = "22w29-pre4";
+
 if (process.argv.includes("--start")) _hide = true;
 if (process.argv.includes("--dev")) _devMode = true;
 
