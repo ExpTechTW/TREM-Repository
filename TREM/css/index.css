@@ -197,7 +197,7 @@ body {
     white-space: nowrap;
 }
 .alert-box.show {
-    bottom: 60px;
+    bottom: 52px;
     opacity: 1;
 }
 .alert-box-body {
