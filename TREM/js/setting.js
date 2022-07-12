@@ -1,10 +1,12 @@
 const ipc = require("electron").ipcRenderer;
+const os = require("node:os");
 const { shell } = require("@electron/remote");
 
 let Loc;
 
-document.getElementById("ver").innerText = `TREM 版本號: ${app.getVersion()}`;
-document.getElementById("uuid").innerText = `UUID: ${localStorage["UUID"]}`;
+document.getElementById("client-version").innerText = `${app.getVersion()}`;
+document.getElementById("client-os").innerText = `${os.version()} (${os.release()})`;
+document.getElementById("client-uuid").title = `${localStorage["UUID"]}`;
 
 const lockScroll = state => {
 	if (state) {

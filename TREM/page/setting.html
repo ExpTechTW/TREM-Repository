@@ -52,6 +52,12 @@
                     role="button" tabindex="0">
                     <span>關於</span>
                 </div>
+                <div class="client-info-container">
+                    <div id="client-version"></div>
+                    <div id="client-os"></div>
+                    <div id="client-uuid">UUID</div>
+                    <div id="client-license">Licensed under AGPL-3.0</div>
+                </div>
             </div>
             <div class="list" id="list" style="width: 85%;height:90%; float: right;">
                 <div class="list-container show" id="EEW">
@@ -432,37 +438,25 @@
                     <div class="external-link" role="link" onclick="openURL('https:\/\/github.com/ExpTechTW/TREM')">
                         GitHub<span class="material-icons">launch</span></div>
                     <div>
-                        <font color="white" size="5">
-                            <br>
-                            <br><b>• 貢獻者</b>
-                            <br> - whes1015#1015
-                            <br> - Kamiya#4047
-                            <br> - M789#2056
-                            <br> - eggrollpvp#8159
-                            <br> - 布丁Timyaya#8732
-                            <br>
-                            <div class="control-title">YouTube 合作夥伴</div>
-                            <div class="external-link"
-                                onclick="openURL('https:\/\/www.youtube.com/channel/UCJUeRIt6jKSE-4jP7QB70kw')">
-                                布丁Timyaya 地震記錄<span class="material-icons">launch</span></div>
+                        <ul>貢獻者
+                            <li>whes1015</li>
+                            <li>M789</li>
+                            <li>eggrollpvp</li>
+                            <li>布丁Timyaya</li>
+                            <li>Kamiya</li>
+                        </ul>
+                        <div class="control-title">YouTube 合作夥伴</div>
+                        <div class="external-link"
+                            onclick="openURL('https:\/\/www.youtube.com/channel/UCJUeRIt6jKSE-4jP7QB70kw')">
+                            布丁Timyaya 地震記錄<span class="material-icons">launch</span></div>
 
-                            <div class="control-title">Discord 群組</div>
-                            <div class="external-link" onclick="openURL('https:\/\/discord.gg/5dbHqV8ees')">ExpTech
-                                Studio<span class="material-icons">launch</span></div>
-                            <div class="external-link" onclick="openURL('https:\/\/discord.gg/7sacMKp')">地牛記錄小組
-                                TWERG<span class="material-icons">launch</span></div>
-                        </font>
-                        <br>
-                        <br>
+                        <div class="control-title">Discord 群組</div>
+                        <div class="external-link" onclick="openURL('https:\/\/discord.gg/5dbHqV8ees')">ExpTech
+                            Studio<span class="material-icons">launch</span></div>
+                        <div class="external-link" onclick="openURL('https:\/\/discord.gg/7sacMKp')">地牛記錄小組
+                            TWERG<span class="material-icons">launch</span></div>
                     </div>
-                    <div>
-                        <br>
-                        <font color="white" size="4">資訊</font>
-                        <br>
-                        <font id="ver" color="white" size="3"></font><br>
-                        <font id="uuid" color="white" size="3"></font><br>
-                        <font color="white" size="3">開源協議: AGPL-3.0</font><br>
-                    </div>
+
                     <button class="flat-button" onclick="dumpUpload()">DUMP</button>
                     <button class="flat-button" onclick="reset()">重置設定</button>
                     <button class="flat-button" onclick="openSettingFile()">開啟設定檔</button>

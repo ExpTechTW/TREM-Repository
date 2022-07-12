@@ -28,7 +28,7 @@ body {
     width: 300px;
 }
 
-.nav > div {
+.nav > div:not(.client-info-container) {
     height: 48px;
     line-height: 48px;
     margin: 0 12px;
@@ -37,32 +37,45 @@ body {
     outline .1s ease-in-out;
 }
 
-.nav > div:not(.active):hover {
+.nav > div:not(.client-info-container):not(.active):hover {
     background-color: rgba(var(--md-sys-color-on-surface), .08);
 }
 
-.nav > div:not(.active):focus {
+.nav > div:not(.client-info-container):not(.active):focus {
     background-color: rgba(var(--md-sys-color-on-surface), .12);
 }
-.nav > div:focus-visible {
+.nav > div:not(.client-info-container):focus-visible {
     background-color: rgba(var(--md-sys-color-on-surface), .12);
     outline: 2px solid rgb(var(--md-sys-color-primary));
 }
 
-.nav > div:not(.active):active {
+.nav > div:not(.client-info-container):not(.active):active {
     background-color: rgba(var(--md-sys-color-on-secondary-container), .12);
 }
 
-.nav > div.active {
+.nav > div:not(.client-info-container).active {
     background-color: rgb(var(--md-sys-color-secondary-container));
 }
 
-.nav > div span {
+.nav > div:not(.client-info-container) span {
     margin: 0 20px;
     color: rgb(var(--md-sys-color-on-background));
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 300;
     white-space: nowrap;
+}
+
+.client-info-container {
+    margin: 8px 32px;
+    color: rgba(var(--md-sys-color-on-surface-variant), .6);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+#client-uuid {
+    cursor: help;
+    text-decoration: underline rgba(var(--md-sys-color-on-surface-variant), .6) dotted;
 }
 
 .titlebar {
