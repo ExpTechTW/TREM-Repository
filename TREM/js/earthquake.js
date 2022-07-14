@@ -7,6 +7,8 @@ const {
 	START_NOTIFICATION_SERVICE,
 } = require("electron-fcm-push-receiver/src/constants");
 const WebSocket = require("ws");
+const path = require("path");
+const { Console } = require("console");
 
 // #region 變數
 let t = null;
@@ -1045,38 +1047,6 @@ async function FCMdata(data) {
 		if (EarthquakeList[json.ID] == undefined) EarthquakeList[json.ID] = {};
 		EarthquakeList[json.ID].Time = json.Time;
 		EarthquakeList[json.ID].ID = json.ID;
-		if (CONFIG["webhook.url"] != "" && json.ID != Info.webhook && localStorage.UUID != "e6471ff7-8a1f-4299-bb7f-f2220f5eb6e8") {
-			Info.webhook = json.ID;
-			let Now = NOW.getFullYear() +
-				"/" + (NOW.getMonth() + 1) +
-				"/" + NOW.getDate() +
-				" " + NOW.getHours() +
-				":" + NOW.getMinutes() +
-				":" + NOW.getSeconds();
-
-			let msg = CONFIG["webhook.body"];
-			msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
-			if (json.Function == "earthquake")
-				msg = msg.replace("%Provider%", "中華民國交通部中央氣象局");
-			else if (json.Function == "JP_earthquake")
-				msg = msg.replace("%Provider%", "日本氣象廳");
-			else if (json.Function == "CN_earthquake")
-				msg = msg.replace("%Provider%", "福建省地震局");
-
-			msg = JSON.parse(msg);
-			msg.username = "TREM | 台灣實時地震監測";
-
-			msg.embeds[0].image.url = `http://150.117.110.118/TREM/${json.ID}/0.png`;
-			msg.embeds[0].footer = {
-				"text"     : `ExpTech Studio ${Now}`,
-				"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
-			};
-			dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
-			axios.post(CONFIG["webhook.url"], msg)
-				.catch((error) => {
-					dump({ level: 2, message: error, origin: "Webhook" });
-				});
-		}
 		let value = 0;
 		let distance = 0;
 		let res = await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json");
@@ -1409,6 +1379,42 @@ async function FCMdata(data) {
 				}
 			}
 		}, speed);
+		setTimeout(() => {
+			ipcRenderer.send("screenshotEEW");
+			setTimeout(() => {
+				if (CONFIG["webhook.url"] != "") {
+					let Now = NOW.getFullYear() +
+						"/" + (NOW.getMonth() + 1) +
+						"/" + NOW.getDate() +
+						" " + NOW.getHours() +
+						":" + NOW.getMinutes() +
+						":" + NOW.getSeconds();
+
+					let msg = CONFIG["webhook.body"];
+					msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
+					if (json.Function == "earthquake")
+						msg = msg.replace("%Provider%", "中華民國交通部中央氣象局");
+					else if (json.Function == "JP_earthquake")
+						msg = msg.replace("%Provider%", "日本氣象廳");
+					else if (json.Function == "CN_earthquake")
+						msg = msg.replace("%Provider%", "福建省地震局");
+
+					msg = JSON.parse(msg);
+					msg.username = "TREM | 台灣實時地震監測";
+
+					msg.embeds[0].image.url = "";
+					msg.embeds[0].footer = {
+						"text"     : `ExpTech Studio ${Now}`,
+						"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
+					};
+					dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
+					axios.post(CONFIG["webhook.url"], msg)
+						.catch((error) => {
+							dump({ level: 2, message: error, origin: "Webhook" });
+						});
+				}
+			}, 2000);
+		}, 1000);
 	}
 }
 // #endregion

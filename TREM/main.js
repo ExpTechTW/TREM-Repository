@@ -185,12 +185,19 @@ ipcMain.on("restart", () => {
 	app.quit();
 });
 
-ipcMain.on("screenshot", async () => {
+ipcMain.on("screenshotEEW", () => {
+	screenshot("EEW.png");
+});
+
+ipcMain.on("screenshot", () => {
+	screenshot("screenshot" + Date.now() + ".png");
+	shell.showItemInFolder(path.join(folder, filename));
+});
+
+async function screenshot(filename) {
 	const folder = path.join(app.getPath("userData"), "Screenshots");
 	if (!fs.existsSync(folder))
 		fs.mkdirSync(folder);
-	const filename = "screenshot" + Date.now() + ".png";
 	console.log(filename);
 	fs.writeFileSync(path.join(folder, filename), (await MainWindow.webContents.capturePage()).toPNG());
-	shell.showItemInFolder(path.join(folder, filename));
-});
+}
