@@ -66,6 +66,7 @@ function createSettingWindow() {
 		width          : 1000,
 		minHeight      : 600,
 		minWidth       : 800,
+		frame          : false,
 		show           : false,
 		webPreferences : {
 			nodeIntegration  : true,

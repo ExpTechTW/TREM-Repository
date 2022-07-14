@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Roboto&display=swap');
+@import url("../css/titlebar.css");
 @import url("../css/m3/m3_theme.css");
 @import url("../css/m3/m3_dialog.css");
 @import url("../css/m3/m3_filled_tonal_button.css");
@@ -11,21 +12,23 @@
 body {
     position: absolute;
     background-color: rgb(var(--md-sys-color-background));
-    transition: background-color .1s ease-in-out;
+    transition: background-color .1s ease-in-out,
+                color .1s ease-in-out;
     overflow: hidden;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    margin: 0;
 }
 
 .main {
     position: absolute;
     display: flex;
     flex-direction: column;
-    top: 0;
+    top: 28px;
     right: 0;
-    bottom: 0;
+    bottom: 8px;
     left: 0;
 }
 
