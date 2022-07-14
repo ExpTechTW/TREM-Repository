@@ -59,243 +59,230 @@
                     <div id="client-license">Licensed under AGPL-3.0</div>
                 </div>
             </div>
-            <div class="list" id="list" style="width: 85%;height:90%; float: right;">
+            <div class="list" id="list">
                 <div class="list-container show" id="EEW">
-                    <div>
-                        <div class="control-title">強震即時警報</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">所在地</span>
-                                    <span class="option-label-description">設定所在地</span>
-                                </div>
-                                <div class="control">
-                                    <select id="location.city" name="city" onchange="SelectSave('location.city')">
-                                    </select>
-                                    <select id="location.town" name="town" onchange="SelectSave('location.town')">
-                                    </select>
-                                </div>
+                    <div class="control-title">強震即時警報</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">所在地</span>
+                                <span class="option-label-description">設定所在地</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">接收震度</span>
-                                    <span class="option-label-description">所在地超過「接收震度」時觸發 強震即時警報</span>
-                                </div>
-                                <div class="control">
-                                    <select id="eew.Intensity" name="city" onchange="SelectSave('eew.Intensity')">
-                                        <option value="0">0 級</option>
-                                        <option value="1">1 級</option>
-                                        <option value="2">2 級</option>
-                                        <option value="3">3 級</option>
-                                        <option value="4">4 級</option>
-                                        <option value="5">5 弱</option>
-                                        <option value="6">5 強</option>
-                                        <option value="7">6 弱</option>
-                                        <option value="8">6 強</option>
-                                        <option value="9">7 級</option>
-                                    </select>
-                                </div>
+                            <div class="control">
+                                <select id="location.city" name="city" onchange="SelectSave('location.city')">
+                                </select>
+                                <select id="location.town" name="town" onchange="SelectSave('location.town')">
+                                </select>
                             </div>
-                            <button class="filled-tonal-button" onclick="testEEW()" style="margin-top: 10px;">
-                                <span class="material-symbols-rounded filled-tonal-button-icon">replay</span>
-                                <span class="filled-tonal-button-label">測試警報</span>
-                            </button>
                         </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">接收震度</span>
+                                <span class="option-label-description">所在地超過「接收震度」時觸發 強震即時警報</span>
+                            </div>
+                            <div class="control">
+                                <select id="eew.Intensity" name="city" onchange="SelectSave('eew.Intensity')">
+                                    <option value="0">0 級</option>
+                                    <option value="1">1 級</option>
+                                    <option value="2">2 級</option>
+                                    <option value="3">3 級</option>
+                                    <option value="4">4 級</option>
+                                    <option value="5">5 弱</option>
+                                    <option value="6">5 強</option>
+                                    <option value="7">6 弱</option>
+                                    <option value="8">6 強</option>
+                                    <option value="9">7 級</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="filled-tonal-button" onclick="testEEW()" style="margin-top: 10px;">
+                            <span class="material-symbols-rounded filled-tonal-button-icon">replay</span>
+                            <span class="filled-tonal-button-label">測試警報</span>
+                        </button>
                     </div>
-                    <div>
-                        <div class="control-title">接收參數</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">接收台灣以外的地震速報</span>
-                                    <span class="option-label-description">日本 氣象廳 | 中國 福建省地震局</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="accept.eew.jp" onclick="CheckSave('accept.eew.jp')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                    <div class="control-title">接收參數</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">接收台灣以外的地震速報</span>
+                                <span class="option-label-description">日本 氣象廳 | 中國 福建省地震局</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">計算場址效應</span>
-                                    <span class="option-label-description">一種影響地震震度的因素 | 僅適用於「各地預估震度」</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="earthquake.siteEffect"
-                                        onclick="CheckSave('earthquake.siteEffect')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="accept.eew.jp" onclick="CheckSave('accept.eew.jp')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">計算場址效應</span>
+                                <span class="option-label-description">一種影響地震震度的因素 | 僅適用於「各地預估震度」</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">自適應波速</span>
-                                    <span class="option-label-description">根據震中距計算 P波 S波 抵達時間</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="auto.waveSpeed" onclick="CheckSave('auto.waveSpeed')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="earthquake.siteEffect"
+                                    onclick="CheckSave('earthquake.siteEffect')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">自適應波速</span>
+                                <span class="option-label-description">根據震中距計算 P波 S波 抵達時間</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">即時測站</span>
-                                    <span class="option-label-description">顯示 TREM 測站的即時數據</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="earthquake.Real-time"
-                                        onclick="CheckSave('earthquake.Real-time')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="auto.waveSpeed" onclick="CheckSave('auto.waveSpeed')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">即時測站</span>
+                                <span class="option-label-description">顯示 TREM 測站的即時數據</span>
                             </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="earthquake.Real-time"
+                                    onclick="CheckSave('earthquake.Real-time')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
                         </div>
                     </div>
                 </div>
                 <div class="list-container" id="Screen">
-                    <div>
-                        <div class="control-title">強震即時警報</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">顯示視窗</span>
-                                    <span class="option-label-description">在收到地震速報時自動開啟視窗</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="eew.show" onclick="CheckSave('eew.show')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                    <div class="control-title">強震即時警報</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">顯示視窗</span>
+                                <span class="option-label-description">在收到地震速報時自動開啟視窗</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">視窗覆蓋</span>
-                                    <span class="option-label-description">將視窗顯示於最上層</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="eew.cover" onclick="CheckSave('eew.cover')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="eew.show" onclick="CheckSave('eew.show')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">視窗覆蓋</span>
+                                <span class="option-label-description">將視窗顯示於最上層</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">震波平滑</span>
-                                    <span class="option-label-description">以較短的間隔對畫面進行渲染</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="shock.smoothing" onclick="CheckSave('shock.smoothing')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="eew.cover" onclick="CheckSave('eew.cover')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">震波平滑</span>
+                                <span class="option-label-description">以較短的間隔對畫面進行渲染</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">顯示 P 波</span>
-                                    <span class="option-label-description">先到達的「地震波」</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="shock.p" onclick="CheckSave('shock.p')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="shock.smoothing" onclick="CheckSave('shock.smoothing')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">顯示 P 波</span>
+                                <span class="option-label-description">先到達的「地震波」</span>
                             </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="shock.p" onclick="CheckSave('shock.p')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
                         </div>
                     </div>
-                    <div>
-                        <div class="control-title">地震報告</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">顯示視窗</span>
-                                    <span class="option-label-description">在收到地震報告時自動開啟視窗</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="report.show" onclick="CheckSave('report.show')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                    <div class="control-title">地震報告</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">顯示視窗</span>
+                                <span class="option-label-description">在收到地震報告時自動開啟視窗</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">視窗覆蓋</span>
-                                    <span class="option-label-description">將視窗顯示於最上層</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="report.cover" onclick="CheckSave('report.cover')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="report.show" onclick="CheckSave('report.show')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">視窗覆蓋</span>
+                                <span class="option-label-description">將視窗顯示於最上層</span>
                             </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="report.cover" onclick="CheckSave('report.cover')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
                         </div>
                     </div>
-                    <div>
-                        <div class="control-title">即時測站</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">顯示測站</span>
-                                    <span class="option-label-description">顯示在地圖上的即時測站</span>
-                                </div>
-                                <div class="control">
-                                    <select id="Real-time.station" name="town"
-                                        onchange="SelectSave('Real-time.station')">
-                                    </select>
-                                </div>
+                    <div class="control-title">即時測站</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">顯示測站</span>
+                                <span class="option-label-description">顯示在地圖上的即時測站</span>
                             </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">顯示視窗</span>
-                                    <span class="option-label-description">自動開啟視窗</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="Real-time.show" onclick="CheckSave('Real-time.show')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">視窗覆蓋</span>
-                                    <span class="option-label-description">將視窗顯示於最上層</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="Real-time.cover" onclick="CheckSave('Real-time.cover')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                            <div class="control">
+                                <select id="Real-time.station" name="town" onchange="SelectSave('Real-time.station')">
+                                </select>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <div class="control-title">地圖</div>
-                        <div class="control-container">
-                            <div class="option-container">
-                                <div class="option-label">
-                                    <span class="option-label-title">自動縮放</span>
-                                    <span class="option-label-description">讓程式自動縮放地圖</span>
-                                </div>
-                                <label class="md3 switch">
-                                    <input type="checkbox" id="map.autoZoom" onclick="CheckSave('map.autoZoom')">
-                                    <span class="slider">
-                                        <span class="material-symbols-rounded icon">done</span>
-                                    </span>
-                                </label>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">顯示視窗</span>
+                                <span class="option-label-description">自動開啟視窗</span>
                             </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="Real-time.show" onclick="CheckSave('Real-time.show')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">視窗覆蓋</span>
+                                <span class="option-label-description">將視窗顯示於最上層</span>
+                            </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="Real-time.cover" onclick="CheckSave('Real-time.cover')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-title">地圖</div>
+                    <div class="control-container">
+                        <div class="option-container">
+                            <div class="option-label">
+                                <span class="option-label-title">自動縮放</span>
+                                <span class="option-label-description">讓程式自動縮放地圖</span>
+                            </div>
+                            <label class="md3 switch">
+                                <input type="checkbox" id="map.autoZoom" onclick="CheckSave('map.autoZoom')">
+                                <span class="slider">
+                                    <span class="material-symbols-rounded icon">done</span>
+                                </span>
+                            </label>
                         </div>
                     </div>
                 </div>

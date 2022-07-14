@@ -9,13 +9,11 @@ document.getElementById("client-os").innerText = `${os.version()} (${os.release(
 document.getElementById("client-uuid").title = `${localStorage["UUID"]}`;
 
 const lockScroll = state => {
-	if (state) {
-		$("body").css({ "overflow": "hidden" });
+	if (state)
 		$(document).off("scroll", () => window.scrollTo(0, 0));
-	} else {
+	else
 		$(document).off("scroll");
-		$("body").css({ "overflow": "visible" });
-	}
+
 };
 
 const showDialog = (type, title, message, button = 0, customIcon, callback) => {
@@ -251,7 +249,30 @@ function setList(args, el, event) {
 	$(el).addClass("active");
 
 	currentel.fadeOut(100).removeClass("show").show();
+	changeel.children("div").each((i, e) => {
+		$(e).css("opacity", "0");
+		$(e).children().each((i2, e2) => {
+			if (e2.id != "HAReloadButton")
+				$(e2).css("opacity", "0");
+		});
+	});
 	changeel.delay(100).hide().addClass("show").fadeIn(200);
+	$("#list")[0].scrollTo(0, 0);
+	const changeelchild = $(`#${args} > div`);
+
+	let delay = 0;
+	for (let i = 0; i < changeelchild.length; i++) {
+		$(changeelchild[i]).delay(delay).fadeTo(200, 1);
+		delay += 20;
+		const child = changeelchild[i].children;
+		if (child.length)
+			for (let j = 0; j < child.length; j++)
+				if (child[j].id != "HAReloadButton") {
+					$(child[j]).delay(delay).fadeTo(100, 1);
+					delay += 20;
+				}
+
+	}
 }
 
 function testEEW() {
@@ -286,8 +307,13 @@ const testAudioState = {
 let testAudioBtn;
 testAudioState.audio.addEventListener("ended", () => {
 	testAudioState.is_playing = false;
+	testAudioBtn.style.removeProperty("--progress");
 	testAudioBtn.childNodes[1].textContent = "play_arrow";
 	testAudioBtn.childNodes[3].textContent = "測試音效";
+});
+testAudioState.audio.addEventListener("timeupdate", () => {
+	console.log(testAudioState.audio.currentTime);
+	testAudioBtn.style.setProperty("--progress", (testAudioState.audio.currentTime / (testAudioState.audio.duration - 0.25)) || 0);
 });
 
 /**
@@ -299,6 +325,7 @@ const testAudio = (audioString, el) => {
 		testAudioState.audio.pause();
 		testAudioState.audio.currentTime = 0;
 		testAudioState.is_playing = false;
+		testAudioBtn.style.removeProperty("--progress");
 		testAudioBtn.childNodes[1].textContent = "play_arrow";
 		testAudioBtn.childNodes[3].textContent = "測試音效";
 	}
@@ -307,6 +334,7 @@ const testAudio = (audioString, el) => {
 		testAudioState.audio.src = `../Audio/${audioString}.wav`;
 		testAudioState.audio.load();
 		testAudioState.audio.play();
+		testAudioState.audio.played;
 		testAudioState.is_playing = true;
 		el.childNodes[1].textContent = "pause";
 		el.childNodes[3].textContent = "停止測試";
@@ -314,6 +342,7 @@ const testAudio = (audioString, el) => {
 		testAudioState.audio.pause();
 		testAudioState.audio.currentTime = 0;
 		testAudioState.is_playing = false;
+		testAudioBtn.style.removeProperty("--progress");
 		el.childNodes[1].textContent = "play_arrow";
 		el.childNodes[3].textContent = "測試音效";
 	}

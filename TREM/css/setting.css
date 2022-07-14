@@ -9,18 +9,31 @@
 @import url("../css/disable_scrollbar.css");
 
 body {
+    position: absolute;
     background-color: rgb(var(--md-sys-color-background));
     transition: background-color .1s ease-in-out;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .main {
+    position: absolute;
     display: flex;
     flex-direction: column;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .setting-container {
     display: flex;
     flex-direction: row;
+    min-height: 0;
+    flex: 1;
 }
 
 .nav {
@@ -93,15 +106,50 @@ body {
 }
 
 #list {
-    margin: 0 12px;
+    overflow-y: scroll;
+    height: 100%;
+    margin: 0 8px;
+    flex: 1;
+    display: flex;
+}
+
+#list::-webkit-scrollbar {
+    display: initial;
+    width: 6px;
+}
+
+#list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#list::-webkit-scrollbar-thumb {
+    background: rgb(var(--md-sys-color-surface-variant));
+    border-radius: 10px;
+}
+
+#list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(0deg, rgba(var(--md-sys-color-on-surface-variant), .08) 0%, rgba(var(--md-sys-color-on-surface-variant), .08) 100%),
+                rgb(var(--md-sys-color-surface-variant));
 }
 
 .list-container {
     display: none;
+    width: 100%;
+    margin: 0 4px;
+    height: max-content;
+}
+
+.list-container > * > * {
+    opacity: 1;
+    transition: opacity .2s ease-in-out;
 }
 
 .list-container.show {
     display: block;
+}
+
+.list-container :last-child {
+    margin-bottom: 0;
 }
 
 .control-title {

@@ -4,6 +4,7 @@
 
 .md3.switch {
     user-select: none;
+    position: relative;
     height: 28px;
     width: 48px;
     -webkit-tap-highlight-color: transparent;

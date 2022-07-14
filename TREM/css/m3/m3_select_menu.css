@@ -1,4 +1,5 @@
 select {
+    user-select: none;
     background-color: rgb(var(--md-sys-color-surface-variant));
     border-radius: 6px 6px 0 0;
     padding: 0 16px;
