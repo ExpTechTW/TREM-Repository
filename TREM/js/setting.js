@@ -119,6 +119,10 @@ fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json"
 fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/Json/earthquake/station.json")
 	.then(async res => await res.json())
 	.then(loc => {
+		if (loc[CONFIG["Real-time.station"]] == undefined) {
+			CONFIG["Real-time.station"] = "L-711-6732340-12";
+			ipcRenderer.send("saveSetting", CONFIG);
+		}
 		for (let index = 0; index < Object.keys(loc).length; index++) {
 			if (Object.keys(loc)[index] == "List") continue;
 			const select = document.getElementById("Real-time.station");
