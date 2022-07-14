@@ -54,6 +54,8 @@ function createWindow() {
 		else {
 			event.preventDefault();
 			MainWindow.hide();
+			if (SettingWindow)
+				SettingWindow.close();
 		}
 	});
 }
