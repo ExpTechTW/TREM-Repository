@@ -27,3 +27,11 @@ const changeView = (args, el, event) => {
 	currentel.fadeOut(100).removeClass("show").show();
 	changeel.delay(100).hide().addClass("show").fadeIn(200);
 };
+
+const { desktopCapturer } = require("@electron/remote");
+
+document.addEventListener("keyup", (event) => {
+	if (event.key == "F12")
+		ipcRenderer.send("screenshot");
+
+}, false);

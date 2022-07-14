@@ -1,4 +1,4 @@
-const { BrowserWindow, Menu, Tray, app, globalShortcut, ipcMain, nativeImage } = require("electron");
+const { BrowserWindow, Menu, Tray, app, globalShortcut, ipcMain, nativeImage, shell } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const pushReceiver = require("electron-fcm-push-receiver");
@@ -181,4 +181,14 @@ ipcMain.on("restart", () => {
 	app.relaunch();
 	if (SettingWindow != null) SettingWindow.close();
 	app.quit();
+});
+
+ipcMain.on("screenshot", async () => {
+	const folder = path.join(app.getPath("userData"), "Screenshots");
+	if (!fs.existsSync(folder))
+		fs.mkdirSync(folder);
+	const filename = "screenshot" + Date.now() + ".png";
+	console.log(filename);
+	fs.writeFileSync(path.join(folder, filename), (await MainWindow.webContents.capturePage()).toPNG());
+	shell.showItemInFolder(path.join(folder, filename));
 });
