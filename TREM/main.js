@@ -9,8 +9,6 @@ let tray = null;
 let _hide = false;
 let _devMode = false;
 
-process.env.Version = "22w29-pre4";
-
 if (process.argv.includes("--start")) _hide = true;
 if (process.argv.includes("--dev")) _devMode = true;
 
@@ -26,7 +24,7 @@ app.setLoginItemSettings({
 
 function createWindow() {
 	MainWindow = new BrowserWindow({
-		title          : "TREM | 台灣實時地震監測",
+		title          : "TREM | 台灣即時地震監測",
 		width          : 1280,
 		height         : 720,
 		resizable      : false,
@@ -48,7 +46,7 @@ function createWindow() {
 	pushReceiver.setup(MainWindow.webContents);
 
 	if (process.platform === "win32")
-		app.setAppUserModelId("TREM | 台灣實時地震監測");
+		app.setAppUserModelId("TREM | 台灣即時地震監測");
 
 	MainWindow.on("close", (event) => {
 		if (app.quitting)
@@ -131,7 +129,7 @@ else {
 				},
 			},
 		]);
-		tray.setToolTip("TREM | 台灣實時地震監測");
+		tray.setToolTip("TREM | 台灣即時地震監測");
 		tray.setContextMenu(contextMenu);
 		tray.setIgnoreDoubleClickEvents(true);
 		tray.on("click", (e) => {

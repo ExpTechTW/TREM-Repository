@@ -70,7 +70,7 @@ const DEFAULT_CONFIG = {
 	},
 	"Real-time.station": {
 		"type"  : "SelectBox",
-		"value" : "6732340",
+		"value" : "L-711-6732340-12",
 	},
 	"report.cover": {
 		"type"  : "CheckBox",
