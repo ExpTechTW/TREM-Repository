@@ -1146,6 +1146,7 @@ async function FCMdata(data) {
 		if (json.ID != Info.Notify) {
 			if (CONFIG["eew.show"]) {
 				win.show();
+				win.flashFrame(true);
 				if (CONFIG["eew.cover"]) win.setAlwaysOnTop(true);
 			}
 			let Nmsg = "";
