@@ -1,16 +1,9 @@
+/* eslint-disable no-undef */
 /* eslint-disable prefer-const */
 const { BrowserWindow, shell } = require("@electron/remote");
-const {
-	NOTIFICATION_RECEIVED,
-	NOTIFICATION_SERVICE_ERROR,
-	NOTIFICATION_SERVICE_STARTED,
-	START_NOTIFICATION_SERVICE,
-} = require("electron-fcm-push-receiver/src/constants");
-const WebSocket = require("ws");
-const path = require("path");
-const { Console } = require("console");
 
 // #region 變數
+let Stamp = 0;
 let t = null;
 let Lat = 25.0421407;
 let Long = 121.5198716;
@@ -32,17 +25,11 @@ let PGAaudio = false;
 let PGAAudio = false;
 let PGAtag = 0;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
-let TimerDesynced = false;
 let expected = [];
 let Info = {};
 let Focus = [];
 let PGAmark = false;
-let ServerT = 0;
-let ServerTime = 0;
 let Check = {};
-let NOW = new Date();
-let ws;
-let Reconnect = false;
 let INFO = [];
 let TINFO = 0;
 let ITimer = null;
@@ -105,8 +92,13 @@ Date.prototype.format =
 
 // #region 初始化
 try {
-	dump({ level: 0, message: "Initializing", origin: "Initialization" });
-
+	setInterval(() => {
+		if (DATAstamp != 0 && Stamp != DATAstamp) {
+			Stamp = DATAstamp;
+			FCMdata(DATA);
+		}
+	}, 0);
+	dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer} | MD5 >> ${MD5Check}`, origin: "Initialization" });
 	init();
 } catch (error) {
 	alert("錯誤!! 請到 TREM 官方 Discord 回報");
@@ -458,59 +450,6 @@ function init() {
 }
 // #endregion
 
-// #region 連接 伺服器
-function reconnect() {
-	if (Reconnect) return;
-	Reconnect = true;
-	setTimeout(() => {
-		createWebSocket();
-		Reconnect = false;
-	}, 2000);
-}
-
-function createWebSocket() {
-	try {
-		ws = new WebSocket("wss://exptech.mywire.org:1015", { handshakeTimeout: 3000 });
-		initEventHandle();
-	} catch (e) {
-		reconnect();
-	}
-}
-
-function initEventHandle() {
-	ws.onclose = function() {
-		TimerDesynced = true;
-		reconnect();
-	};
-
-	ws.onerror = function(err) {
-		reconnect();
-	};
-
-	ws.onopen = function() {
-		TimerDesynced = false;
-		ws.send(JSON.stringify({
-			"APIkey"        : "https://github.com/ExpTechTW",
-			"Function"      : "earthquakeService",
-			"Type"          : "subscription-v1",
-			"FormatVersion" : 3,
-			"UUID"          : localStorage.UUID,
-		}));
-		dump({ level: 0, message: `Connected to API Server (${localStorage.UUID})`, origin: "WebSocket" });
-	};
-
-	ws.onmessage = function(evt) {
-		let json = JSON.parse(evt.data);
-		dump({ level: 3, message: `(onMessage) Received ${json.Function ?? json.response}`, origin: "WebSocket" });
-		if (json.Function == "NTP")
-			TimeNow(json.Full);
-		else
-			FCMdata(evt.data);
-
-	};
-}
-// #endregion
-
 // #region 用戶所在位置
 async function setUserLocationMarker() {
 	if (!Location) {
@@ -600,10 +539,10 @@ function ReportGET(eew) {
 	axios.post("https://exptech.mywire.org:1015", data)
 		.then((response) => {
 			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
-			if (response.data["state"] == "Warn") {
-				alert("API 速度限制\n短時間內訪問太多次伺服器\n請稍後再試");
-				app.exit();
-			}
+			if (response.data["state"] == "Warn")
+				setTimeout(() => {
+					ReportGET(eew);
+				}, 2000);
 			ReportList(response.data, eew);
 		})
 		.catch((error) => {
@@ -960,36 +899,6 @@ if (localStorage.Test != undefined)
 				dump({ level: 2, message: error, origin: "Verbose" });
 			});
 	}, 1000);
-// #endregion
-
-// #region FCM
-ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
-	localStorage.UUID = token;
-	createWebSocket();
-	dump({ level: 0, message: `Service Started (${token})`, origin: "FCM" });
-});
-
-ipcRenderer.on(NOTIFICATION_SERVICE_ERROR, (_, error) => {
-	dump({ level: 2, message: error, origin: "FCM" });
-});
-
-ipcRenderer.on(NOTIFICATION_RECEIVED, (_, Notification) => {
-	if (Notification.data.Data != undefined)
-		FCMdata(Notification.data.Data);
-
-});
-
-ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
-// #endregion
-
-// #region NTP
-function TimeNow(now) {
-	ServerT = new Date().getTime();
-	ServerTime = now;
-}
-setInterval(() => {
-	NOW = new Date(ServerTime + (new Date().getTime() - ServerT));
-}, 0);
 // #endregion
 
 // #region EEW
