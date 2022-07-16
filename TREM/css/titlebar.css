@@ -35,6 +35,7 @@
 	align-items: center;
 	width: 100%;
 	height: 100%;
+	color:  rgb(var(--md-sys-color-primary));;
 }
 
 #window-controls .button span {
@@ -61,10 +62,15 @@
 #window-controls .button {
 	user-select: none;
 }
-#window-controls .button:hover {
+#window-controls .button.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+	opacity: .2;
+}
+#window-controls .button:not(.disabled):hover {
 	background-color: rgba(var(--md-sys-color-on-background),0.08);
 }
-#window-controls .button:active {
+#window-controls .button:not(.disabled):active {
 	background-color: rgba(var(--md-sys-color-on-background),0.16);
 }
 
