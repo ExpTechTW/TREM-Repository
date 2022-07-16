@@ -742,7 +742,7 @@ function ReportList(Data, eew) {
                         <br><font color="white" size="3">${DATA.originTime}</font>
                     </div>
                     <div class="right">
-                    <b><font color="white" size="5">M${DATA.magnitudeValue}</font></b>
+                    <b><font color="white" size="5">M${DATA.magnitudeValue.toFixed(1)}</font></b>
                     </div>
                     </div>`;
 				} else
@@ -754,7 +754,7 @@ function ReportList(Data, eew) {
                     <div class="middle" style="width:60%;">
                         <b><font color="white" size="4">${star}${msg}</font></b>
                         <br><font color="white" size="2">${DATA.originTime}</font>
-                        <br><b><font color="white" size="6">M${DATA.magnitudeValue} </font></b><br><font color="white" size="2"> 深度: </font><b><font color="white" size="4">${DATA.depth}km</font></b>
+                        <br><b><font color="white" size="6">M${DATA.magnitudeValue.toFixed(1)} </font></b><br><font color="white" size="2"> 深度: </font><b><font color="white" size="4">${DATA.depth}km</font></b>
                     </div>
                 </div>`;
 
@@ -769,7 +769,7 @@ function ReportList(Data, eew) {
                     <br><font color="white" size="3">${DATA.originTime}</font>
                 </div>
                 <div class="right">
-                <b><font color="white" size="5">M${DATA.magnitudeValue}</font></b>
+                <b><font color="white" size="5">M${DATA.magnitudeValue.toFixed(1)}</font></b>
                 </div>
             </div>`;
 			Div.style.backgroundColor = color(DATA.data[0].areaIntensity);
