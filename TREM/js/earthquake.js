@@ -588,7 +588,8 @@ async function ReportClick(time) {
 			"Value"         : ReportCache[time].earthquakeNo,
 		};
 		if (
-			ReportCache[time].earthquakeNo.toString().substring(3, 6) == "000"
+			// 確認是否為無編號地震
+			ReportCache[time].earthquakeNo % 1000 == 0
 			|| await axios.post("https://exptech.mywire.org:1015", body)
 				.then((response) => {
 					let json = response.data.response;
