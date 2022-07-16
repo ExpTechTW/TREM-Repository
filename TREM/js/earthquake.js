@@ -280,7 +280,7 @@ function init() {
 							document.getElementById("rt-station-pga").innerText = amount;
 						}
 						map.addLayer(ReportMark);
-						ReportMark.setZIndexOffset(1000);
+						ReportMark.setZIndexOffset(2000 + amount);
 						Station[Object.keys(Json)[index]] = ReportMark;
 						if (pga[station[Object.keys(Json)[index]].PGA] == undefined && Intensity != "NA")
 							pga[station[Object.keys(Json)[index]].PGA] = {
@@ -337,6 +337,7 @@ function init() {
 							let town = list[1];
 							let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
 							map.addLayer(ReportMark);
+							ReportMark.setZIndexOffset(1500 + PAlert.data[index].intensity);
 							Station[PAlert.data[index].loc] = ReportMark;
 							if (PAlert.data[index].intensity > pga[PAlert.data[index].TREM].Intensity) pga[PAlert.data[index].TREM].Intensity = PAlert.data[index].intensity;
 							pga[PAlert.data[index].TREM].Time = NOW.getTime();
@@ -362,10 +363,13 @@ function init() {
 							delete pga[Object.keys(pga)[index]];
 							index--;
 						} else {
-							PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
+							let Pmarker = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
 								color     : color(Intensity),
 								fillColor : "transparent",
-							}).addTo(map);
+							});
+							map.addLayer(Pmarker);
+							Pmarker.setZIndexOffset(1000 + Intensity);
+							PGA[Object.keys(pga)[index]] = Pmarker;
 							PGAaudio = true;
 						}
 					}
