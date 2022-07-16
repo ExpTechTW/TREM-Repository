@@ -753,7 +753,7 @@ function addReport(report, prepend = false) {
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
 		report_time.innerText = report.Time;
-		report_detail_container.append(report_location, report_time, report_magnitude, report_depth);
+		report_detail_container.append(report_location, report_time);
 
 		report_container.append(report_intenisty_container, report_detail_container);
 		Div.append(report_container);
