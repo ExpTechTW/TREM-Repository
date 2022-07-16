@@ -716,7 +716,7 @@ function ReportList(Data, eew) {
 
 			let star = "";
 			if (DATA.ID.length != 0) star += "↺ ";
-			if (DATA.earthquakeNo.toString().substring(3, 6) != "000") star += "✩ ";
+			if (DATA.earthquakeNo % 1000 != 0) star += "✩ ";
 			if (index == 0)
 				if (eew.Time != undefined && eew.report == undefined) {
 					Div.style.backgroundColor = color(eew.Max);
