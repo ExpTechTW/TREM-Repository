@@ -24,7 +24,7 @@
 	grid-template-columns: repeat(3, 46px);
 	position: absolute;
 	top: 0;
-	right: 10px;
+	right: 8px;
 	height: 100%;
 }
 
@@ -51,6 +51,7 @@
 
 #close-button {
 	grid-column: 3;
+	border-top-right-radius: 16px;
 }
 
 #window-controls {
