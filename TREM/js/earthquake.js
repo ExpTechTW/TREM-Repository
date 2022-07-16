@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable prefer-const */
 const { BrowserWindow, shell } = require("@electron/remote");
+const _ = require("lodash");
 
 // #region 變數
 let Stamp = 0;
@@ -538,7 +539,7 @@ function playNextAudio() {
 // #endregion
 
 // #region Report Data
-function ReportGET(eew) {
+function ReportGET() {
 	let data = {
 		"APIkey"        : "https://github.com/ExpTechTW",
 		"Function"      : "data",
@@ -552,13 +553,30 @@ function ReportGET(eew) {
 			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 			if (response.data["state"] == "Warn")
 				setTimeout(() => {
-					ReportGET(eew);
+					ReportGET();
 				}, 2000);
-			ReportList(response.data, eew);
+			ReportList(response.data);
 		})
 		.catch((error) => {
 			dump({ level: 2, message: error, origin: "EQReportFetcher" });
+			console.error(error);
 		});
+}
+async function getReportByData(data) {
+	try {
+		const list = await axios.post("https://exptech.mywire.org:1015", {
+			"APIkey"        : "https://github.com/ExpTechTW",
+			"Function"      : "data",
+			"Type"          : "earthquake",
+			"FormatVersion" : 1,
+			"Value"         : 100,
+		});
+		return _.find(list?.response?.data?.response, data);
+	} catch (error) {
+		dump({ level: 2, message: error, origin: "EQReportFetcher" });
+		console.error(error);
+	}
+
 }
 // #endregion
 
@@ -690,117 +708,128 @@ let openURL = url => {
 
 // #region Report list
 let roll = document.getElementById("rolllist");
-function ReportList(Data, eew) {
-	clear();
-	function clear() {
-		if (roll.childNodes.length != 0) {
-			roll.childNodes.forEach((childNodes) => {
-				roll.removeChild(childNodes);
-			});
-			clear();
-		} else
-			add(eew);
-
-	}
-
-	function add() {
-		for (let index = 0; index < Data.response.length; index++) {
-			let DATA = Data.response[index];
-			let Div = document.createElement("DIV");
-			let Level = IntensityI(DATA.data[0].areaIntensity);
-			let msg = "";
-			if (DATA.location.includes("("))
-				msg = DATA.location.substring(DATA.location.indexOf("(") + 1, DATA.location.indexOf(")")).replace("位於", "");
-			else
-				msg = DATA.location;
-
-			let star = "";
-			if (DATA.ID.length != 0) star += "↺ ";
-			if (DATA.earthquakeNo % 1000 != 0) star += "✩ ";
-			if (index == 0)
-				if (eew.Time != undefined && eew.report == undefined) {
-					Div.style.backgroundColor = color(eew.Max);
-					Div.innerHTML =
-						`<div class="background" style="display: flex; align-items:center; padding:5%;padding-right: 1vh;">
-                    <div class="left" style="width:30%; text-align: center">
-                        <font color="white" size="3">最大震度</font><br><b><font color="white" size="7">${IntensityI(eew.Max)}</font></b>
-                    </div>
-                    <div class="middle" style="width:60%;">
-                        <b><font color="white" size="5">震源 調查中</font></b>
-                        <br><font color="white" size="3">${eew.Time}</font>
-                    </div>
-                    </div>`;
-					roll.appendChild(Div);
-					Div = document.createElement("DIV");
-					Div.innerHTML =
-						`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
-                    <div class="left" style="width:20%; text-align: center;">
-                        <b><font color="white" size="6">${Level}</font></b>
-                    </div>
-                    <div class="middle" style="width:60%;">
-                        <b><font color="white" size="4">${star}${msg}</font></b>
-                        <br><font color="white" size="3">${DATA.originTime}</font>
-                    </div>
-                    <div class="right">
-                    <b><font color="white" size="5">M${DATA.magnitudeValue.toFixed(1)}</font></b>
-                    </div>
-                    </div>`;
-				} else
-					Div.innerHTML =
-						`<div class="background" style="display: flex; align-items:center; padding:2%;padding-right: 1vh;">
-                    <div class="left" style="width:30%; text-align: center;">
-                        <font color="white" size="3">最大震度</font><br><b><font color="white" size="7">${Level}</font></b>
-                    </div>
-                    <div class="middle" style="width:60%;">
-                        <b><font color="white" size="4">${star}${msg}</font></b>
-                        <br><font color="white" size="2">${DATA.originTime}</font>
-                        <br><b><font color="white" size="6">M${DATA.magnitudeValue.toFixed(1)} </font></b><br><font color="white" size="2"> 深度: </font><b><font color="white" size="4">${DATA.depth}km</font></b>
-                    </div>
-                </div>`;
-
-			else
-				Div.innerHTML =
-					`<div class="background" style="display: flex; align-items:center;padding-right: 1vh;">
-                <div class="left" style="width:20%; text-align: center;">
-                    <b><font color="white" size="6">${Level}</font></b>
-                </div>
-                <div class="middle" style="width:60%;">
-                    <b><font color="white" size="4">${star}${msg}</font></b>
-                    <br><font color="white" size="3">${DATA.originTime}</font>
-                </div>
-                <div class="right">
-                <b><font color="white" size="5">M${DATA.magnitudeValue.toFixed(1)}</font></b>
-                </div>
-            </div>`;
-			Div.style.backgroundColor = color(DATA.data[0].areaIntensity);
-			ReportCache[DATA.originTime] = Data.response[index];
-			Div.addEventListener("click", (event) => {
-				if (event.detail == 2 && DATA.ID.length != 0) {
-					localStorage.Test = true;
-					localStorage.TestID = DATA.ID;
-					ipcRenderer.send("restart");
-				} else
-					setTimeout(() => {
-						ReportClick(DATA.originTime);
-					}, 100);
-			});
-			roll.appendChild(Div);
-		}
-		if (eew.report != undefined) {
-			ReportClick(Data.response[0].originTime);
-			setTimeout(() => {
-				if (ReportMarkID != null) {
-					ReportMarkID = null;
-					for (let index = 0; index < MarkList.length; index++)
-						map.removeLayer(MarkList[index]);
-
-					focus();
-				}
-			}, 30000);
-		}
-	}
-
+function ReportList(Data) {
+	console.log(Data);
+	roll.replaceChildren();
+	for (const report of Data.response)
+		addReport(report);
 }
+
+function addReport(report, prepend = false) {
+	let Level = IntensityI(report.data[0].areaIntensity);
+	let msg = "";
+	if (report.location.includes("("))
+		msg = report.location.substring(report.location.indexOf("(") + 1, report.location.indexOf(")")).replace("位於", "");
+	else
+		msg = report.location;
+
+	let star = "";
+	if (report.ID.length != 0) star += "↺ ";
+	if (report.earthquakeNo % 1000 != 0) star += "✩ ";
+
+	let Div = document.createElement("div");
+	if (report.Time != undefined && report.report == undefined) {
+		const report_container = document.createElement("div");
+		report_container.className = "report-container";
+
+		const report_intenisty_container = document.createElement("div");
+		report_intenisty_container.className = "report-intenisty-container";
+
+		const report_intenisty_title = document.createElement("span");
+		report_intenisty_title.className = "report-intenisty-title";
+		report_intenisty_title.innerText = "最大震度";
+		const report_intenisty_value = document.createElement("span");
+		report_intenisty_value.className = "report-intenisty-value";
+		report_intenisty_value.innerText = report.Max;
+		report_intenisty_container.append(report_intenisty_title, report_intenisty_value);
+
+
+		const report_detail_container = document.createElement("div");
+		report_detail_container.className = "report-detail-container locating";
+
+		const report_location = document.createElement("span");
+		report_location.className = "report-location";
+		report_location.innerText = "震源 調查中";
+		const report_time = document.createElement("span");
+		report_time.className = "report-time";
+		report_time.innerText = report.Time;
+		report_detail_container.append(report_location, report_time, report_magnitude, report_depth);
+
+		report_container.append(report_intenisty_container, report_detail_container);
+		Div.append(report_container);
+		Div.style.backgroundColor = color(report.Max);
+	} else {
+		const report_container = document.createElement("div");
+		report_container.className = "report-container";
+
+		const report_intenisty_container = document.createElement("div");
+		report_intenisty_container.className = "report-intenisty-container";
+
+		const report_intenisty_title = document.createElement("span");
+		report_intenisty_title.className = "report-intenisty-title";
+		report_intenisty_title.innerText = "最大震度";
+		const report_intenisty_value = document.createElement("span");
+		report_intenisty_value.className = "report-intenisty-value";
+		report_intenisty_value.innerText = Level;
+		report_intenisty_container.append(report_intenisty_title, report_intenisty_value);
+
+
+		const report_detail_container = document.createElement("div");
+		report_detail_container.className = "report-detail-container";
+
+		const report_location = document.createElement("span");
+		report_location.className = "report-location";
+		report_location.innerText = `${star}${msg}`;
+		const report_time = document.createElement("span");
+		report_time.className = "report-time";
+		report_time.innerText = report.originTime;
+		const report_magnitude = document.createElement("span");
+		report_magnitude.className = "report-magnitude";
+		report_magnitude.innerText = report.magnitudeValue.toFixed(1);
+		const report_depth = document.createElement("span");
+		report_depth.className = "report-depth";
+		report_depth.innerText = report.depth;
+		report_detail_container.append(report_location, report_time, report_magnitude, report_depth);
+
+		report_container.append(report_intenisty_container, report_detail_container);
+		Div.append(report_container);
+		Div.style.backgroundColor = color(report.data[0].areaIntensity);
+		ReportCache[report.originTime] = report;
+		Div.addEventListener("click", (event) => {
+			if (event.detail == 2 && report.ID.length != 0) {
+				localStorage.Test = true;
+				localStorage.TestID = report.ID;
+				ipcRenderer.send("restart");
+			} else
+				setTimeout(() => {
+					ReportClick(report.originTime);
+				}, 100);
+		});
+	}
+
+	if (prepend) {
+		const locating = document.querySelector(".report-detail-container.locating");
+		if (locating)
+			locating.replaceWith(Div);
+		else
+			roll.prepend(Div);
+	} else
+		roll.append(Div);
+
+	if (report.report != undefined) {
+		ReportClick(Data.response[0].originTime);
+		setTimeout(() => {
+			if (ReportMarkID != null) {
+				ReportMarkID = null;
+				for (let index = 0; index < MarkList.length; index++)
+					map.removeLayer(MarkList[index]);
+
+				focus();
+			}
+		}, 30000);
+	}
+}
+
 // #endregion
 
 // #region 設定
@@ -986,9 +1015,9 @@ async function FCMdata(data) {
 			win.setAlwaysOnTop(false);
 		}
 		new Notification("地震報告", { body: `${json.Location.substring(json.Location.indexOf("(") + 1, json.Location.indexOf(")")).replace("位於", "")}\n${json["UTC+8"]}\n發生 M${json.Scale} 有感地震`, icon: "TREM.ico" });
-		ReportGET({
-			report: true,
-		});
+		const report = await getReportByData({ earthquakeNo: json.ID, epicenterLon: json.EastLongitude, epicenterLat: json.NorthLatitude, depth: json.Depth, magnitudeValue: json.Scale });
+		addReport(report, true);
+
 		if (CONFIG["report.audio"]) audioPlay("./audio/Report.wav");
 		setTimeout(() => {
 			ipcRenderer.send("screenshotEEW", {
