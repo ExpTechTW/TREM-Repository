@@ -703,7 +703,8 @@ function ReportList(Data, eew) {
 				msg = DATA.location;
 
 			let star = "";
-			if (DATA.earthquakeNo.toString().substring(3, 6) != "000") star = "✩ ";
+			if (DATA.ID.length != 0) star += "↺ ";
+			if (DATA.earthquakeNo.toString().substring(3, 6) != "000") star += "✩ ";
 			if (index == 0)
 				if (eew.Time != undefined && eew.report == undefined) {
 					Div.style.backgroundColor = color(eew.Max);
@@ -761,8 +762,15 @@ function ReportList(Data, eew) {
             </div>`;
 			Div.style.backgroundColor = color(DATA.data[0].areaIntensity);
 			ReportCache[DATA.originTime] = Data.response[index];
-			Div.addEventListener("click", () => {
-				ReportClick(DATA.originTime);
+			Div.addEventListener("click", (event) => {
+				if (event.detail == 2 && DATA.ID.length != 0) {
+					localStorage.Test = true;
+					localStorage.TestID = DATA.ID;
+					ipcRenderer.send("restart");
+				} else
+					setTimeout(() => {
+						ReportClick(DATA.originTime);
+					}, 100);
 			});
 			roll.appendChild(Div);
 		}
@@ -882,22 +890,45 @@ ipcMain.on("updateTheme", () => {
 });
 if (localStorage.Test != undefined)
 	setTimeout(() => {
-		delete localStorage.Test;
-		dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
-		let data = {
-			"APIkey"        : "https://github.com/ExpTechTW",
-			"Function"      : "earthquake",
-			"Type"          : "test",
-			"FormatVersion" : 3,
-			"UUID"          : localStorage.UUID,
-			"Addition"      : "TW",
-		};
-		if (CONFIG["accept.eew.jp"]) delete data["Addition"];
-		dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-		axios.post("https://exptech.mywire.org:1015", data)
-			.catch((error) => {
-				dump({ level: 2, message: error, origin: "Verbose" });
-			});
+		if (localStorage.TestID != undefined) {
+			delete localStorage.Test;
+			let list = localStorage.TestID.split(",");
+			for (let index = 0; index < list.length; index++)
+				setTimeout(() => {
+					dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
+					let data = {
+						"APIkey"        : "https://github.com/ExpTechTW",
+						"Function"      : "earthquake",
+						"Type"          : "test",
+						"FormatVersion" : 3,
+						"UUID"          : localStorage.UUID,
+						"ID"            : list[index],
+					};
+					dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
+					axios.post("https://exptech.mywire.org:1015", data)
+						.catch((error) => {
+							dump({ level: 2, message: error, origin: "Verbose" });
+						});
+				}, 1000);
+			delete localStorage.TestID;
+		} else {
+			delete localStorage.Test;
+			dump({ level: 0, message: "Start EEW Test", origin: "EEW" });
+			let data = {
+				"APIkey"        : "https://github.com/ExpTechTW",
+				"Function"      : "earthquake",
+				"Type"          : "test",
+				"FormatVersion" : 3,
+				"UUID"          : localStorage.UUID,
+				"Addition"      : "TW",
+			};
+			if (CONFIG["accept.eew.jp"]) delete data["Addition"];
+			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
+			axios.post("https://exptech.mywire.org:1015", data)
+				.catch((error) => {
+					dump({ level: 2, message: error, origin: "Verbose" });
+				});
+		}
 	}, 1000);
 // #endregion
 
@@ -992,7 +1023,7 @@ async function FCMdata(data) {
 		}
 
 		let Intensity = IntensityN(level);
-		if (Intensity < Number(CONFIG["eew.Intensity"])) {
+		if (Intensity < Number(CONFIG["eew.Intensity"]) && !json.Replay) {
 			TimerDesynced = false;
 			return;
 		}
@@ -1063,7 +1094,7 @@ async function FCMdata(data) {
 			audioPlay("./audio/Alert.wav");
 		}
 		let _time = -1;
-		let Stamp = 0;
+		let stamp = 0;
 		if (json.ID != Info.Alert) {
 			focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 7.5);
 			Info.Alert = json.ID;
@@ -1071,8 +1102,8 @@ async function FCMdata(data) {
 			if (t != null) clearInterval(t);
 			t = setInterval(() => {
 				value = Math.round((distance - ((NOW.getTime() - json.Time) / 1000) * Sspeed) / Sspeed);
-				if (Stamp != value && !audioLock) {
-					Stamp = value;
+				if (stamp != value && !audioLock) {
+					stamp = value;
 					if (_time >= 0) {
 						audioPlay("./audio/1/ding.wav");
 						_time++;
@@ -1314,7 +1345,7 @@ async function FCMdata(data) {
 					msg.embeds[0].image.url = "";
 					msg.embeds[0].footer = {
 						"text"     : `ExpTech Studio ${Now}`,
-						"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/%E4%B8%BB%E8%A6%81%E7%9A%84-(main)/image/Icon/ExpTech.png",
+						"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/master/image/Icon/ExpTech.png",
 					};
 					dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
 					axios.post(CONFIG["webhook.url"], msg)
