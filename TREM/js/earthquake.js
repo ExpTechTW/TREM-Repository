@@ -374,13 +374,10 @@ function init() {
 							delete pga[Object.keys(pga)[index]];
 							index--;
 						} else {
-							let Pmarker = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
+							PGA[Object.keys(pga)[index]] = L.polygon(PGAjson[Object.keys(pga)[index].toString()], {
 								color     : color(Intensity),
 								fillColor : "transparent",
-							});
-							map.addLayer(Pmarker);
-							Pmarker.setZIndexOffset(1000 + Intensity);
-							PGA[Object.keys(pga)[index]] = Pmarker;
+							}).addTo(map);
 							PGAaudio = true;
 						}
 					}
