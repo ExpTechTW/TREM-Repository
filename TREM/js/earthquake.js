@@ -103,7 +103,8 @@ try {
 	dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer} | MD5 >> ${MD5Check}`, origin: "Initialization" });
 	init();
 } catch (error) {
-	alert("錯誤!! 請到 TREM 官方 Discord 回報");
+	showDialog("error", "發生錯誤", `初始化過程中發生錯誤，您可以繼續使用此應用程式，但無法保證所有功能皆能繼續正常運作。\n\n如果這是您第一次看到這個訊息，請嘗試重新啟動應用程式。\n如果這個錯誤持續出現，請到 TREM Discord 伺服器回報問題。\n\n錯誤訊息：${error}`);
+	$("#load").delay(1000).fadeOut(1000);
 	dump({ level: 2, message: error, origin: "Initialization" });
 }
 let win = BrowserWindow.fromId(process.env.window * 1);

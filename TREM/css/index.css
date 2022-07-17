@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&family=Roboto&display=swap');
 @import url("./m3/m3_theme.css");
+@import url("./m3/m3_dialog.css");
+@import url("./m3/m3_flat_button.css");
 @import url("./m3/m3_fab.css");
 @import url("./m3/m3_nav-rail.css");
 @import url("./disable_scrollbar.css");
@@ -87,7 +89,7 @@ body {
 }
 
 #load {
-	z-index: 25565;
+	z-index: 25560;
 	position: fixed;
 	display: flex;
 	flex-direction: column;
