@@ -911,23 +911,24 @@ ipcMain.on("testEEW", () => {
 ipcMain.on("updateTheme", () => {
 	console.log("updateTheme");
 	setThemeColor(CONFIG["theme.color"], CONFIG["theme.dark"]);
-	map.removeLayer(mapLayer);
-	mapTW.removeLayer(mapLayerTW);
-	mapLayer = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
-		maxZoom    : 14,
-		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
-		tileSize   : 512,
-		zoomOffset : -1,
-		minZoom    : 2,
-	}).addTo(map);
-	mapLayerTW = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
-		maxZoom    : 14,
-		id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
-		tileSize   : 512,
-		zoomOffset : -1,
-		minZoom    : 2,
-	}).addTo(mapTW);
-
+	if (mapLayer.options.id != (CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10")) {
+		map.removeLayer(mapLayer);
+		mapTW.removeLayer(mapLayerTW);
+		mapLayer = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+			maxZoom    : 14,
+			id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
+			tileSize   : 512,
+			zoomOffset : -1,
+			minZoom    : 2,
+		}).addTo(map);
+		mapLayerTW = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw", {
+			maxZoom    : 14,
+			id         : CONFIG["theme.dark"] ? "mapbox/dark-v10" : "mapbox/light-v10",
+			tileSize   : 512,
+			zoomOffset : -1,
+			minZoom    : 2,
+		}).addTo(mapTW);
+	}
 });
 if (localStorage.Test != undefined)
 	setTimeout(() => {
