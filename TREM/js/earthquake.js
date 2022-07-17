@@ -730,7 +730,7 @@ function addReport(report, prepend = false) {
 	let Div = document.createElement("div");
 	if (report.Time != undefined && report.report == undefined) {
 		const report_container = document.createElement("div");
-		report_container.className = "report-container";
+		report_container.className = "report-container locating";
 
 		const report_intenisty_container = document.createElement("div");
 		report_intenisty_container.className = "report-intenisty-container";
@@ -745,14 +745,14 @@ function addReport(report, prepend = false) {
 
 
 		const report_detail_container = document.createElement("div");
-		report_detail_container.className = "report-detail-container locating";
+		report_detail_container.className = "report-detail-container";
 
 		const report_location = document.createElement("span");
 		report_location.className = "report-location";
 		report_location.innerText = "震源 調查中";
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
-		report_time.innerText = report.Time;
+		report_time.innerText = report.Time.replace("-", "/");
 		report_detail_container.append(report_location, report_time);
 
 		report_container.append(report_intenisty_container, report_detail_container);
@@ -782,7 +782,7 @@ function addReport(report, prepend = false) {
 		report_location.innerText = `${star}${msg}`;
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
-		report_time.innerText = report.originTime;
+		report_time.innerText = report.originTime.replace("-", "/");
 		const report_magnitude = document.createElement("span");
 		report_magnitude.className = "report-magnitude";
 		report_magnitude.innerText = report.magnitudeValue.toFixed(1);
@@ -810,7 +810,7 @@ function addReport(report, prepend = false) {
 	if (prepend) {
 		const locating = document.querySelector(".report-detail-container.locating");
 		if (locating)
-			locating.replaceWith(Div);
+			locating.replaceWith(Div.children[0]);
 		else
 			roll.prepend(Div);
 	} else

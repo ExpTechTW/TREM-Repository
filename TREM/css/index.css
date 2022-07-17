@@ -271,7 +271,7 @@ body {
 	grid-template-columns: repeat(2, minmax(0, auto));
 	grid-template-rows: repeat(3, minmax(0, auto));
 }
-#rolllist > div:first-child > .report-container > .report-detail-container.locating {
+#rolllist > div:first-child > .report-container.locating > .report-detail-container {
 	grid-template-columns: auto;
 	grid-template-rows: repeat(2, 1fr);
   height: 60px;
