@@ -752,7 +752,7 @@ function addReport(report, prepend = false) {
 		report_location.innerText = "震源 調查中";
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
-		report_time.innerText = report.Time.replace("-", "/");
+		report_time.innerText = report.Time.replace(/-/g, "/");
 		report_detail_container.append(report_location, report_time);
 
 		report_container.append(report_intenisty_container, report_detail_container);
@@ -782,7 +782,7 @@ function addReport(report, prepend = false) {
 		report_location.innerText = `${star}${msg}`;
 		const report_time = document.createElement("span");
 		report_time.className = "report-time";
-		report_time.innerText = report.originTime.replace("-", "/");
+		report_time.innerText = report.originTime.replace(/-/g, "/");
 		const report_magnitude = document.createElement("span");
 		report_magnitude.className = "report-magnitude";
 		report_magnitude.innerText = report.magnitudeValue.toFixed(1);
