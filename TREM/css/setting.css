@@ -217,8 +217,16 @@ body {
     font-weight: 500;
 }
 
+.option-label-id {
+    color: rgba(var(--md-sys-color-on-surface-variant), .4);
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
 .option-label .option-label-description {
-    color: rgba(var(--md-sys-color-on-background), .6);
+    color: rgba(var(--md-sys-color-on-background), .8);
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 14px;
     line-height: 20px;
