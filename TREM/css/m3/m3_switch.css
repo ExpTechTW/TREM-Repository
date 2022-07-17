@@ -5,8 +5,8 @@
 .md3.switch {
     user-select: none;
     position: relative;
-    height: 28px;
-    width: 48px;
+    height: 32px;
+    width: 50px;
     -webkit-tap-highlight-color: transparent;
     margin: 10px;
     font-family: 'Roboto', sans-serif;
@@ -16,6 +16,8 @@
     opacity: 0;
     width: 0;
     height: 0;
+    margin: 0;
+    padding: 0;
 }
 
 /* track */

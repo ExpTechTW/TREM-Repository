@@ -40,7 +40,7 @@ body {
     flex-direction: column;
     top: 28px;
     right: 0;
-    bottom: 8px;
+    bottom: 12px;
     left: 0;
 }
 
@@ -123,7 +123,7 @@ body {
 #list {
     overflow-y: scroll;
     height: 100%;
-    margin: 0 8px;
+    margin: 0 12px;
     flex: 1;
     display: flex;
 }
@@ -150,7 +150,7 @@ body {
 .list-container {
     display: none;
     width: 100%;
-    margin: 0 4px;
+    margin: 0 8px;
     height: max-content;
 }
 
@@ -163,7 +163,7 @@ body {
     display: block;
 }
 
-.list-container :last-child {
+.list-container > div:last-child {
     margin-bottom: 0;
 }
 
@@ -184,7 +184,6 @@ body {
 
 .option-container {
     display: flex;
-    width: 98%;
     flex-direction: row;
     align-items: center;
 }

@@ -234,14 +234,12 @@ function setList(args, el, event) {
 	for (let i = 0; i < changeelchild.length; i++) {
 		$(changeelchild[i]).delay(delay + 40 * i).fadeTo(100, 1);
 		delay += 20;
-		console.log(delay, changeelchild[i].innerText);
 		const child = changeelchild[i].children;
 		if (child.length)
 			for (let j = 0; j < child.length; j++)
 				if (child[j].id != "HAReloadButton") {
 					$(child[j]).delay(delay).fadeTo(100, 1);
 					delay += 20;
-					console.log(delay, child[j].innerText);
 				}
 
 	}
