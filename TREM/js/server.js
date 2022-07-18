@@ -21,68 +21,37 @@ let TimerDesynced = false;
 let ServerT = 0;
 let ServerTime = 0;
 let NOW = new Date();
-let IP = {
-	"HTTP"      : [],
-	"WEBSOCKET" : [],
-};
+let IP = {};
 let LifeTime = {};
 
 let Pdata = {
 	"APIkey"   : "https://github.com/ExpTechTW",
-	"Function" : "proxy",
+	"Function" : "NTP",
 };
 
 Main();
 
 function Main() {
-	fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/IP.json")
-		.then((response) => response.json())
-		.then((res) => {
-			let url = res.Proxy[Object.keys(res.Proxy)[Math.floor((Math.random() * Object.keys(res.Proxy).length))]];
-			axios.post(url, Pdata)
-				.then((response) => {
-					let data = response.data.response.online;
-					for (let index = 0; index < Object.keys(data.HTTP).length; index++) {
-						LifeTime[`http://${Object.keys(data.HTTP)[index]}/`] = data.HTTP[Object.keys(data.HTTP)[index]];
-						IP.HTTP.push(`http://${Object.keys(data.HTTP)[index]}/`);
-						console.log(`http://${Object.keys(data.HTTP)[index]}/`);
-					}
-					for (let index = 0; index < Object.keys(data.WEBSOCKET).length; index++) {
-						LifeTime[`ws://${Object.keys(data.WEBSOCKET)[index]}/`] = data.WEBSOCKET[Object.keys(data.WEBSOCKET)[index]];
-						IP.WEBSOCKET.push(`ws://${Object.keys(data.WEBSOCKET)[index]}/`);
-					}
-					for (let index = 0; index < Object.keys(data.SSL).length; index++) {
-						LifeTime[`https://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-						LifeTime[`wss://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-						IP.HTTP.push(`https://${Object.keys(data.SSL)[index]}/`);
-						IP.WEBSOCKET.push(`wss://${Object.keys(data.SSL)[index]}/`);
-					}
-					TimeNow(response.data.response.Full);
-					ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
-				}).catch((err) => {
-					Main();
-				});
+	axios.post("http://exptech.mywire.org:10150/", Pdata)
+		.then((response) => {
+			IP = response.data.Proxy;
+			TimeNow(response.data.Full);
+			ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
+		}).catch((err) => {
+			Main();
 		});
 }
 
 function PostIP() {
 	if (IP.HTTP.length == 0) return "https://exptech.mywire.org:1015/";
-	let url = IP.HTTP[Math.floor((Math.random() * IP.HTTP.length))];
-	if (NOW.getTime() - LifeTime[url] > 30000) {
-		IP.HTTP.splice(IP.HTTP.indexOf(url), 1);
-		return "https://exptech.mywire.org:1015/";
-	}
-	return url;
+	return IP.HTTP[0];
 }
 
 function WebsocketIP() {
 	if (IP.WEBSOCKET.length == 0) return "wss://exptech.mywire.org:1015/";
-	let url = IP.WEBSOCKET[Math.floor((Math.random() * IP.WEBSOCKET.length))];
-	if (NOW.getTime() - LifeTime[url] > 30000) {
-		IP.WEBSOCKET.splice(IP.WEBSOCKET.indexOf(url), 1);
-		return "wss://exptech.mywire.org:1015/";
-	}
-	return url;
+	for (let index = 0; index < IP.WEBSOCKET.length; index++)
+		if (IP.WEBSOCKET[index].startsWith("wss")) return IP.WEBSOCKET[index];
+	return "wss://exptech.mywire.org:1015/";
 }
 
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
@@ -147,25 +116,7 @@ function initEventHandle() {
 		let json = JSON.parse(evt.data);
 		dump({ level: 3, message: `(onMessage) Received ${json.Function ?? json.response}`, origin: "WebSocket" });
 		if (json.Function == "NTP") {
-			IP = {
-				"HTTP"      : [],
-				"WEBSOCKET" : [],
-			};
-			let data = json.online;
-			for (let index = 0; index < Object.keys(data.HTTP).length; index++) {
-				LifeTime[`http://${Object.keys(data.HTTP)[index]}/`] = data.HTTP[Object.keys(data.HTTP)[index]];
-				IP.HTTP.push(`http://${Object.keys(data.HTTP)[index]}/`);
-			}
-			for (let index = 0; index < Object.keys(data.WEBSOCKET).length; index++) {
-				LifeTime[`ws://${Object.keys(data.WEBSOCKET)[index]}/`] = data.WEBSOCKET[Object.keys(data.WEBSOCKET)[index]];
-				IP.WEBSOCKET.push(`ws://${Object.keys(data.WEBSOCKET)[index]}/`);
-			}
-			for (let index = 0; index < Object.keys(data.SSL).length; index++) {
-				LifeTime[`https://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-				LifeTime[`wss://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-				IP.HTTP.push(`https://${Object.keys(data.SSL)[index]}/`);
-				IP.WEBSOCKET.push(`wss://${Object.keys(data.SSL)[index]}/`);
-			}
+			IP = json.Proxy;
 			TimeNow(json.Full);
 		} else {
 			DATA = evt.data;
