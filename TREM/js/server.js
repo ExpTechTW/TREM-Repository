@@ -31,27 +31,39 @@ let Pdata = {
 	"APIkey"   : "https://github.com/ExpTechTW",
 	"Function" : "proxy",
 };
-axios.post("https://exptech.mywire.org:1015/", Pdata)
-	.then((response) => {
-		let data = response.data.response.online;
-		for (let index = 0; index < Object.keys(data.HTTP).length; index++) {
-			LifeTime[`http://${Object.keys(data.HTTP)[index]}/`] = data.HTTP[Object.keys(data.HTTP)[index]];
-			IP.HTTP.push(`http://${Object.keys(data.HTTP)[index]}/`);
-			console.log(`http://${Object.keys(data.HTTP)[index]}/`);
-		}
-		for (let index = 0; index < Object.keys(data.WEBSOCKET).length; index++) {
-			LifeTime[`ws://${Object.keys(data.WEBSOCKET)[index]}/`] = data.WEBSOCKET[Object.keys(data.WEBSOCKET)[index]];
-			IP.WEBSOCKET.push(`ws://${Object.keys(data.WEBSOCKET)[index]}/`);
-		}
-		for (let index = 0; index < Object.keys(data.SSL).length; index++) {
-			LifeTime[`https://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-			LifeTime[`wss://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
-			IP.HTTP.push(`https://${Object.keys(data.SSL)[index]}/`);
-			IP.WEBSOCKET.push(`wss://${Object.keys(data.SSL)[index]}/`);
-		}
-		TimeNow(response.data.response.Full);
-		ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
-	});
+
+Main();
+
+function Main() {
+	fetch("https://raw.githubusercontent.com/ExpTechTW/API/master/IP.json")
+		.then((response) => response.json())
+		.then((res) => {
+			let url = res.Proxy[Object.keys(res.Proxy)[Math.floor((Math.random() * Object.keys(res.Proxy).length))]];
+			axios.post(url, Pdata)
+				.then((response) => {
+					let data = response.data.response.online;
+					for (let index = 0; index < Object.keys(data.HTTP).length; index++) {
+						LifeTime[`http://${Object.keys(data.HTTP)[index]}/`] = data.HTTP[Object.keys(data.HTTP)[index]];
+						IP.HTTP.push(`http://${Object.keys(data.HTTP)[index]}/`);
+						console.log(`http://${Object.keys(data.HTTP)[index]}/`);
+					}
+					for (let index = 0; index < Object.keys(data.WEBSOCKET).length; index++) {
+						LifeTime[`ws://${Object.keys(data.WEBSOCKET)[index]}/`] = data.WEBSOCKET[Object.keys(data.WEBSOCKET)[index]];
+						IP.WEBSOCKET.push(`ws://${Object.keys(data.WEBSOCKET)[index]}/`);
+					}
+					for (let index = 0; index < Object.keys(data.SSL).length; index++) {
+						LifeTime[`https://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
+						LifeTime[`wss://${Object.keys(data.SSL)[index]}/`] = data.SSL[Object.keys(data.SSL)[index]];
+						IP.HTTP.push(`https://${Object.keys(data.SSL)[index]}/`);
+						IP.WEBSOCKET.push(`wss://${Object.keys(data.SSL)[index]}/`);
+					}
+					TimeNow(response.data.response.Full);
+					ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
+				}).catch((err) => {
+					Main();
+				});
+		});
+}
 
 function PostIP() {
 	if (IP.HTTP.length == 0) return "https://exptech.mywire.org:1015/";
