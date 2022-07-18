@@ -179,7 +179,6 @@ function init() {
 
 	map.removeControl(map.zoomControl);
 
-	ReportGET({});
 	main();
 
 	setInterval(() => {
