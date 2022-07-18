@@ -93,52 +93,39 @@ Date.prototype.format =
 // #endregion
 
 // #region 初始化
-try {
-	setInterval(() => {
-		if (DATAstamp != 0 && Stamp != DATAstamp) {
-			Stamp = DATAstamp;
-			FCMdata(DATA);
-		}
-	}, 0);
-	dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer} | MD5 >> ${MD5Check}`, origin: "Initialization" });
-	init();
-} catch (error) {
-	showDialog("error", "發生錯誤", `初始化過程中發生錯誤，您可以繼續使用此應用程式，但無法保證所有功能皆能繼續正常運作。\n\n如果這是您第一次看到這個訊息，請嘗試重新啟動應用程式。\n如果這個錯誤持續出現，請到 TREM Discord 伺服器回報問題。\n\n錯誤訊息：${error}`);
-	$("#load").delay(1000).fadeOut(1000);
-	dump({ level: 2, message: error, origin: "Initialization" });
-}
 let win = BrowserWindow.fromId(process.env.window * 1);
 win.setAlwaysOnTop(false);
-const time = document.getElementById("time");
-
-setInterval(() => {
-	if (CONFIG["location.city"] != Check.city || CONFIG["location.town"] != Check.town) {
-		Check.city = CONFIG["location.city"];
-		Check.town = CONFIG["location.town"];
-		setUserLocationMarker();
-	}
-	if (TimerDesynced)
-		time.classList.add("desynced");
-	else {
-		if (time.classList.contains("desynced"))
-			time.classList.remove("desynced");
-		time.innerText = NOW.format("YYYY/MM/DD HH:mm:ss");
-	}
-	if (Object.keys(Tsunami).length != 0)
-		if (NOW.getTime() - Tsunami.Time > 240000) {
-			map.removeLayer(Tsunami.Cross);
-			delete Tsunami.Cross;
-			delete Tsunami.Time;
-			focus();
-		}
-
-	if (Report != 0 && NOW.getTime() - Report > 600000) {
-		Report = NOW.getTime();
-		ReportGET({});
-	}
-}, 200);
 
 function init() {
+	const time = document.getElementById("time");
+
+	setInterval(() => {
+		if (CONFIG["location.city"] != Check.city || CONFIG["location.town"] != Check.town) {
+			Check.city = CONFIG["location.city"];
+			Check.town = CONFIG["location.town"];
+			setUserLocationMarker();
+		}
+		if (TimerDesynced)
+			time.classList.add("desynced");
+		else {
+			if (time.classList.contains("desynced"))
+				time.classList.remove("desynced");
+			time.innerText = NOW.format("YYYY/MM/DD HH:mm:ss");
+		}
+		if (Object.keys(Tsunami).length != 0)
+			if (NOW.getTime() - Tsunami.Time > 240000) {
+				map.removeLayer(Tsunami.Cross);
+				delete Tsunami.Cross;
+				delete Tsunami.Time;
+				focus();
+			}
+
+		if (Report != 0 && NOW.getTime() - Report > 600000) {
+			Report = NOW.getTime();
+			ReportGET({});
+		}
+	}, 200);
+
 	map = L.map("map", {
 		attributionControl : false,
 		closePopupOnClick  : false,
@@ -231,8 +218,7 @@ function init() {
 				"Type"          : "TREM",
 				"FormatVersion" : 1,
 			};
-
-			axios.post("https://exptech.mywire.org:1015", data)
+			axios.post(PostIP(), data)
 				.then((response) => {
 					for (let index = 0; index < Object.keys(Station).length; index++) {
 						map.removeLayer(Station[Object.keys(Station)[index]]);
@@ -549,7 +535,7 @@ function ReportGET() {
 		"Value"         : 100,
 	};
 
-	axios.post("https://exptech.mywire.org:1015", data)
+	axios.post(PostIP(), data)
 		.then((response) => {
 			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
 			if (response.data["state"] == "Warn")
@@ -565,7 +551,7 @@ function ReportGET() {
 }
 async function getReportByData(data) {
 	try {
-		const list = await axios.post("https://exptech.mywire.org:1015", {
+		const list = await axios.post(PostIP(), {
 			"APIkey"        : "https://github.com/ExpTechTW",
 			"Function"      : "data",
 			"Type"          : "earthquake",
@@ -606,7 +592,7 @@ async function ReportClick(time) {
 		if (
 			// 確認是否為無編號地震
 			ReportCache[time].earthquakeNo % 1000 == 0
-			|| await axios.post("https://exptech.mywire.org:1015", body)
+			|| await axios.post(PostIP(), body)
 				.then((response) => {
 					let json = response.data.response;
 					if (json == undefined)
@@ -710,7 +696,6 @@ let openURL = url => {
 // #region Report list
 let roll = document.getElementById("rolllist");
 function ReportList(Data) {
-	console.log(Data);
 	roll.replaceChildren();
 	for (const report of Data.response)
 		addReport(report);
@@ -905,6 +890,22 @@ function color(Intensity) {
 // #endregion
 
 // #region IPC
+ipcMain.on("start", () => {
+	try {
+		setInterval(() => {
+			if (DATAstamp != 0 && Stamp != DATAstamp) {
+				Stamp = DATAstamp;
+				FCMdata(DATA);
+			}
+		}, 0);
+		dump({ level: 0, message: `Initializing ServerCore >> ${ServerVer} | MD5 >> ${MD5Check}`, origin: "Initialization" });
+		init();
+	} catch (error) {
+		showDialog("error", "發生錯誤", `初始化過程中發生錯誤，您可以繼續使用此應用程式，但無法保證所有功能皆能繼續正常運作。\n\n如果這是您第一次看到這個訊息，請嘗試重新啟動應用程式。\n如果這個錯誤持續出現，請到 TREM Discord 伺服器回報問題。\n\n錯誤訊息：${error}`);
+		$("#load").delay(1000).fadeOut(1000);
+		dump({ level: 2, message: error, origin: "Initialization" });
+	}
+});
 ipcMain.on("testEEW", () => {
 	localStorage.Test = true;
 	ipcRenderer.send("restart");
@@ -948,7 +949,7 @@ if (localStorage.Test != undefined)
 						"ID"            : list[index],
 					};
 					dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-					axios.post("https://exptech.mywire.org:1015", data)
+					axios.post(PostIP(), data)
 						.catch((error) => {
 							dump({ level: 2, message: error, origin: "Verbose" });
 						});
@@ -967,7 +968,7 @@ if (localStorage.Test != undefined)
 			};
 			if (CONFIG["accept.eew.jp"]) delete data["Addition"];
 			dump({ level: 3, message: `Timer status: ${TimerDesynced ? "Desynced" : "Synced"}`, origin: "Verbose" });
-			axios.post("https://exptech.mywire.org:1015", data)
+			axios.post(PostIP(), data)
 				.catch((error) => {
 					dump({ level: 2, message: error, origin: "Verbose" });
 				});
