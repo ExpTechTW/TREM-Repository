@@ -218,7 +218,6 @@ function setList(args, el, event) {
 	currentnav.removeClass("active");
 	$(el).addClass("active");
 
-	currentel.fadeOut(100).removeClass("show").show();
 	changeel.children("div").each((i, e) => {
 		$(e).css("opacity", "0");
 		$(e).children().each((i2, e2) => {
@@ -226,8 +225,10 @@ function setList(args, el, event) {
 				$(e2).css("opacity", "0");
 		});
 	});
-	changeel.delay(100).hide().addClass("show").fadeIn(200);
-	$("#list")[0].scrollTo(0, 0);
+	changeel.hide().delay(100).addClass("show").fadeIn(200);
+	currentel.fadeOut(100).removeClass("show").show();
+	$("#list").delay(100)[0].scrollTo(0, 0);
+
 	const changeelchild = $(`#${args} > div`);
 
 	let delay = 0;

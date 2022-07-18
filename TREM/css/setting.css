@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Roboto&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Roboto&display=swap");
 @import url("../css/titlebar.css");
 @import url("../css/m3/m3_theme.css");
 @import url("../css/m3/m3_dialog.css");
@@ -88,7 +88,7 @@ body {
 .nav > div:not(.client-info-container) span {
     margin: 0 20px;
     color: rgb(var(--md-sys-color-on-background));
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-weight: 300;
     white-space: nowrap;
 }
@@ -96,7 +96,7 @@ body {
 .client-info-container {
     margin: 8px 32px;
     color: rgba(var(--md-sys-color-on-surface-variant), .6);
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-size: 12px;
     font-weight: 300;
 }
@@ -114,7 +114,7 @@ body {
 .headline-medium {
     color: rgb(var(--md-sys-color-on-surface));
     font-size: 36px !important;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-weight: 400;
     line-height: 34px;
     margin: 0 4px;
@@ -171,7 +171,7 @@ body {
     user-select: none;
     margin: 10px 0;
     color: rgb(var(--md-sys-color-primary));
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-size: 24px;
     font-weight: 400;
 }
@@ -211,14 +211,14 @@ body {
 
 .option-label .option-label-title {
     color: rgb(var(--md-sys-color-on-background));
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-size: 20px;
     font-weight: 500;
 }
 
 .option-label-id {
     color: rgba(var(--md-sys-color-on-surface-variant), .4);
-    font-family: 'Consolas', monospace;
+    font-family: "Consolas", monospace;
     font-size: 14px;
     font-weight: 500;
     margin-left: 4px;
@@ -226,7 +226,7 @@ body {
 
 .option-label .option-label-description {
     color: rgba(var(--md-sys-color-on-background), .8);
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-size: 14px;
     line-height: 20px;
     font-weight: 300;
@@ -252,7 +252,7 @@ code {
     color: rgb(var(--md-sys-color-on-surface-variant));
     padding: 5px;
     border-radius: 5px;
-    font-family: 'Consolas', monospace;
+    font-family: "Consolas", monospace;
 }
 
 .external-link {
