@@ -120,7 +120,7 @@ function init() {
 				focus();
 			}
 
-		if (Report != 0 && NOW.getTime() - Report > 600000) {
+		if (NOW.getTime() - Report > 600000) {
 			Report = NOW.getTime();
 			ReportGET({});
 		}
