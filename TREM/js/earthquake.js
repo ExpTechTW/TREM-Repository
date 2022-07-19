@@ -1258,7 +1258,7 @@ async function FCMdata(data) {
 				updateText();
 			}, 1000);
 
-		EEWshot =	NOW.getTime() + 3500;
+		EEWshot =	NOW.getTime() - 3500;
 		EarthquakeList[json.ID].Timer = setInterval(() => {
 			if (CONFIG["shock.p"]) {
 				if (EarthquakeList[json.ID].Pcircle != null)
