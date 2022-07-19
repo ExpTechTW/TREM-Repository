@@ -47,6 +47,7 @@ let clickT = 0;
 let investigation = false;
 let ReportTag = 0;
 let EEWshot = 0;
+let EEWshotC = 0;
 // #endregion
 
 // #region override Date.format()
@@ -1259,6 +1260,7 @@ async function FCMdata(data) {
 			}, 1000);
 
 		EEWshot =	NOW.getTime() - 3500;
+		EEWshotC = 0;
 		EarthquakeList[json.ID].Timer = setInterval(() => {
 			if (CONFIG["shock.p"]) {
 				if (EarthquakeList[json.ID].Pcircle != null)
@@ -1303,7 +1305,8 @@ async function FCMdata(data) {
 				map.addLayer(EarthquakeList[json.ID].Scircle);
 				mapTW.addLayer(EarthquakeList[json.ID].Scircle1);
 			}
-			if (NOW.getTime() - EEWshot > 5000) {
+			if (NOW.getTime() - EEWshot > 5000 && EEWshotC <= 1) {
+				EEWshotC++;
 				EEWshot = NOW.getTime();
 				ipcRenderer.send("screenshotEEW", json);
 			}
