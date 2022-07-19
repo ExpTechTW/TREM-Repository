@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable prefer-const */
 const { BrowserWindow, shell } = require("@electron/remote");
-const _ = require("lodash");
 
 // #region 變數
 let Stamp = 0;
@@ -23,7 +22,6 @@ let Pga = {};
 let pga = {};
 let PGALimit = 0;
 let PGAaudio = false;
-let PGAAudio = false;
 let PGAtag = 0;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
 let expected = [];
@@ -45,8 +43,9 @@ let station = {};
 let PGAjson = {};
 let MainClock = null;
 let geojson = null;
-let Punix = 0;
 let clickT = 0;
+let investigation = false;
+let ReportTag = 0;
 // #endregion
 
 // #region override Date.format()
@@ -95,9 +94,11 @@ Date.prototype.format =
 
 // #region 初始化
 let win = BrowserWindow.fromId(process.env.window * 1);
+let roll = document.getElementById("rolllist");
 win.setAlwaysOnTop(false);
 
 function init() {
+	ReportGET({});
 	const time = document.getElementById("time");
 
 	setInterval(() => {
@@ -121,9 +122,18 @@ function init() {
 				focus();
 			}
 
-		if (NOW.getTime() - Report > 600000) {
-			Report = NOW.getTime();
-			ReportGET({});
+		if (investigation && NOW.getTime() - Report > 600000) {
+			investigation = false;
+			roll.removeChild(roll.children[0]);
+		}
+		if (ReportTag != 0 && NOW.getTime() - ReportTag > 30000) {
+			ReportTag = 0;
+			if (ReportMarkID != null) {
+				ReportMarkID = null;
+				for (let index = 0; index < MarkList.length; index++)
+					map.removeLayer(MarkList[index]);
+				focus();
+			}
 		}
 	}, 200);
 
@@ -233,7 +243,6 @@ function init() {
 						let Sdata = Json[Object.keys(Json)[index]];
 						let amount = 0;
 						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"]);
-						// amount = 10;
 						if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue;
 						let Intensity = (NOW.getTime() - Sdata.TimeStamp > 5000) ? "NA" :
 							(amount >= 800) ? 9 :
@@ -310,7 +319,7 @@ function init() {
 						} else
 							delete Pga[Object.keys(Json)[index]];
 					}
-					if (PAlert.data != undefined) {
+					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
 							if (NOW.getTime() - PAlert.timestamp > 30000) break;
 							if (pga[PAlert.data[index].TREM] == undefined)
@@ -342,16 +351,7 @@ function init() {
 								MAXPGA.intensity = PAlert.data[index].intensity;
 							}
 						}
-						if (NOW.getTime() - PAlert.timestamp < 30000 && Punix != PAlert.unix) {
-							Punix = PAlert.unix;
-							setTimeout(() => {
-								ipcRenderer.send("screenshotEEW", {
-									"ID"      : new Date().getTime(),
-									"Version" : 0,
-								});
-							}, 5000);
-						}
-					}
+
 					for (let index = 0; index < Object.keys(PGA).length; index++) {
 						map.removeLayer(PGA[Object.keys(PGA)[index]]);
 						delete PGA[Object.keys(PGA)[index]];
@@ -381,19 +381,8 @@ function init() {
 					if (Object.keys(PGA).length == 0) PGAaudio = false;
 
 					if (!PGAaudio) {
-						PGAAudio = false;
 						PGAtag = 0;
 						PGALimit = 0;
-					}
-					if (!PGAAudio && PGAaudio) {
-						if (!win.isVisible())
-							if (CONFIG["Real-time.show"]) {
-								win.show();
-								if (CONFIG["Real-time.cover"]) win.setAlwaysOnTop(true);
-								win.setAlwaysOnTop(false);
-							}
-
-						PGAAudio = true;
 					}
 					for (let Index = 0; Index < All.length - 1; Index++)
 						for (let index = 0; index < All.length - 1; index++)
@@ -420,6 +409,18 @@ function init() {
 								Max  : All[0].intensity,
 								Time : NOW.format("YYYY/MM/DD HH:mm:ss"),
 							});
+							setTimeout(() => {
+								ipcRenderer.send("screenshotEEW", {
+									"ID"      : NOW.getTime(),
+									"Version" : 0,
+								});
+							}, 5000);
+							if (!win.isVisible())
+								if (CONFIG["Real-time.show"]) {
+									win.show();
+									if (CONFIG["Real-time.cover"]) win.setAlwaysOnTop(true);
+									win.setAlwaysOnTop(false);
+								}
 						}
 						PGAtag = All[0].intensity;
 					}
@@ -685,7 +686,6 @@ let openURL = url => {
 // #endregion
 
 // #region Report list
-let roll = document.getElementById("rolllist");
 function ReportList(Data, eew) {
 	roll.replaceChildren();
 	for (let index = 0; index < Data.response.length; index++) {
@@ -722,7 +722,7 @@ function addReport(report, prepend = false) {
 		report_intenisty_title.innerText = "最大震度";
 		const report_intenisty_value = document.createElement("span");
 		report_intenisty_value.className = "report-intenisty-value";
-		report_intenisty_value.innerText = report.Max;
+		report_intenisty_value.innerText = IntensityI(report.Max);
 		report_intenisty_container.append(report_intenisty_title, report_intenisty_value);
 
 
@@ -738,8 +738,10 @@ function addReport(report, prepend = false) {
 		report_detail_container.append(report_location, report_time);
 
 		report_container.append(report_intenisty_container, report_detail_container);
-		Div.append(report_container);
+		Div.prepend(report_container);
 		Div.style.backgroundColor = color(report.Max);
+		roll.prepend(Div);
+		investigation = true;
 	} else {
 		const report_container = document.createElement("div");
 		report_container.className = "report-container";
@@ -788,25 +790,27 @@ function addReport(report, prepend = false) {
 					ReportClick(report.originTime);
 				}, 100);
 		});
-	}
-
-	if (prepend) {
-		const locating = document.querySelector(".report-detail-container.locating");
-		if (locating)
-			locating.replaceWith(Div.children[0]);
-		else
-			roll.prepend(Div);
-		ReportClick(report.originTime);
-		setTimeout(() => {
+		if (prepend) {
+			const locating = document.querySelector(".report-detail-container.locating");
+			if (locating)
+				locating.replaceWith(Div.children[0]);
+			else {
+				if (investigation) {
+					investigation = false;
+					roll.removeChild(roll.children[0]);
+				}
+				roll.prepend(Div);
+			}
 			if (ReportMarkID != null) {
 				ReportMarkID = null;
 				for (let index = 0; index < MarkList.length; index++)
 					map.removeLayer(MarkList[index]);
-				focus();
 			}
-		}, 30000);
-	} else
-		roll.append(Div);
+			ReportClick(report.originTime);
+			ReportTag = NOW.getTime();
+		} else
+			roll.append(Div);
+	}
 }
 
 // #endregion
@@ -1001,7 +1005,7 @@ async function FCMdata(data) {
 			win.setAlwaysOnTop(false);
 		}
 		if (CONFIG["report.audio"]) audioPlay("./audio/Water.wav");
-	} if (json.Function == "palert")
+	} else if (json.Function == "palert")
 		PAlert = json.Data;
 	else if (json.Function == "report") {
 		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
