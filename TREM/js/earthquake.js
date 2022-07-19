@@ -46,6 +46,7 @@ let geojson = null;
 let clickT = 0;
 let investigation = false;
 let ReportTag = 0;
+let EEWshot = 0;
 // #endregion
 
 // #region override Date.format()
@@ -1257,7 +1258,7 @@ async function FCMdata(data) {
 				updateText();
 			}, 1000);
 
-
+		EEWshot =	NOW.getTime() + 3500;
 		EarthquakeList[json.ID].Timer = setInterval(() => {
 			if (CONFIG["shock.p"]) {
 				if (EarthquakeList[json.ID].Pcircle != null)
@@ -1301,6 +1302,10 @@ async function FCMdata(data) {
 				});
 				map.addLayer(EarthquakeList[json.ID].Scircle);
 				mapTW.addLayer(EarthquakeList[json.ID].Scircle1);
+			}
+			if (NOW.getTime() - EEWshot > 5000) {
+				EEWshot = NOW.getTime();
+				ipcRenderer.send("screenshotEEW", json);
 			}
 			if (NOW.getTime() - json.TimeStamp > 240000 || json.Cancel && EarthquakeList[json.ID] != undefined) {
 				if (json.Cancel) {
@@ -1366,41 +1371,38 @@ async function FCMdata(data) {
 			}
 		}, speed);
 		setTimeout(() => {
-			ipcRenderer.send("screenshotEEW", json);
-			setTimeout(() => {
-				if (CONFIG["webhook.url"] != "") {
-					let Now = NOW.getFullYear() +
+			if (CONFIG["webhook.url"] != "") {
+				let Now = NOW.getFullYear() +
 						"/" + (NOW.getMonth() + 1) +
 						"/" + NOW.getDate() +
 						" " + NOW.getHours() +
 						":" + NOW.getMinutes() +
 						":" + NOW.getSeconds();
 
-					let msg = CONFIG["webhook.body"];
-					msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
-					if (json.Function == "earthquake")
-						msg = msg.replace("%Provider%", "中華民國交通部中央氣象局");
-					else if (json.Function == "JP_earthquake")
-						msg = msg.replace("%Provider%", "日本氣象廳");
-					else if (json.Function == "CN_earthquake")
-						msg = msg.replace("%Provider%", "福建省地震局");
+				let msg = CONFIG["webhook.body"];
+				msg = msg.replace("%Depth%", json.Depth).replace("%NorthLatitude%", json.NorthLatitude).replace("%Time%", json["UTC+8"]).replace("%EastLongitude%", json.EastLongitude).replace("%Scale%", json.Scale);
+				if (json.Function == "earthquake")
+					msg = msg.replace("%Provider%", "中華民國交通部中央氣象局");
+				else if (json.Function == "JP_earthquake")
+					msg = msg.replace("%Provider%", "日本氣象廳");
+				else if (json.Function == "CN_earthquake")
+					msg = msg.replace("%Provider%", "福建省地震局");
 
-					msg = JSON.parse(msg);
-					msg.username = "TREM | 台灣實時地震監測";
+				msg = JSON.parse(msg);
+				msg.username = "TREM | 台灣實時地震監測";
 
-					msg.embeds[0].image.url = "";
-					msg.embeds[0].footer = {
-						"text"     : `ExpTech Studio ${Now}`,
-						"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/master/image/Icon/ExpTech.png",
-					};
-					dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
-					axios.post(CONFIG["webhook.url"], msg)
-						.catch((error) => {
-							dump({ level: 2, message: error, origin: "Webhook" });
-						});
-				}
-			}, 2000);
-		}, 1000);
+				msg.embeds[0].image.url = "";
+				msg.embeds[0].footer = {
+					"text"     : `ExpTech Studio ${Now}`,
+					"icon_url" : "https://raw.githubusercontent.com/ExpTechTW/API/master/image/Icon/ExpTech.png",
+				};
+				dump({ level: 0, message: "Posting Webhook", origin: "Webhook" });
+				axios.post(CONFIG["webhook.url"], msg)
+					.catch((error) => {
+						dump({ level: 2, message: error, origin: "Webhook" });
+					});
+			}
+		}, 2000);
 	}
 }
 // #endregion
