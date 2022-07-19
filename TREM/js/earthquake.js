@@ -46,6 +46,7 @@ let PGAjson = {};
 let MainClock = null;
 let geojson = null;
 let Punix = 0;
+let clickT = 0;
 // #endregion
 
 // #region override Date.format()
@@ -232,6 +233,7 @@ function init() {
 						let Sdata = Json[Object.keys(Json)[index]];
 						let amount = 0;
 						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"]);
+						// amount = 10;
 						if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue;
 						let Intensity = (NOW.getTime() - Sdata.TimeStamp > 5000) ? "NA" :
 							(amount >= 800) ? 9 :
@@ -493,6 +495,7 @@ audioDOM.addEventListener("ended", () => {
 });
 
 function audioPlay(src) {
+	console.log(src);
 	audioList.push(src);
 	if (!AudioT)
 		AudioT = setInterval(() => {
@@ -525,30 +528,19 @@ function playNextAudio() {
 // #endregion
 
 // #region Report Data
-function ReportGET() {
-	let data = {
-		"APIkey"        : "https://github.com/ExpTechTW",
-		"Function"      : "data",
-		"Type"          : "earthquake",
-		"FormatVersion" : 1,
-		"Value"         : 100,
-	};
-
-	axios.post(PostIP(), data)
-		.then((response) => {
-			dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
-			if (response.data["state"] == "Warn")
-				setTimeout(() => {
-					ReportGET();
-				}, 2000);
-			ReportList(response.data);
-		})
-		.catch((error) => {
-			dump({ level: 2, message: error, origin: "EQReportFetcher" });
-			console.error(error);
-		});
+async function ReportGET(eew) {
+	const res = await getReportByData();
+	dump({ level: 0, message: "Reports fetched", origin: "EQReportFetcher" });
+	if (res["state"] == "Warn") {
+		dump({ level: 2, message: res, origin: "EQReportFetcher" });
+		console.error(res);
+		setTimeout(() => {
+			ReportGET();
+		}, 2000);
+	} else
+		ReportList(res, eew);
 }
-async function getReportByData(data) {
+async function getReportByData() {
 	try {
 		const list = await axios.post(PostIP(), {
 			"APIkey"        : "https://github.com/ExpTechTW",
@@ -557,7 +549,7 @@ async function getReportByData(data) {
 			"FormatVersion" : 1,
 			"Value"         : 100,
 		});
-		return _.find(list?.response?.data?.response, data);
+		return list.data;
 	} catch (error) {
 		dump({ level: 2, message: error, origin: "EQReportFetcher" });
 		console.error(error);
@@ -694,10 +686,15 @@ let openURL = url => {
 
 // #region Report list
 let roll = document.getElementById("rolllist");
-function ReportList(Data) {
+function ReportList(Data, eew) {
 	roll.replaceChildren();
-	for (const report of Data.response)
-		addReport(report);
+	for (let index = 0; index < Data.response.length; index++) {
+		if (eew != undefined && index == Data.response.length - 1) {
+			Data.response[index].Max = eew.Max;
+			Data.response[index].Time = eew.Time;
+		}
+		addReport(Data.response[index]);
+	}
 }
 
 function addReport(report, prepend = false) {
@@ -785,8 +782,9 @@ function addReport(report, prepend = false) {
 				localStorage.Test = true;
 				localStorage.TestID = report.ID;
 				ipcRenderer.send("restart");
-			} else
+			} else if (NOW.getTime() - clickT > 150)
 				setTimeout(() => {
+					clickT = NOW.getTime();
 					ReportClick(report.originTime);
 				}, 100);
 		});
@@ -798,21 +796,17 @@ function addReport(report, prepend = false) {
 			locating.replaceWith(Div.children[0]);
 		else
 			roll.prepend(Div);
-	} else
-		roll.append(Div);
-
-	if (report.report != undefined) {
-		ReportClick(Data.response[0].originTime);
+		ReportClick(report.originTime);
 		setTimeout(() => {
 			if (ReportMarkID != null) {
 				ReportMarkID = null;
 				for (let index = 0; index < MarkList.length; index++)
 					map.removeLayer(MarkList[index]);
-
 				focus();
 			}
 		}, 30000);
-	}
+	} else
+		roll.append(Div);
 }
 
 // #endregion
@@ -1017,9 +1011,8 @@ async function FCMdata(data) {
 			win.setAlwaysOnTop(false);
 		}
 		new Notification("地震報告", { body: `${json.Location.substring(json.Location.indexOf("(") + 1, json.Location.indexOf(")")).replace("位於", "")}\n${json["UTC+8"]}\n發生 M${json.Scale} 有感地震`, icon: "TREM.ico" });
-		const report = await getReportByData({ earthquakeNo: json.ID, epicenterLon: json.EastLongitude, epicenterLat: json.NorthLatitude, depth: json.Depth, magnitudeValue: json.Scale });
-		addReport(report, true);
-
+		const report = await getReportByData();
+		addReport(report.response[0], true);
 		if (CONFIG["report.audio"]) audioPlay("./audio/Report.wav");
 		setTimeout(() => {
 			ipcRenderer.send("screenshotEEW", {
