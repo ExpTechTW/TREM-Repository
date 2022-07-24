@@ -225,10 +225,9 @@ function init() {
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
 			let data = {
-				"APIkey"        : "https://github.com/ExpTechTW",
-				"Function"      : "data",
-				"Type"          : "TREM",
-				"FormatVersion" : 1,
+				"APIkey"   : "https://github.com/ExpTechTW",
+				"Function" : "data",
+				"Type"     : "TREM",
 			};
 			axios.post(PostIP(), data)
 				.then((response) => {
@@ -294,20 +293,16 @@ function init() {
 								"intensity" : Intensity,
 							});
 							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
-							if (amount >= 4)
-								if (Pga[Object.keys(Json)[index]]) {
-									if (amount > 8 && PGALimit == 0) {
-										PGALimit = 1;
-										audioPlay("./audio/PGA1.wav");
-									} else if (amount > 250 && PGALimit != 2) {
-										PGALimit = 2;
-										audioPlay("./audio/PGA2.wav");
-									}
-									pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
-								} else
-									Pga[Object.keys(Json)[index]] = true;
-
-
+							if (amount >= 5) {
+								if (amount > 8 && PGALimit == 0) {
+									PGALimit = 1;
+									audioPlay("./audio/PGA1.wav");
+								} else if (amount > 250 && PGALimit != 2) {
+									PGALimit = 2;
+									audioPlay("./audio/PGA2.wav");
+								}
+								pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
+							}
 							if (MAXPGA.pga < amount && Level != "NA") {
 								MAXPGA.pga = amount;
 								MAXPGA.station = Object.keys(Json)[index];
@@ -318,8 +313,7 @@ function init() {
 								MAXPGA.intensity = Intensity;
 								MAXPGA.ms = NOW.getTime() - Sdata.TimeStamp;
 							}
-						} else
-							delete Pga[Object.keys(Json)[index]];
+						}
 					}
 					if (PAlert.data != undefined)
 						for (let index = 0; index < PAlert.data.length; index++) {
@@ -414,7 +408,7 @@ function init() {
 							setTimeout(() => {
 								ipcRenderer.send("screenshotEEW", {
 									"ID"      : NOW.getTime(),
-									"Version" : 0,
+									"Version" : "P",
 								});
 							}, 5000);
 							if (!win.isVisible())
@@ -546,11 +540,10 @@ async function ReportGET(eew) {
 async function getReportByData() {
 	try {
 		const list = await axios.post(PostIP(), {
-			"APIkey"        : "https://github.com/ExpTechTW",
-			"Function"      : "data",
-			"Type"          : "earthquake",
-			"FormatVersion" : 1,
-			"Value"         : 100,
+			"APIkey"   : "https://github.com/ExpTechTW",
+			"Function" : "data",
+			"Type"     : "earthquake",
+			"Value"    : 100,
 		});
 		return list.data;
 	} catch (error) {
@@ -577,11 +570,10 @@ async function ReportClick(time) {
 
 		let LIST = [];
 		let body = {
-			"APIkey"        : "https://github.com/ExpTechTW",
-			"Function"      : "data",
-			"Type"          : "report",
-			"FormatVersion" : 1,
-			"Value"         : ReportCache[time].earthquakeNo,
+			"APIkey"   : "https://github.com/ExpTechTW",
+			"Function" : "data",
+			"Type"     : "report",
+			"Value"    : ReportCache[time].earthquakeNo,
 		};
 		if (
 			// 確認是否為無編號地震
@@ -1022,8 +1014,8 @@ async function FCMdata(data) {
 		if (CONFIG["report.audio"]) audioPlay("./audio/Report.wav");
 		setTimeout(() => {
 			ipcRenderer.send("screenshotEEW", {
-				"ID"      : json.No,
-				"Version" : 0,
+				"ID"      : json.ID + "-" + NOW.getTime(),
+				"Version" : "R",
 			});
 		}, 5000);
 	} else if (json.Function == "earthquake" || ((json.Function == "JP_earthquake" || json.Function == "CN_earthquake") && CONFIG["accept.eew.jp"])) {
@@ -1305,8 +1297,12 @@ async function FCMdata(data) {
 				map.addLayer(EarthquakeList[json.ID].Scircle);
 				mapTW.addLayer(EarthquakeList[json.ID].Scircle1);
 			}
+			if (NOW.getTime() - EEWshot > 60000)
+				EEWshotC = 0;
+
 			if (NOW.getTime() - EEWshot > 5000 && EEWshotC <= 1) {
 				EEWshotC++;
+				json.Version = json.Version + "-" + EEWshotC;
 				EEWshot = NOW.getTime();
 				ipcRenderer.send("screenshotEEW", json);
 			}
