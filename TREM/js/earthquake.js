@@ -354,7 +354,7 @@ function init() {
 					}
 					for (let index = 0; index < Object.keys(pga).length; index++) {
 						let Intensity = pga[Object.keys(pga)[index]].Intensity;
-						if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 15000) {
+						if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 18000) {
 							delete pga[Object.keys(pga)[index]];
 							index--;
 						} else {
