@@ -26,7 +26,7 @@ let PGAaudio = false;
 let PGAtag = 0;
 let MAXPGA = { pga: 0, station: "NA", level: 0 };
 let expected = [];
-let Info = {};
+let Info = { Notify: [] };
 let Focus = [];
 let PGAmark = false;
 let Check = {};
@@ -217,6 +217,7 @@ let PAlert = {
 let Location;
 let station = {};
 let PGAjson = {};
+let PalertT = 0;
 let MainClock = null;
 let geojson = null;
 let Pgeojson = null;
@@ -434,7 +435,7 @@ function init() {
 															(amount >= 3) ? 1 :
 																0;
 						let size = 15;
-						let Image = `./image/$${Intensity}.png`;
+						let Image = `./image/${Intensity}.png`;
 						if (Intensity == 0) {
 							size = 10;
 							Image = "./image/0-1.png";
@@ -478,7 +479,6 @@ function init() {
 									PGALimit = 2;
 									audioPlay("./audio/PGA2.wav");
 								}
-								// pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 							if (MAXPGA.pga < amount && Level != "NA") {
 								MAXPGA.pga = amount;
 								MAXPGA.station = Object.keys(Json)[index];
@@ -493,64 +493,43 @@ function init() {
 					}
 					if (PAlert.data != undefined) {
 						let PLoc = {};
-						for (let index = 0; index < PAlert.data.length; index++)
-							// if (NOW.getTime() - PAlert.timestamp > 30000) break;
+						for (let index = 0; index < PAlert.data.length; index++) {
+							if (NOW.getTime() - PAlert.timestamp > 30000) {
+								if (Pgeojson != null) map.removeLayer(Pgeojson);
+								break;
+							}
 							PLoc[PAlert.data[index].loc] = PAlert.data[index].intensity;
-							// if (pga[PAlert.data[index].TREM] == undefined)
-							// 	pga[PAlert.data[index].TREM] = {
-							// 		"Intensity" : 0,
-							// 		"Time"      : 0,
-							// 	};
-							// let myIcon = L.icon({
-							// 	iconUrl  : `./image/${PAlert.data[index].intensity}.png`,
-							// 	iconSize : [15, 15],
-							// });
-							// let list = PAlert.data[index].loc.split(" ");
-							// let city = list[0];
-							// let town = list[1];
-							// let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
-							// map.addLayer(ReportMark);
-							// ReportMark.setZIndexOffset(1500 + PAlert.data[index].intensity);
-							// Station[PAlert.data[index].loc] = ReportMark;
-							// if (PAlert.data[index].intensity > pga[PAlert.data[index].TREM].Intensity) pga[PAlert.data[index].TREM].Intensity = PAlert.data[index].intensity;
-							// pga[PAlert.data[index].TREM].Time = NOW.getTime();
-							// All.push({
-							// 	"loc"       : PAlert.data[index].loc,
-							// 	"intensity" : PAlert.data[index].intensity,
-							// });
-							// if (IntensityN(MAXPGA.level) < PAlert.data[index].intensity) {
-							// 	MAXPGA.pga = "";
-							// 	MAXPGA.level = IntensityI(PAlert.data[index].intensity);
-							// 	MAXPGA.loc = PAlert.data[index].loc;
-							// 	MAXPGA.intensity = PAlert.data[index].intensity;
-							// }
-
-						// if (Pgeojson != null) map.removeLayer(Pgeojson);
-						Pgeojson = L.geoJson(statesData, {
-							style: (feature) => {
-								let name = feature.properties.COUNTY + " " + feature.properties.TOWN;
-								if (PLoc[name] == 0 || PLoc[name] == undefined)
+						}
+						if (PalertT != PAlert.timestamp && Object.keys(PLoc).length != 0) {
+							PalertT = PAlert.timestamp;
+							if (Pgeojson == null) audioPlay("./audio/palert.wav");
+							if (Pgeojson != null) map.removeLayer(Pgeojson);
+							Pgeojson = L.geoJson(statesData, {
+								style: (feature) => {
+									let name = feature.properties.COUNTY + " " + feature.properties.TOWN;
+									if (PLoc[name] == 0 || PLoc[name] == undefined)
+										return {
+											weight      : 0,
+											opacity     : 0,
+											color       : "#8E8E8E",
+											dashArray   : "",
+											fillOpacity : 0,
+											fillColor   : "transparent",
+										};
 									return {
-										weight      : 1,
-										opacity     : 0.8,
+										weight      : 0,
+										opacity     : 0,
 										color       : "#8E8E8E",
 										dashArray   : "",
 										fillOpacity : 0.8,
-										fillColor   : "transparent",
+										fillColor   : color(PLoc[name]),
 									};
-								return {
-									weight      : 1,
-									opacity     : 0.8,
-									color       : "#8E8E8E",
-									dashArray   : "",
-									fillOpacity : 0.8,
-									fillColor   : color(PLoc[name]),
-								};
-							},
-						});
-						map.addLayer(Pgeojson);
+								},
+							});
+							map.addLayer(Pgeojson);
+						}
+						if (Pgeojson != null) Pgeojson.setZIndexOffset(1000);
 					}
-
 					for (let index = 0; index < Object.keys(PGA).length; index++) {
 						map.removeLayer(PGA[Object.keys(PGA)[index]]);
 						delete PGA[Object.keys(PGA)[index]];
@@ -607,12 +586,12 @@ function init() {
 								Max  : All[0].intensity,
 								Time : NOW.format("YYYY/MM/DD HH:mm:ss"),
 							});
-							// setTimeout(() => {
-							// 	ipcRenderer.send("screenshotEEW", {
-							// 		"ID"      : NOW.getTime(),
-							// 		"Version" : "P",
-							// 	});
-							// }, 5000);
+							setTimeout(() => {
+								ipcRenderer.send("screenshotEEW", {
+									"ID"      : NOW.getTime(),
+									"Version" : "P",
+								});
+							}, 5000);
 							if (!win.isVisible())
 								if (CONFIG["Real-time.show"]) {
 									win.show();
@@ -1297,7 +1276,7 @@ async function FCMdata(data) {
 			},
 		});
 		mapTW.addLayer(geojson);
-		if (json.ID != Info.Notify) {
+		if (!Info.Notify.includes(json.ID)) {
 			if (CONFIG["eew.show"]) {
 				win.show();
 				win.flashFrame(true);
@@ -1311,7 +1290,7 @@ async function FCMdata(data) {
 
 			new Notification("EEW 強震即時警報", { body: `${level.replace("+", "強").replace("-", "弱")}級地震，${Nmsg}\nM ${json.Scale} ${json.Location ?? "未知區域"}`, icon: "TREM.ico" });
 			audioList = [];
-			Info.Notify = json.ID;
+			Info.Notify.push(json.ID);
 			if (CONFIG["eew.audio"]) audioPlay("./audio/EEW.wav");
 			audioPlay(`./audio/1/${level.replace("+", "").replace("-", "")}.wav`);
 			if (level.includes("+"))
@@ -1394,7 +1373,7 @@ async function FCMdata(data) {
 		mapTW.addLayer(Cross1);
 		Cross.setZIndexOffset(6000);
 		let Loom = 0;
-		let speed = 1000;
+		let speed = 500;
 		if (CONFIG["shock.smoothing"]) speed = 0;
 		if (EarthquakeList[json.ID].Timer != undefined) clearInterval(EarthquakeList[json.ID].Timer);
 		if (EarthquakeList.ITimer != undefined) clearInterval(EarthquakeList.ITimer);

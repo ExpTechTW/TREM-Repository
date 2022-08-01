@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-function */
 /* eslint-disable prefer-const */
 const {
 	NOTIFICATION_RECEIVED,
