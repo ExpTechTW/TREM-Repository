@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable prefer-const */
 const { BrowserWindow, shell } = require("@electron/remote");
+axios.defaults.timeout = 15000;
 
 // #region 變數
 let Stamp = 0;
@@ -19,6 +20,7 @@ let mapLayer, mapLayerTW;
 let Station = {};
 let PGA = {};
 let pga = {};
+let TREM = {};
 let PGALimit = 0;
 let PGAaudio = false;
 let PGAtag = 0;
@@ -30,18 +32,194 @@ let PGAmark = false;
 let Check = {};
 let INFO = [];
 let TINFO = 0;
+let ticker = null;
 let ITimer = null;
 let Tsunami = {};
 let Report = 0;
 let Sspeed = 4;
 let Pspeed = 7;
 let Server = [];
-let PAlert = {};
+let PAlert = {
+	"data": [
+		{
+			"loc"       : "新竹縣 北埔鄉",
+			"intensity" : 2,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 峨眉鄉",
+			"intensity" : 2,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 五峰鄉",
+			"intensity" : 2,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "苗栗縣 苗栗市",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 苑裡鎮",
+			"intensity" : 2,
+			"TREM"      : 6,
+		},
+		{
+			"loc"       : "苗栗縣 通霄鎮",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 竹南鎮",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 頭份市",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 後龍鎮",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 卓蘭鎮",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 大湖鄉",
+			"intensity" : 2,
+			"TREM"      : 7,
+		},
+		{
+			"loc"       : "苗栗縣 公館鄉",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 銅鑼鄉",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 南庄鄉",
+			"intensity" : 2,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "苗栗縣 頭屋鄉",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 三義鄉",
+			"intensity" : 2,
+			"TREM"      : 7,
+		},
+		{
+			"loc"       : "苗栗縣 造橋鄉",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 三灣鄉",
+			"intensity" : 2,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "苗栗縣 獅潭鄉",
+			"intensity" : 2,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "苗栗縣 泰安鄉",
+			"intensity" : 2,
+			"TREM"      : 7,
+		},
+		{
+			"loc"       : "臺中市 大甲區",
+			"intensity" : 2,
+			"TREM"      : 6,
+		},
+		{
+			"loc"       : "臺中市 后里區",
+			"intensity" : 2,
+			"TREM"      : 7,
+		},
+		{
+			"loc"       : "臺中市 外埔區",
+			"intensity" : 2,
+			"TREM"      : 6,
+		},
+		{
+			"loc"       : "桃園市 龍潭區",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹市 東區",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹市 香山區",
+			"intensity" : 1,
+			"TREM"      : 3,
+		},
+		{
+			"loc"       : "新竹縣 竹北市",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 竹東鎮",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 關西鎮",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 芎林鄉",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 橫山鄉",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "新竹縣 寶山鄉",
+			"intensity" : 1,
+			"TREM"      : 4,
+		},
+		{
+			"loc"       : "苗栗縣 西湖鄉",
+			"intensity" : 1,
+			"TREM"      : 3,
+		},
+	],
+	"time"      : "2022-08-01 22:00:19",
+	"unix"      : 1659362419000,
+	"timestamp" : 1659362458833,
+	"station"   : 26,
+	"final"     : true,
+	"img"       : "https://pbs.twimg.com/media/FZFKIRXaMAYi1Ov.png",
+};
 let Location;
 let station = {};
 let PGAjson = {};
 let MainClock = null;
 let geojson = null;
+let Pgeojson = null;
 let clickT = 0;
 let investigation = false;
 let ReportTag = 0;
@@ -242,8 +420,8 @@ function init() {
 					for (let index = 0; index < Object.keys(Json).length; index++) {
 						let Sdata = Json[Object.keys(Json)[index]];
 						let amount = 0;
-						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata["MaxPGA"]);
-						if (station[Object.keys(Json)[index]] == undefined || !Sdata["Verify"]) continue;
+						if (Number(Sdata["MaxPGA"]) > amount) amount = Number(Sdata.MaxPGA);
+						if (station[Object.keys(Json)[index]] == undefined) continue;
 						let Intensity = (NOW.getTime() - Sdata.TimeStamp > 5000) ? "NA" :
 							(amount >= 800) ? 9 :
 								(amount >= 440) ? 8 :
@@ -253,7 +431,7 @@ function init() {
 												(amount >= 25) ? 4 :
 													(amount >= 8) ? 3 :
 														(amount >= 5) ? 2 :
-															(amount >= 4) ? 1 :
+															(amount >= 3) ? 1 :
 																0;
 						let size = 15;
 						let Image = `./image/$${Intensity}.png`;
@@ -275,7 +453,7 @@ function init() {
 						if (Object.keys(Json)[index] == CONFIG["Real-time.station"]) {
 							document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]].Loc;
 							document.getElementById("rt-station-time").innerText = now.format("MM/DD HH:mm:ss");
-							document.getElementById("rt-station-intensity").innerText = Intensity;
+							document.getElementById("rt-station-intensity").innerText = IntensityI(Intensity) ;
 							document.getElementById("rt-station-pga").innerText = amount;
 						}
 						map.addLayer(ReportMark);
@@ -292,7 +470,7 @@ function init() {
 								"intensity" : Intensity,
 							});
 							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
-							if (amount >= 5) {
+							if (Sdata.Alert)
 								if (amount > 8 && PGALimit == 0) {
 									PGALimit = 1;
 									audioPlay("./audio/PGA1.wav");
@@ -300,8 +478,7 @@ function init() {
 									PGALimit = 2;
 									audioPlay("./audio/PGA2.wav");
 								}
-								pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
-							}
+								// pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 							if (MAXPGA.pga < amount && Level != "NA") {
 								MAXPGA.pga = amount;
 								MAXPGA.station = Object.keys(Json)[index];
@@ -314,38 +491,65 @@ function init() {
 							}
 						}
 					}
-					if (PAlert.data != undefined)
-						for (let index = 0; index < PAlert.data.length; index++) {
-							if (NOW.getTime() - PAlert.timestamp > 30000) break;
-							if (pga[PAlert.data[index].TREM] == undefined)
-								pga[PAlert.data[index].TREM] = {
-									"Intensity" : 0,
-									"Time"      : 0,
+					if (PAlert.data != undefined) {
+						let PLoc = {};
+						for (let index = 0; index < PAlert.data.length; index++)
+							// if (NOW.getTime() - PAlert.timestamp > 30000) break;
+							PLoc[PAlert.data[index].loc] = PAlert.data[index].intensity;
+							// if (pga[PAlert.data[index].TREM] == undefined)
+							// 	pga[PAlert.data[index].TREM] = {
+							// 		"Intensity" : 0,
+							// 		"Time"      : 0,
+							// 	};
+							// let myIcon = L.icon({
+							// 	iconUrl  : `./image/${PAlert.data[index].intensity}.png`,
+							// 	iconSize : [15, 15],
+							// });
+							// let list = PAlert.data[index].loc.split(" ");
+							// let city = list[0];
+							// let town = list[1];
+							// let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
+							// map.addLayer(ReportMark);
+							// ReportMark.setZIndexOffset(1500 + PAlert.data[index].intensity);
+							// Station[PAlert.data[index].loc] = ReportMark;
+							// if (PAlert.data[index].intensity > pga[PAlert.data[index].TREM].Intensity) pga[PAlert.data[index].TREM].Intensity = PAlert.data[index].intensity;
+							// pga[PAlert.data[index].TREM].Time = NOW.getTime();
+							// All.push({
+							// 	"loc"       : PAlert.data[index].loc,
+							// 	"intensity" : PAlert.data[index].intensity,
+							// });
+							// if (IntensityN(MAXPGA.level) < PAlert.data[index].intensity) {
+							// 	MAXPGA.pga = "";
+							// 	MAXPGA.level = IntensityI(PAlert.data[index].intensity);
+							// 	MAXPGA.loc = PAlert.data[index].loc;
+							// 	MAXPGA.intensity = PAlert.data[index].intensity;
+							// }
+
+						// if (Pgeojson != null) map.removeLayer(Pgeojson);
+						Pgeojson = L.geoJson(statesData, {
+							style: (feature) => {
+								let name = feature.properties.COUNTY + " " + feature.properties.TOWN;
+								if (PLoc[name] == 0 || PLoc[name] == undefined)
+									return {
+										weight      : 1,
+										opacity     : 0.8,
+										color       : "#8E8E8E",
+										dashArray   : "",
+										fillOpacity : 0.8,
+										fillColor   : "transparent",
+									};
+								return {
+									weight      : 1,
+									opacity     : 0.8,
+									color       : "#8E8E8E",
+									dashArray   : "",
+									fillOpacity : 0.8,
+									fillColor   : color(PLoc[name]),
 								};
-							let myIcon = L.icon({
-								iconUrl  : `./image/${PAlert.data[index].intensity}.png`,
-								iconSize : [15, 15],
-							});
-							let list = PAlert.data[index].loc.split(" ");
-							let city = list[0];
-							let town = list[1];
-							let ReportMark = L.marker([Location[city][town][1], Location[city][town][2]], { icon: myIcon });
-							map.addLayer(ReportMark);
-							ReportMark.setZIndexOffset(1500 + PAlert.data[index].intensity);
-							Station[PAlert.data[index].loc] = ReportMark;
-							if (PAlert.data[index].intensity > pga[PAlert.data[index].TREM].Intensity) pga[PAlert.data[index].TREM].Intensity = PAlert.data[index].intensity;
-							pga[PAlert.data[index].TREM].Time = NOW.getTime();
-							All.push({
-								"loc"       : PAlert.data[index].loc,
-								"intensity" : PAlert.data[index].intensity,
-							});
-							if (IntensityN(MAXPGA.level) < PAlert.data[index].intensity) {
-								MAXPGA.pga = "";
-								MAXPGA.level = IntensityI(PAlert.data[index].intensity);
-								MAXPGA.loc = PAlert.data[index].loc;
-								MAXPGA.intensity = PAlert.data[index].intensity;
-							}
-						}
+							},
+						});
+						map.addLayer(Pgeojson);
+					}
 
 					for (let index = 0; index < Object.keys(PGA).length; index++) {
 						map.removeLayer(PGA[Object.keys(PGA)[index]]);
@@ -376,6 +580,7 @@ function init() {
 					if (Object.keys(PGA).length == 0) PGAaudio = false;
 
 					if (!PGAaudio) {
+						if (Pgeojson != null) map.removeLayer(Pgeojson);
 						PGAtag = 0;
 						PGALimit = 0;
 					}
@@ -386,8 +591,6 @@ function init() {
 								All[index + 1] = All[index];
 								All[index] = Temp;
 							}
-
-
 					if (All.length != 0 && All[0].intensity > PGAtag && Object.keys(pga).length != 0) {
 						if (CONFIG["Real-time.audio"])
 							if (All[0].intensity >= 5 && PGAtag < 5)
@@ -404,12 +607,12 @@ function init() {
 								Max  : All[0].intensity,
 								Time : NOW.format("YYYY/MM/DD HH:mm:ss"),
 							});
-							setTimeout(() => {
-								ipcRenderer.send("screenshotEEW", {
-									"ID"      : NOW.getTime(),
-									"Version" : "P",
-								});
-							}, 5000);
+							// setTimeout(() => {
+							// 	ipcRenderer.send("screenshotEEW", {
+							// 		"ID"      : NOW.getTime(),
+							// 		"Version" : "P",
+							// 	});
+							// }, 5000);
 							if (!win.isVisible())
 								if (CONFIG["Real-time.show"]) {
 									win.show();
@@ -1000,6 +1203,8 @@ async function FCMdata(data) {
 		if (CONFIG["report.audio"]) audioPlay("./audio/Water.wav");
 	} else if (json.Function == "palert")
 		PAlert = json.Data;
+	else if (json.Function == "TREM_earthquake")
+		TREM = json;
 	else if (json.Function == "report") {
 		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
 		if (CONFIG["report.show"]) {
@@ -1248,6 +1453,12 @@ async function FCMdata(data) {
 		if (ITimer == null)
 			ITimer = setInterval(() => {
 				updateText();
+				if (ticker == null)
+					ticker = setInterval(() => {
+						if (TINFO + 1 >= INFO.length)
+							TINFO = 0;
+						else TINFO++;
+					}, 5000);
 			}, 1000);
 
 		EEWshot =	NOW.getTime() - 3500;
@@ -1339,6 +1550,7 @@ async function FCMdata(data) {
 					// restore reports
 					$(roll).fadeIn(200);
 					ITimer = null;
+					ticker = null;
 					focus([Lat, Long], 7.5);
 					TimerDesynced = false;
 					audioList = [];
@@ -1408,7 +1620,7 @@ async function FCMdata(data) {
 function updateText() {
 	$("#alert-box")[0].className = `${INFO[TINFO].alert_type} ${IntensityToClassString(INFO[TINFO].alert_intensity)}`;
 	$("#alert-local")[0].className = `alert-item ${IntensityToClassString(INFO[TINFO].alert_local)}`;
-	$("#alert-provider").text(INFO[TINFO].alert_provider);
+	$("#alert-provider").text(`${INFO.length ? `${TINFO + 1} ` : ""}${INFO[TINFO].alert_provider}`);
 	$("#alert-number").text(`${INFO[TINFO].alert_number}`);
 	$("#alert-location").text(INFO[TINFO].alert_location);
 	$("#alert-time").text(INFO[TINFO].alert_time.format("YYYY/MM/DD HH:mm:ss"));
@@ -1429,9 +1641,4 @@ function updateText() {
 		Catch.innerHTML = `<font color="white" size="6"><b>震波到地表進度: ${Num}%</b></font>`;
 	else
 		Catch.innerHTML = "";
-
-	if (TINFO + 1 >= INFO.length)
-		TINFO = 0;
-	else
-		TINFO++;
 }
