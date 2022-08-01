@@ -39,181 +39,7 @@ let Report = 0;
 let Sspeed = 4;
 let Pspeed = 7;
 let Server = [];
-let PAlert = {
-	"data": [
-		{
-			"loc"       : "新竹縣 北埔鄉",
-			"intensity" : 2,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 峨眉鄉",
-			"intensity" : 2,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 五峰鄉",
-			"intensity" : 2,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "苗栗縣 苗栗市",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 苑裡鎮",
-			"intensity" : 2,
-			"TREM"      : 6,
-		},
-		{
-			"loc"       : "苗栗縣 通霄鎮",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 竹南鎮",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 頭份市",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 後龍鎮",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 卓蘭鎮",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 大湖鄉",
-			"intensity" : 2,
-			"TREM"      : 7,
-		},
-		{
-			"loc"       : "苗栗縣 公館鄉",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 銅鑼鄉",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 南庄鄉",
-			"intensity" : 2,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "苗栗縣 頭屋鄉",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 三義鄉",
-			"intensity" : 2,
-			"TREM"      : 7,
-		},
-		{
-			"loc"       : "苗栗縣 造橋鄉",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 三灣鄉",
-			"intensity" : 2,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "苗栗縣 獅潭鄉",
-			"intensity" : 2,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "苗栗縣 泰安鄉",
-			"intensity" : 2,
-			"TREM"      : 7,
-		},
-		{
-			"loc"       : "臺中市 大甲區",
-			"intensity" : 2,
-			"TREM"      : 6,
-		},
-		{
-			"loc"       : "臺中市 后里區",
-			"intensity" : 2,
-			"TREM"      : 7,
-		},
-		{
-			"loc"       : "臺中市 外埔區",
-			"intensity" : 2,
-			"TREM"      : 6,
-		},
-		{
-			"loc"       : "桃園市 龍潭區",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹市 東區",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹市 香山區",
-			"intensity" : 1,
-			"TREM"      : 3,
-		},
-		{
-			"loc"       : "新竹縣 竹北市",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 竹東鎮",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 關西鎮",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 芎林鄉",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 橫山鄉",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "新竹縣 寶山鄉",
-			"intensity" : 1,
-			"TREM"      : 4,
-		},
-		{
-			"loc"       : "苗栗縣 西湖鄉",
-			"intensity" : 1,
-			"TREM"      : 3,
-		},
-	],
-	"time"      : "2022-08-01 22:00:19",
-	"unix"      : 1659362419000,
-	"timestamp" : 1659362458833,
-	"station"   : 26,
-	"final"     : true,
-	"img"       : "https://pbs.twimg.com/media/FZFKIRXaMAYi1Ov.png",
-};
+let PAlert = {};
 let Location;
 let station = {};
 let PGAjson = {};
@@ -471,7 +297,7 @@ function init() {
 								"intensity" : Intensity,
 							});
 							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
-							if (Sdata.Alert)
+							if (Sdata.Alert) {
 								if (amount > 8 && PGALimit == 0) {
 									PGALimit = 1;
 									audioPlay("./audio/PGA1.wav");
@@ -479,6 +305,8 @@ function init() {
 									PGALimit = 2;
 									audioPlay("./audio/PGA2.wav");
 								}
+								pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
+							}
 							if (MAXPGA.pga < amount && Level != "NA") {
 								MAXPGA.pga = amount;
 								MAXPGA.station = Object.keys(Json)[index];
@@ -578,7 +406,6 @@ function init() {
 								audioPlay("./audio/Shindo1.wav");
 							else if (PGAtag == 0)
 								audioPlay("./audio/Shindo0.wav");
-
 
 						if (All[0].intensity >= 2) {
 							Report = NOW.getTime();
