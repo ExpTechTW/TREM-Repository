@@ -56,7 +56,6 @@ let investigation = false;
 let ReportTag = 0;
 let EEWshot = 0;
 let EEWshotC = 0;
-const Alert = fs.existsSync(path.join(app.getPath("userData"), "./unlockAlert.tmp"));
 // #endregion
 
 // #region override Date.format()
@@ -302,7 +301,7 @@ function init() {
 								"intensity" : Intensity,
 							});
 							if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
-							if (Sdata.Alert || Alert) {
+							if (Sdata.Alert || fs.existsSync(path.join(app.getPath("userData"), "./unlockAlert.tmp"))) {
 								if (amount > 8 && PGALimit == 0) {
 									PGALimit = 1;
 									audioPlay("./audio/PGA1.wav");
