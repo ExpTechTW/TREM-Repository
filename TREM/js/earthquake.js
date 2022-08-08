@@ -1331,17 +1331,6 @@ async function FCMdata(data) {
 				iconUrl  : "./image/cross.png",
 				iconSize : [30, 30],
 			});
-			let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
-			let Cross1 = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
-			if (EarthquakeList[json.ID].Cross != undefined)
-				map.removeLayer(EarthquakeList[json.ID].Cross);
-			EarthquakeList[json.ID].Cross = Cross;
-			map.addLayer(Cross);
-			if (EarthquakeList[json.ID].Cross1 != undefined)
-				mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
-			EarthquakeList[json.ID].Cross1 = Cross1;
-			mapTW.addLayer(Cross1);
-			Cross.setZIndexOffset(6000);
 			let Loom = 0;
 			let speed = 500;
 			if (CONFIG["shock.smoothing"]) speed = 0;
@@ -1354,8 +1343,8 @@ async function FCMdata(data) {
 			if (json.Replay) {
 				replay = json.timestamp;
 				replayT = NOW.getTime();
-				classString += "eew-history";
-			} else if (json.Test)
+			}
+			if (json.Test)
 				classString += "eew-test";
 			else if (json.Alert)
 				classString += "eew-alert";
@@ -1411,9 +1400,11 @@ async function FCMdata(data) {
 							else TINFO++;
 						}, 5000);
 				}, 1000);
-
 			EEWshot =	NOW.getTime() - 3500;
 			EEWshotC = 0;
+			if (EarthquakeList[json.ID].Cross != undefined)map.removeLayer(EarthquakeList[json.ID].Cross);
+			if (EarthquakeList[json.ID].Cross1 != undefined) mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
+			let S1 = 0;
 			EarthquakeList[json.ID].Timer = setInterval(() => {
 				if (EarthquakeList[json.ID].Cancel == undefined) {
 					if (CONFIG["shock.p"]) {
@@ -1472,6 +1463,22 @@ async function FCMdata(data) {
 							Loom = 750000;
 							focus([Number(json.NorthLatitude), Number(json.EastLongitude) - 0.9], 6);
 						}
+					}
+					if (NOW.getMilliseconds() < 500 && S1 == 0) {
+						S1 = 1;
+						let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
+						let Cross1 = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
+						EarthquakeList[json.ID].Cross = Cross;
+						map.addLayer(Cross);
+						EarthquakeList[json.ID].Cross1 = Cross1;
+						mapTW.addLayer(Cross1);
+						Cross.setZIndexOffset(6000);
+					} else if (NOW.getMilliseconds() > 500 && S1 == 1) {
+						S1 = 0;
+						map.removeLayer(EarthquakeList[json.ID].Cross);
+						mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
+						delete EarthquakeList[json.ID].Cross;
+						delete EarthquakeList[json.ID].Cross1;
 					}
 				}
 				if (NOW.getTime() - EEWshot > 60000)
