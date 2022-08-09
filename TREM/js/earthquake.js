@@ -69,6 +69,7 @@ let replayT = 0;
 let Second = -1;
 let mapLock = false;
 let PAlertT = 0;
+let auto = false;
 // #endregion
 
 // #region override Date.format()
@@ -188,9 +189,14 @@ function init() {
 		preferCanvas       : true,
 	}).setView([23.608428, 120.799168], 7);
 
+	mapTW.on("zoom", () => {
+		mapTW.setView([23.608428, 120.799168], 7);
+	});
+
 	mapTW.dragging.disable();
 	mapTW.scrollWheelZoom.disable();
 	mapTW.doubleClickZoom.disable();
+	map.doubleClickZoom.disable();
 	mapTW.removeControl(mapTW.zoomControl);
 
 	L.geoJson(statesData, {
@@ -211,17 +217,21 @@ function init() {
 		},
 	}).addTo(map);
 
-	map.on("contextmenu", (e) => {
+	map.on("click", (e) => {
 		if (ReportMarkID != null) {
 			ReportMarkID = null;
 			for (let index = 0; index < MarkList.length; index++)
 				map.removeLayer(MarkList[index]);
 		}
 		mapLock = false;
-		focus();
+		focus([23.608428, 120.799168], 7.5);
 	});
 
-	map.on("mousedown", (e) => {
+	map.on("drag", (e) => {
+		mapLock = true;
+	});
+
+	map.on("dblclick", (e) => {
 		mapLock = true;
 	});
 
@@ -385,7 +395,7 @@ function init() {
 							pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 						}
 					}
-					if (test == -10) {
+					if (test == -1) {
 						test = 0;
 						pga = {};
 						pga["1"] = {
@@ -584,8 +594,8 @@ function init() {
 	$("#app-version").text(app.getVersion());
 	$("#loading").text({ en: "Welcome", ja: "ようこそ", "zh-TW": "歡迎" }[CONFIG["general.locale"]]);
 	$("#load").delay(1000).fadeOut(1000);
-	mapLock = false;
 	setInterval(() => {
+		if (mapLock) return;
 		// map.setView([23.19, 120.275], 9.5);
 		if (Object.keys(PGA).length >= 1) {
 			if (Object.keys(PGA).length == 1) {
@@ -611,9 +621,12 @@ function init() {
 				}
 				focus([(X1 + X2) / 2, (Y1 + Y2) / 2], Zoom);
 			}
+			auto = true;
 		} else
+		if (auto) {
+			auto = false;
 			focus([23.608428, 120.799168], 7.5);
-		console.log(map.getZoom());
+		}
 	}, 500);
 }
 // #endregion
@@ -640,8 +653,6 @@ async function setUserLocationMarker() {
 
 // #region 聚焦
 function focus(Loc, size) {
-	// console.log(mapLock);
-	if (mapLock) return;
 	let X = 0;
 	if (size >= 7) X = 1.5;
 	if (size >= 7.5) X = 0.9;

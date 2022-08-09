@@ -187,7 +187,7 @@ ipcMain.on("restart", () => {
 });
 
 ipcMain.on("screenshotEEW", async (event, json) => {
-	return
+	return;
 	const folder = path.join(app.getPath("userData"), "EEW");
 	if (!fs.existsSync(folder))
 		fs.mkdirSync(folder);
