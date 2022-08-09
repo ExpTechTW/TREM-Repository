@@ -67,6 +67,8 @@ let Response = {};
 let replay = 0;
 let replayT = 0;
 let Second = -1;
+let mapLock = false;
+let PAlertT = 0;
 // #endregion
 
 // #region override Date.format()
@@ -158,6 +160,10 @@ function init() {
 		if (investigation && NOW.getTime() - Report > 600000) {
 			investigation = false;
 			roll.removeChild(roll.children[0]);
+			if (Pgeojson != null) {
+				map.removeLayer(Pgeojson);
+				Pgeojson = null;
+			}
 		}
 		if (ReportTag != 0 && NOW.getTime() - ReportTag > 30000) {
 			ReportTag = 0;
@@ -205,13 +211,18 @@ function init() {
 		},
 	}).addTo(map);
 
-	map.on("click", (e) => {
+	map.on("contextmenu", (e) => {
 		if (ReportMarkID != null) {
 			ReportMarkID = null;
 			for (let index = 0; index < MarkList.length; index++)
 				map.removeLayer(MarkList[index]);
 		}
+		mapLock = false;
 		focus();
+	});
+
+	map.on("mousedown", (e) => {
+		mapLock = true;
 	});
 
 	map.removeControl(map.zoomControl);
@@ -243,6 +254,8 @@ function init() {
 					});
 			});
 	}
+
+	let test = -1;
 
 	function PGAMain() {
 		dump({ level: 0, message: "Start PGA Timer", origin: "PGATimer" });
@@ -372,6 +385,42 @@ function init() {
 							pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 						}
 					}
+					if (test == -10) {
+						test = 0;
+						pga = {};
+						pga["1"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["2"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["5"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["8"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["4"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["7"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["3"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+						pga["6"] = {
+							"Intensity" : 1,
+							"Time"      : NOW.getTime(),
+						};
+					}
 					if (MAXPGA.pga < amount && Level != "NA") {
 						MAXPGA.pga = amount;
 						MAXPGA.station = Object.keys(Json)[index];
@@ -385,13 +434,8 @@ function init() {
 				}
 			}
 			if (PAlert.data != undefined)
-				if (NOW.getTime() - PAlert.timestamp > 30000) {
-					if (Pgeojson != null) {
-						map.removeLayer(Pgeojson);
-						Pgeojson = null;
-						focus();
-					}
-				} else {
+				if (PAlert.timestamp != PAlertT) {
+					PAlertT = PAlert.timestamp;
 					let PLoc = {};
 					let MaxI = 0;
 					for (let index = 0; index < PAlert.data.length; index++) {
@@ -456,7 +500,7 @@ function init() {
 			RMT++;
 			for (let index = 0; index < Object.keys(pga).length; index++) {
 				let Intensity = pga[Object.keys(pga)[index]].Intensity;
-				if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 30000) {
+				if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 10000) {
 					delete pga[Object.keys(pga)[index]];
 					index--;
 				} else {
@@ -469,12 +513,12 @@ function init() {
 				}
 			}
 			if (RMT >= 2) RMT = 0;
-			if (Object.keys(pga).length != 0 && !PGAmark) {
+			if (Object.keys(pga).length != 0 && !PGAmark)
 				PGAmark = true;
-				focus([23.608428, 120.799168], 7, true);
-			}
+				// focus([23.608428, 120.799168], 7, true);
+
 			if (PGAmark && Object.keys(pga).length == 0) {
-				focus();
+				// focus();
 				PGAmark = false;
 				RMT = 1;
 				RMTlimit = [];
@@ -540,6 +584,37 @@ function init() {
 	$("#app-version").text(app.getVersion());
 	$("#loading").text({ en: "Welcome", ja: "ようこそ", "zh-TW": "歡迎" }[CONFIG["general.locale"]]);
 	$("#load").delay(1000).fadeOut(1000);
+	mapLock = false;
+	setInterval(() => {
+		// map.setView([23.19, 120.275], 9.5);
+		if (Object.keys(PGA).length >= 1) {
+			if (Object.keys(PGA).length == 1) {
+				let X1 = (PGAjson[Object.keys(pga)[0].toString()][0][0] + (PGAjson[Object.keys(pga)[0].toString()][2][0] - PGAjson[Object.keys(pga)[0].toString()][0][0]) / 2);
+				let Y1 = (PGAjson[Object.keys(pga)[0].toString()][0][1] + (PGAjson[Object.keys(pga)[0].toString()][1][1] - PGAjson[Object.keys(pga)[0].toString()][0][1]) / 2);
+				focus([X1, Y1], 9.5);
+			} else if (Object.keys(PGA).length >= 2) {
+				let X1 = (PGAjson[Object.keys(pga)[0].toString()][0][0] + (PGAjson[Object.keys(pga)[0].toString()][2][0] - PGAjson[Object.keys(pga)[0].toString()][0][0]) / 2);
+				let Y1 = (PGAjson[Object.keys(pga)[0].toString()][0][1] + (PGAjson[Object.keys(pga)[0].toString()][1][1] - PGAjson[Object.keys(pga)[0].toString()][0][1]) / 2);
+				let X2 = (PGAjson[Object.keys(pga)[1].toString()][0][0] + (PGAjson[Object.keys(pga)[1].toString()][2][0] - PGAjson[Object.keys(pga)[1].toString()][0][0]) / 2);
+				let Y2 = (PGAjson[Object.keys(pga)[1].toString()][0][1] + (PGAjson[Object.keys(pga)[1].toString()][1][1] - PGAjson[Object.keys(pga)[1].toString()][0][1]) / 2);
+				let Zoom = 9;
+				if (Object.keys(PGA).length == 2) {
+					let num = Math.sqrt(Math.pow(X1 - X2, 2) + Math.pow(Y1 - Y2, 2));
+					if (num > 0.6) Zoom = 9;
+					if (num > 1) Zoom = 8.5;
+					if (num > 1.5) Zoom = 8;
+					if (num > 2.8) Zoom = 7;
+				} else {
+					if (Object.keys(PGA).length >= 4) Zoom = 8;
+					if (Object.keys(PGA).length >= 6) Zoom = 7.5;
+					if (Object.keys(PGA).length >= 8) Zoom = 7;
+				}
+				focus([(X1 + X2) / 2, (Y1 + Y2) / 2], Zoom);
+			}
+		} else
+			focus([23.608428, 120.799168], 7.5);
+		console.log(map.getZoom());
+	}, 500);
 }
 // #endregion
 
@@ -549,7 +624,6 @@ async function setUserLocationMarker() {
 		Location = await (await fetch("https://raw.githubusercontent.com/ExpTechTW/TW-EEW/master/locations.json")).json();
 		dump({ level: 0, message: "Get Location File", origin: "Location" });
 	}
-
 	Lat = Location[CONFIG["location.city"]][CONFIG["location.town"]][1];
 	Long = Location[CONFIG["location.city"]][CONFIG["location.town"]][2];
 	if (marker != null) map.removeLayer(marker);
@@ -560,22 +634,30 @@ async function setUserLocationMarker() {
 	marker = L.marker([Lat, Long], { icon: myIcon });
 	map.addLayer(marker);
 	marker.setZIndexOffset(1);
-	focus([Lat, Long], 7.5);
-
+	focus([23.608428, 120.799168], 7.5);
 }
 // #endregion
 
 // #region 聚焦
-function focus(Loc, size, args) {
-	if (Loc != undefined && args == undefined) {
+function focus(Loc, size) {
+	// console.log(mapLock);
+	if (mapLock) return;
+	let X = 0;
+	if (size >= 7) X = 1.5;
+	if (size >= 7.5) X = 0.9;
+	if (size >= 8) X = 0.6;
+	if (size >= 8.5) X = 0.6;
+	if (size >= 9) X = 0.35;
+	if (size >= 9.5) X = 0.2;
+	if (Loc != undefined) {
 		Focus[0] = Loc[0];
-		Focus[1] = Loc[1];
+		Focus[1] = Loc[1] + X;
 		Focus[2] = size;
-		map.setView([Loc[0], Loc[1] + 0.9], size);
-	} else if (Loc != undefined)
-		map.setView([Loc[0], Loc[1] + 0.9], size);
-	else
-		map.setView([Focus[0], Focus[1] + 0.9], Focus[2]);
+		if (map.getBounds().getCenter().lat.toFixed(2) != Loc[0].toFixed(2) && map.getBounds().getCenter().lng.toFixed(2) != (Loc[1] + X).toFixed(2))
+			map.setView([Loc[0], Loc[1] + X], size);
+	} else
+	if (map.getBounds().getCenter().lat.toFixed(2) != Focus[0].toFixed(2) && map.getBounds().getCenter().lng.toFixed(2) != Focus[1].toFixed(2))
+		map.setView([Focus[0], Focus[1]], Focus[2]);
 }
 // #endregion
 
@@ -1162,6 +1244,10 @@ async function FCMdata(data) {
 		replay = json.timestamp;
 		replayT = NOW.getTime();
 	} else if (json.Function == "report") {
+		if (Pgeojson != null) {
+			map.removeLayer(Pgeojson);
+			Pgeojson = null;
+		}
 		dump({ level: 0, message: "Got Earthquake Report", origin: "API" });
 		if (CONFIG["report.show"]) {
 			win.show();
