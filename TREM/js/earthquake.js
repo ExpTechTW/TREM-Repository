@@ -1465,6 +1465,7 @@ async function FCMdata(data) {
 					if (EarthquakeList[json.ID].Scircle1 != null)
 						mapTW.removeLayer(EarthquakeList[json.ID].Scircle1);
 					let km = Math.pow((NOW.getTime() - json.Time) * Sspeed, 2) - Math.pow(Number(json.Depth) * 1000, 2);
+					if (EarthquakeList[json.ID].Depth != null) map.removeLayer(EarthquakeList[json.ID].Depth);
 					if (km > 0) {
 						let KM = Math.sqrt(km);
 						EarthquakeList[json.ID].Scircle = L.circle([Number(json.NorthLatitude), Number(json.EastLongitude)], {
@@ -1481,6 +1482,21 @@ async function FCMdata(data) {
 						});
 						map.addLayer(EarthquakeList[json.ID].Scircle);
 						mapTW.addLayer(EarthquakeList[json.ID].Scircle1);
+					} else {
+						let Progress = 0;
+						let num = Math.round(((NOW.getTime() - json.Time) * Sspeed / (json.Depth * 1000)) * 100);
+						if (num > 35) Progress = 1;
+						if (num > 55) Progress = 2;
+						if (num > 75) Progress = 3;
+						if (num > 98) Progress = 4;
+						let myIcon = L.icon({
+							iconUrl  : `./image/progress${Progress}.png`,
+							iconSize : [50, 50],
+						});
+						let DepthM = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude) + 0.2], { icon: myIcon });
+						EarthquakeList[json.ID].Depth = DepthM;
+						map.addLayer(DepthM);
+						DepthM.setZIndexOffset(6000);
 					}
 					if (CONFIG["map.autoZoom"]) {
 						if ((NOW.getTime() - json.Time) * Pspeed > 250000 && Loom < 250000) {
