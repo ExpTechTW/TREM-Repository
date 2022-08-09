@@ -239,7 +239,7 @@ function init() {
 
 	map.removeControl(map.zoomControl);
 
-	main();
+	setTimeout(() => {main();}, 1500);
 
 	setInterval(() => {
 		main();
@@ -266,8 +266,6 @@ function init() {
 					});
 			});
 	}
-
-	let test = -1;
 
 	function PGAMain() {
 		dump({ level: 0, message: "Start PGA Timer", origin: "PGATimer" });
@@ -348,7 +346,7 @@ function init() {
 				if (Object.keys(Json)[index] == CONFIG["Real-time.station"]) {
 					document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]].Loc;
 					document.getElementById("rt-station-time").innerText = now.format("MM/DD HH:mm:ss");
-					document.getElementById("rt-station-intensity").innerText = IntensityI(Intensity) ;
+					document.getElementById("rt-station-intensity").innerText = IntensityI(Intensity);
 					document.getElementById("rt-station-pga").innerText = amount;
 				}
 				map.addLayer(ReportMark);
@@ -396,42 +394,6 @@ function init() {
 							}
 							pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
 						}
-					}
-					if (test == -1) {
-						// test = 0;
-						pga = {};
-						pga["1"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["2"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["5"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["8"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["4"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["7"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["3"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
-						pga["6"] = {
-							"Intensity" : 1,
-							"Time"      : NOW.getTime(),
-						};
 					}
 					if (MAXPGA.pga < amount && Level != "NA") {
 						MAXPGA.pga = amount;
@@ -499,7 +461,7 @@ function init() {
 								"ID"      : NOW.getTime(),
 								"Version" : "P",
 							});
-						}, 2000);
+						}, 1250);
 					}
 					if (Pgeojson != null) Pgeojson.setZIndexOffset(1000);
 				}
@@ -1554,9 +1516,9 @@ async function FCMdata(data) {
 							else TINFO++;
 						}, 5000);
 				}, 1000);
-			EEWshot =	NOW.getTime() - 3500;
+			EEWshot = NOW.getTime() - 4000;
 			EEWshotC = 0;
-			if (EarthquakeList[json.ID].Cross != undefined)map.removeLayer(EarthquakeList[json.ID].Cross);
+			if (EarthquakeList[json.ID].Cross != undefined) map.removeLayer(EarthquakeList[json.ID].Cross);
 			if (EarthquakeList[json.ID].Cross1 != undefined) mapTW.removeLayer(EarthquakeList[json.ID].Cross1);
 			let S1 = 0;
 			EarthquakeList[json.ID].Timer = setInterval(() => {
@@ -1659,6 +1621,14 @@ async function FCMdata(data) {
 						EarthquakeList[json.ID].Cross1 = Cross1;
 						mapTW.addLayer(Cross1);
 						Cross.setZIndexOffset(6000);
+						if (NOW.getTime() - EEWshot > 60000)
+							EEWshotC = 0;
+						if (NOW.getTime() - EEWshot > 5000 && EEWshotC <= 1 && S1 == 1) {
+							EEWshotC++;
+							json.Version = json.Version + "-" + EEWshotC;
+							EEWshot = NOW.getTime();
+							setTimeout(() => {ipcRenderer.send("screenshotEEW", json);}, 500);
+						}
 					} else if (NOW.getMilliseconds() > 500 && S1 == 1) {
 						S1 = 0;
 						map.removeLayer(EarthquakeList[json.ID].Cross);
@@ -1666,15 +1636,6 @@ async function FCMdata(data) {
 						delete EarthquakeList[json.ID].Cross;
 						delete EarthquakeList[json.ID].Cross1;
 					}
-				}
-				if (NOW.getTime() - EEWshot > 60000)
-					EEWshotC = 0;
-
-				if (NOW.getTime() - EEWshot > 5000 && EEWshotC <= 1) {
-					EEWshotC++;
-					json.Version = json.Version + "-" + EEWshotC;
-					EEWshot = NOW.getTime();
-					ipcRenderer.send("screenshotEEW", json);
 				}
 				if (json.Cancel && EarthquakeList[json.ID].Cancel == undefined)
 					for (let index = 0; index < INFO.length; index++)
