@@ -583,9 +583,13 @@ function init() {
 						Zoom = 7;
 						X = 0;
 					}
+					if (km > 250000) {
+						Zoom = 6.5;
+						X = 0;
+					}
 					let num = Math.sqrt(Math.pow(23.608428 - EEW[Object.keys(EEW)[index]].lat, 2) + Math.pow(120.799168 - EEW[Object.keys(EEW)[index]].lon, 2));
 					if (num >= 5)
-						focus([EEW[Object.keys(EEW)[index]].lat, EEW[Object.keys(EEW)[index]].lon], 9.5);
+						focus([EEW[Object.keys(EEW)[index]].lat, EEW[Object.keys(EEW)[index]].lon], Zoom);
 					else
 						focus([(23.608428 + EEW[Object.keys(EEW)[index]].lat) / 2, ((120.799168 + EEW[Object.keys(EEW)[index]].lon) / 2) + X], Zoom);
 					EEW[Object.keys(EEW)[index]].time = NOW.getTime();
