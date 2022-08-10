@@ -202,7 +202,7 @@ function init() {
 	map.doubleClickZoom.disable();
 	mapTW.removeControl(mapTW.zoomControl);
 
-	L.geoJson(statesData, {
+	L.geoJson(Dmap, {
 		style: {
 			weight    : 0.8,
 			opacity   : 0.3,
@@ -211,7 +211,7 @@ function init() {
 		},
 	}).addTo(mapTW);
 
-	L.geoJson(statesData, {
+	L.geoJson(Dmap, {
 		style: {
 			weight    : 0.8,
 			opacity   : 0.8,
@@ -438,7 +438,7 @@ function init() {
 							audioPlay("./audio/palert.wav");
 						}
 						if (Pgeojson != null) map.removeLayer(Pgeojson);
-						Pgeojson = L.geoJson(statesData, {
+						Pgeojson = L.geoJson(DmapT, {
 							style: (feature) => {
 								if (feature.properties.COUNTY != undefined) {
 									let name = feature.properties.COUNTY + " " + feature.properties.TOWN;
@@ -1432,7 +1432,7 @@ async function FCMdata(data) {
 			}
 
 			if (geojson != null) mapTW.removeLayer(geojson);
-			geojson = L.geoJson(statesData, {
+			geojson = L.geoJson(DmapT, {
 				style: (feature) => {
 					if (feature.properties.COUNTY != undefined) {
 						let name = feature.properties.COUNTY + feature.properties.TOWN;
