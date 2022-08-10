@@ -23,7 +23,8 @@ let ServerT = 0;
 let ServerTime = 0;
 let NOW = new Date();
 let IP = {};
-let LifeTime = {};
+let LifeTime = 0;
+let _start = false;
 
 let Pdata = {
 	"APIkey"   : "https://github.com/ExpTechTW",
@@ -38,6 +39,12 @@ function Main() {
 			IP = response.data.Proxy;
 			TimeNow(response.data.Full);
 			ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
+			let C = setInterval(() => {
+				if (!_start)
+					ipcRenderer.send(START_NOTIFICATION_SERVICE, "583094702393");
+				else
+					clearInterval(C);
+			}, 2000);
 		}).catch((err) => {
 			Main();
 		});
@@ -56,6 +63,7 @@ function WebsocketIP() {
 }
 
 ipcRenderer.on(NOTIFICATION_SERVICE_STARTED, (_, token) => {
+	_start = true;
 	localStorage.UUID = token;
 	createWebSocket();
 	ipc.send("start");
@@ -123,6 +131,7 @@ function initEventHandle() {
 			DATA = evt.data;
 			DATAstamp = new Date().getTime();
 		}
+		LifeTime = NOW.getTime();
 	};
 }
 
@@ -133,6 +142,7 @@ function TimeNow(now) {
 
 setInterval(() => {
 	NOW = new Date(ServerTime + (new Date().getTime() - ServerT));
+	if (NOW.getTime() - LifeTime > 65000 && LifeTime != 0) ws.close();
 }, 0);
 
 let md5 = crypto.createHash("md5");
