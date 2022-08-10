@@ -72,6 +72,7 @@ let PAlertT = 0;
 let auto = false;
 let EEW = {};
 let EEWT = { id: 0, time: 0 };
+let TSUNAMI = {};
 // #endregion
 
 // #region override Date.format()
@@ -215,60 +216,6 @@ function init() {
 			weight    : 0.8,
 			opacity   : 0.8,
 			color     : "#8E8E8E",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(WS, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "red",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(ES, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "orange",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(E, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "red",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(W, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "yellow",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(EN, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "purple",
-			fillColor : "transparent",
-		},
-	}).addTo(map);
-
-	L.geoJson(N, {
-		style: {
-			weight    : 10,
-			opacity   : 1,
-			color     : "yellow",
 			fillColor : "transparent",
 		},
 	}).addTo(map);
@@ -540,7 +487,7 @@ function init() {
 			RMT++;
 			for (let index = 0; index < Object.keys(pga).length; index++) {
 				let Intensity = pga[Object.keys(pga)[index]].Intensity;
-				if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 10000) {
+				if (NOW.getTime() - pga[Object.keys(pga)[index]].Time > 30000) {
 					delete pga[Object.keys(pga)[index]];
 					index--;
 				} else {
@@ -1292,6 +1239,104 @@ async function FCMdata(data) {
 			win.setAlwaysOnTop(false);
 		}
 		if (CONFIG["report.audio"]) audioPlay("./audio/Water.wav");
+	} else if (json.Function == "TSUNAMI") {
+		if (Number(json.Version) == 1) {
+			new Notification("海嘯警報", { body: `${json["UTC+8"]} 發生 ${json.Scale} 地震\n\n東經: ${json.EastLongitude} 度\n北緯: ${json.NorthLatitude} 度`, icon: "TREM.ico" });
+			if (CONFIG["report.show"]) {
+				win.show();
+				if (CONFIG["report.cover"]) win.setAlwaysOnTop(true);
+				win.setAlwaysOnTop(false);
+			}
+			if (CONFIG["report.audio"]) audioPlay("./audio/Water.wav");
+			focus([23.608428, 120.799168], 7.5);
+			setTimeout(() => {ipcRenderer.send("screenshotEEW", json);}, 1500);
+		}
+		if (TSUNAMI["Timer"] != null) clearInterval(TSUNAMI["Timer"]);
+		TSUNAMI["Timer"] = setInterval(() => {
+			if (TSUNAMI["E"] != null || json.Cancel) {
+				map.removeLayer(TSUNAMI["E"]);
+				map.removeLayer(TSUNAMI["EN"]);
+				map.removeLayer(TSUNAMI["ES"]);
+				map.removeLayer(TSUNAMI["N"]);
+				map.removeLayer(TSUNAMI["WS"]);
+				map.removeLayer(TSUNAMI["W"]);
+				if (Tsunami.Cross != undefined) map.removeLayer(Tsunami.Cross);
+				TSUNAMI["E"] = null;
+				if (json.Cancel) {
+					TSUNAMI = {};
+					clearInterval(TSUNAMI["Timer"]);
+				}
+			} else {
+				let myIcon = L.icon({
+					iconUrl  : "./image/warn.png",
+					iconSize : [30, 30],
+				});
+				let Cross = L.marker([Number(json.NorthLatitude), Number(json.EastLongitude)], { icon: myIcon });
+				Tsunami.Cross = Cross;
+				Tsunami.Time = NOW.getTime();
+				map.addLayer(Cross);
+				TSUNAMI["E"] = L.geoJson(E, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[0].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				TSUNAMI["EN"] = L.geoJson(EN, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[1].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				TSUNAMI["ES"] = L.geoJson(ES, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[2].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				TSUNAMI["N"] = L.geoJson(N, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[3].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				TSUNAMI["WS"] = L.geoJson(WS, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[4].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				TSUNAMI["W"] = L.geoJson(W, {
+					style: {
+						weight    : 10,
+						opacity   : 1,
+						color     : Tcolor(json.Addition[5].areaColor),
+						fillColor : "transparent",
+					},
+				});
+				map.addLayer(TSUNAMI["E"]);
+				map.addLayer(TSUNAMI["EN"]);
+				map.addLayer(TSUNAMI["ES"]);
+				map.addLayer(TSUNAMI["N"]);
+				map.addLayer(TSUNAMI["WS"]);
+				map.addLayer(TSUNAMI["W"]);
+			}
+		}, 1000);
+		function Tcolor(text) {
+			return (text == "黃色") ? "yellow" :
+				(text == "橙色") ? "red" :
+					(text == "綠色") ? "transparent" :
+						"purple";
+		}
 	} else if (json.Function == "palert")
 		PAlert = json.Data;
 	else if (json.Function == "TREM_earthquake")
