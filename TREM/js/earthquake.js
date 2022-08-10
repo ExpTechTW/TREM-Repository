@@ -7,7 +7,7 @@ const path = require("path");
 axios.defaults.timeout = 5000;
 
 $("#loading").text({ en: "Loading...", ja: "ローディング中...", "zh-TW": "載入中..." }[CONFIG["general.locale"]]);
-document.title = { en: "Taiwan Real-time Earthquake Monitoring", ja: "TREM 台湾リアルタイム地震モニタリング", "zh-TW": "TREM 台灣即時地震監測" }[CONFIG["general.locale"]];
+document.title = { en: "Taiwan Real-time Earthquake Monitoring", ja: "TREM 台湾リアルタイム地震モニタリング", "zh-TW": "TREM 臺灣即時地震監測" }[CONFIG["general.locale"]];
 
 // #region 變數
 let Stamp = 0;
@@ -219,6 +219,60 @@ function init() {
 		},
 	}).addTo(map);
 
+	L.geoJson(WS, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "red",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
+	L.geoJson(ES, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "orange",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
+	L.geoJson(E, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "red",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
+	L.geoJson(W, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "yellow",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
+	L.geoJson(EN, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "purple",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
+	L.geoJson(N, {
+		style: {
+			weight    : 10,
+			opacity   : 1,
+			color     : "yellow",
+			fillColor : "transparent",
+		},
+	}).addTo(map);
+
 	map.on("click", (e) => {
 		if (ReportMarkID != null) {
 			ReportMarkID = null;
@@ -229,12 +283,16 @@ function init() {
 		focus();
 	});
 
+	map.on("dblclick", (e) => {
+		focus();
+	});
+
 	map.on("drag", (e) => {
 		mapLock = true;
 	});
 
 	map.on("dblclick", (e) => {
-		mapLock = true;
+		focus([23.608428, 120.799168], 7.5);
 	});
 
 	map.removeControl(map.zoomControl);
@@ -636,7 +694,7 @@ async function setUserLocationMarker() {
 	marker = L.marker([Lat, Long], { icon: myIcon });
 	map.addLayer(marker);
 	marker.setZIndexOffset(1);
-	map.setView([23.608428, 121.699168], 7.5);
+	focus([23.608428, 120.799168], 7.5);
 }
 // #endregion
 
@@ -651,11 +709,11 @@ function focus(Loc, size) {
 	if (size >= 9) X = 0.35;
 	if (size >= 9.5) X = 0.2;
 	if (Loc != undefined) {
-		Focus[0] = Loc[0] - 0.05;
+		Focus[0] = Loc[0];
 		Focus[1] = Loc[1] + X;
 		Focus[2] = size;
 		if (map.getBounds().getCenter().lat.toFixed(2) != Loc[0].toFixed(2) || map.getBounds().getCenter().lng.toFixed(2) != (Loc[1] + X).toFixed(2) || size != map.getZoom())
-			map.setView([Loc[0] - 0.05, Loc[1] + X], size);
+			map.setView([Loc[0], Loc[1] + X], size);
 	} else if (Focus.length != 0)
 		if (map.getBounds().getCenter().lat.toFixed(2) != Focus[0].toFixed(2) || map.getBounds().getCenter().lng.toFixed(2) != Focus[1].toFixed(2) || Focus[2] != map.getZoom())
 			map.setView([Focus[0], Focus[1]], Focus[2]);
