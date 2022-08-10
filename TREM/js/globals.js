@@ -5,6 +5,8 @@ const { ipcMain } = require("@electron/remote");
 const { ipcRenderer } = require("electron");
 const { join } = require("node:path");
 
+let CONFIG = {}, settingDisabled = false;
+
 /**
  * 設定檔路徑
  * @type {string}
@@ -18,7 +20,6 @@ if (!fs.existsSync(CONFIG_PATH))
  * 設定
  * @type {string}
  */
-let CONFIG, settingDisabled = false;
 try {
 	CONFIG = JSON.parse(fs.readFileSync(CONFIG_PATH, { encoding: "utf-8" }));
 } catch (err) {
