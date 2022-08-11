@@ -142,7 +142,10 @@ function TimeNow(now) {
 
 setInterval(() => {
 	NOW = new Date(ServerTime + (new Date().getTime() - ServerT));
-	if (NOW.getTime() - LifeTime > 65000 && LifeTime != 0) ws.close();
+	if (NOW.getTime() - LifeTime > 65000 && LifeTime != 0) {
+		ws.close();
+		reconnect();
+	}
 }, 0);
 
 let md5 = crypto.createHash("md5");
