@@ -83,6 +83,7 @@ ipcRenderer.on(NOTIFICATION_RECEIVED, (_, Notification) => {
 
 function reconnect() {
 	if (Reconnect) return;
+	LifeTime = 0;
 	Reconnect = true;
 	setTimeout(() => {
 		createWebSocket();
@@ -142,10 +143,9 @@ function TimeNow(now) {
 
 setInterval(() => {
 	NOW = new Date(ServerTime + (new Date().getTime() - ServerT));
-	if (NOW.getTime() - LifeTime > 65000 && LifeTime != 0) {
+	if (NOW.getTime() - LifeTime > 65000 && LifeTime != 0)
 		ws.close();
-		reconnect();
-	}
+
 }, 0);
 
 let md5 = crypto.createHash("md5");
