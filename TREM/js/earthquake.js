@@ -278,7 +278,6 @@ async function init() {
 		if (MainClock != null) clearInterval(MainClock);
 		MainClock = setInterval(() => {
 			if (MainLock) return;
-			console.log(new Date().getTime());
 			MainLock = true;
 			let R = 0;
 			if (replay != 0) R = replay + (NOW.getTime() - replayT);
@@ -652,8 +651,8 @@ async function setUserLocationMarker(city, town) {
 			.setZIndexOffset(1)
 			.addTo(map);
 	} else marker.setLatLng([UserLocationLat, UserLocationLon]);
-
 	dump({ level: 0, message: `User location set to ${city} ${town} (${UserLocationLat}, ${UserLocationLat})`, origin: "Location" });
+	focus([23.608428, 120.799168], 7.5);
 }
 // #endregion
 
