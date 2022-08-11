@@ -291,7 +291,7 @@ async function init() {
 			let cancel;
 			setTimeout(() => {
 				cancel();
-			}, 1500);
+			}, 3000);
 			axios({
 				method      : "post",
 				url         : PostIP(),
@@ -305,7 +305,7 @@ async function init() {
 			}).catch((err) => {
 				handler(Response);
 			});
-		}, 500);
+		}, 1000);
 	}
 
 	function handler(response) {
