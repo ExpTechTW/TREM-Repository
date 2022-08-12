@@ -230,10 +230,6 @@ async function init() {
 		focus();
 	});
 
-	map.on("dblclick", (e) => {
-		focus();
-	});
-
 	map.on("drag", (e) => {
 		mapLock = true;
 	});
