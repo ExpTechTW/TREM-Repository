@@ -180,7 +180,11 @@ async function init() {
 	map = L.map("map", {
 		attributionControl : false,
 		closePopupOnClick  : false,
-		preferCanvas       : true,
+		maxBounds          : [
+			[60, 50],
+			[10, 180],
+		],
+		preferCanvas: true,
 	}).setView([23, 121], 7.5);
 
 	mapTW = L.map("map-tw", {
@@ -201,8 +205,8 @@ async function init() {
 
 	setUserLocationMarker(CONFIG["location.city"], CONFIG["location.town"]);
 	const colors = await getThemeColors(CONFIG["theme.color"], CONFIG["theme.dark"]);
-
-	mapTW_geoJson = L.geoJson(Dmap, {
+	/*
+	mapTW_geoJson = L.geoJson.vt(Dmap, {
 		style: {
 			weight    : 0.8,
 			opacity   : 0.3,
@@ -210,11 +214,15 @@ async function init() {
 			fillColor : colors.surfaceVariant,
 		},
 	}).addTo(mapTW);
-
-	map_geoJson = L.geoJson(Dmap, {
-		style: {
+*/
+	map_geoJson = L.geoJson.vt(Dmap, {
+		minZoom   : 4,
+		maxZoom   : 12,
+		tolerance : 0.5,
+		buffer    : 256,
+		debug     : 0,
+		style     : {
 			weight    : 0.8,
-			opacity   : 0.8,
 			color     : colors.primary,
 			fillColor : colors.surfaceVariant,
 		},
@@ -227,6 +235,10 @@ async function init() {
 				map.removeLayer(MarkList[index]);
 		}
 		mapLock = false;
+		focus();
+	});
+
+	map.on("dblclick", (e) => {
 		focus();
 	});
 
@@ -585,7 +597,7 @@ async function init() {
 						Zoom = 6.5;
 					if (km > 300000)
 						Zoom = 6;
-					console.log(km);
+
 					const num = Math.sqrt(Math.pow(23.608428 - EEW[Object.keys(EEW)[index]].lat, 2) + Math.pow(120.799168 - EEW[Object.keys(EEW)[index]].lon, 2));
 					if (num >= 5)
 						focus([EEW[Object.keys(EEW)[index]].lat, EEW[Object.keys(EEW)[index]].lon], Zoom);
@@ -1193,18 +1205,20 @@ ipcMain.on("testEEW", () => {
 ipcMain.on("updateTheme", async () => {
 	const colors = await getThemeColors(CONFIG["theme.color"], CONFIG["theme.dark"]);
 
+	map_geoJson.options.style = {
+		weight    : 0.8,
+		color     : colors.primary,
+		fillColor : colors.surfaceVariant,
+	};
+	map_geoJson.redraw();
+	/*
 	mapTW_geoJson.setStyle({
 		weight    : 0.8,
 		opacity   : 0.3,
 		color     : colors.primary,
 		fillColor : colors.surfaceVariant,
 	});
-	map_geoJson.setStyle({
-		weight    : 0.8,
-		opacity   : 0.8,
-		color     : colors.primary,
-		fillColor : colors.surfaceVariant,
-	});
+	*/
 	console.log("updateTheme");
 });
 ipcMain.on("updateLocation", (e, { city, town }) => {
@@ -1435,6 +1449,7 @@ async function FCMdata(data) {
 			}
 
 			if (geojson != null) mapTW.removeLayer(geojson);
+			const colors = await getThemeColors(CONFIG["theme.color"], CONFIG["theme.dark"]);
 			geojson = L.geoJson(DmapT, {
 				style: (feature) => {
 					if (feature.properties.COUNTY != undefined) {
@@ -1446,7 +1461,7 @@ async function FCMdata(data) {
 								color       : "#8E8E8E",
 								dashArray   : "",
 								fillOpacity : 0.8,
-								fillColor   : "transparent",
+								fillColor   : colors.surfaceVariant,
 							};
 						return {
 							weight      : 1,
@@ -1463,7 +1478,7 @@ async function FCMdata(data) {
 							color       : "#8E8E8E",
 							dashArray   : "",
 							fillOpacity : 0.8,
-							fillColor   : "transparent",
+							fillColor   : colors.surfaceVariant,
 						};
 				},
 			});
