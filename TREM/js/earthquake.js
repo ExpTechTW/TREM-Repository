@@ -3,8 +3,8 @@
 const { BrowserWindow, shell } = require("@electron/remote");
 const path = require("path");
 
-$("#loading").text({ en: "Loading...", ja: "ローディング中...", "zh-TW": "載入中..." }[CONFIG["general.locale"]]);
-document.title = { en: "Taiwan Real-time Earthquake Monitoring", ja: "TREM 台湾リアルタイム地震モニタリング", "zh-TW": "TREM 臺灣即時地震監測" }[CONFIG["general.locale"]];
+$("#loading").text(Localization[CONFIG["general.locale"]].Application_Loading || Localization["zh-TW"].Application_Loading);
+document.title = Localization[CONFIG["general.locale"]].Application_Title || Localization["zh-TW"].Application_Title;
 
 // #region 變數
 let Stamp = 0;
@@ -71,50 +71,6 @@ let auto = false;
 const EEW = {};
 const EEWT = { id: 0, time: 0 };
 let TSUNAMI = {};
-// #endregion
-
-// #region override Date.format()
-Date.prototype.format =
-	/**
-	 * Format DateTime into string with provided formatting string.
-	 * @param {string} format The formatting string to use.
-	 * @returns {string} The formatted string.
-	 */
-	function(format) {
-		/**
-		 * @type {Date}
-		 */
-		const me = this;
-		return format.replace(/a|A|Z|S(SS)?|ss?|mm?|HH?|hh?|D{1,2}|M{1,2}|YY(YY)?|'([^']|'')*'/g, (str) => {
-			let c1 = str.charAt(0);
-			const ret = str.charAt(0) == "'"
-				? (c1 = 0) || str.slice(1, -1).replace(/''/g, "'")
-				: str == "a"
-					? (me.getHours() < 12 ? "am" : "pm")
-					: str == "A"
-						? (me.getHours() < 12 ? "AM" : "PM")
-						: str == "Z"
-							? (("+" + -me.getTimezoneOffset() / 60).replace(/^\D?(\D)/, "$1").replace(/^(.)(.)$/, "$10$2") + "00")
-							: c1 == "S"
-								? me.getMilliseconds()
-								: c1 == "s"
-									? me.getSeconds()
-									: c1 == "H"
-										? me.getHours()
-										: c1 == "h"
-											? (me.getHours() % 12) || 12
-											: c1 == "D"
-												? me.getDate()
-												: c1 == "m"
-													? me.getMinutes()
-													: c1 == "M"
-														? me.getMonth() + 1
-														: ("" + me.getFullYear()).slice(-str.length);
-			return c1 && str.length < 4 && ("" + ret).length < str.length
-				? ("00" + ret).slice(-str.length)
-				: ret;
-		});
-	};
 // #endregion
 
 // #region 初始化
@@ -197,6 +153,8 @@ async function init() {
 		mapTW.setView([23.608428, 120.799168], 7);
 	});
 
+	Tooltip = new L.LayerGroup();
+
 	mapTW.dragging.disable();
 	mapTW.scrollWheelZoom.disable();
 	mapTW.doubleClickZoom.disable();
@@ -248,6 +206,28 @@ async function init() {
 
 	map.on("dblclick", (e) => {
 		focus([23.608428, 120.799168], 7.5);
+	});
+
+	map.on("zoomend", () => {
+		if (map.getZoom() > 10)
+			for (const key in Station) {
+				const tooltip = Station[key].getTooltip();
+				if (tooltip) {
+					Station[key].unbindTooltip();
+					tooltip.options.permanent = true;
+					Station[key].bindTooltip(tooltip);
+				}
+			}
+		else
+			for (const key in Station) {
+				const tooltip = Station[key].getTooltip();
+				if (tooltip && !Station[key].keepTooltipAlive) {
+					Station[key].unbindTooltip();
+					tooltip.options.permanent = false;
+					Station[key].bindTooltip(tooltip);
+				}
+			}
+
 	});
 
 	map.removeControl(map.zoomControl);
@@ -316,20 +296,21 @@ async function init() {
 	}
 
 	function handler(response) {
-		for (let index = 0; index < Object.keys(Station).length; index++) {
-			map.removeLayer(Station[Object.keys(Station)[index]]);
-			delete Station[Object.keys(Station)[index]];
-			index--;
-		}
 		if (response.state != "Success") return;
-
 		const Json = response.response;
 		MAXPGA = { pga: 0, station: "NA", level: 0 };
 
-		for (let index = 0; index < Object.keys(Json).length; index++) {
-			const Sdata = Json[Object.keys(Json)[index]];
+
+		const removed = Object.keys(Station).filter(key => !Object.keys(Json).includes(key));
+		for (const removedKey of removed) {
+			Station[removedKey].remove();
+			delete Station[removedKey];
+		}
+
+		for (let index = 0, keys = Object.keys(Json), n = keys.length; index < n; index++) {
+			const Sdata = Json[keys[index]];
 			const amount = Number(Sdata.MaxPGA);
-			if (station[Object.keys(Json)[index]] == undefined) continue;
+			if (station[keys[index]] == undefined) continue;
 
 			const Intensity = (NOW.getTime() - Sdata.TimeStamp > 5000) ? "NA" :
 				(amount >= 800) ? 9 :
@@ -356,32 +337,52 @@ async function init() {
 				iconSize : [size, size],
 			});
 
-			if (!Station[Object.keys(Json)[index]])
-				Station[Object.keys(Json)[index]] = L.marker([station[Object.keys(Json)[index]].Lat, station[Object.keys(Json)[index]].Long], { keyboard: false })
-					.addTo(map);
-			Station[Object.keys(Json)[index]]
+			const station_tooltip = `<div>${station[keys[index]].Loc}</div><div>${amount}</div><div>${IntensityI(Intensity)}</div>`;
+			if (!Station[keys[index]]) {
+				Station[keys[index]] = L.marker([station[keys[index]].Lat, station[keys[index]].Long], { keyboard: false })
+					.addTo(map).bindTooltip(station_tooltip, {
+						offset    : [8, 0],
+						permanent : false,
+						className : "rt-station-tooltip",
+					});
+				Station[keys[index]].on("click", () => {
+					Station[keys[index]].keepTooltipAlive = !Station[keys[index]].keepTooltipAlive;
+					if (map.getZoom() <= 10) {
+						const tooltip = Station[keys[index]].getTooltip();
+						Station[keys[index]].unbindTooltip();
+						if (Station[keys[index]].keepTooltipAlive)
+							tooltip.options.permanent = true;
+						else
+							tooltip.options.permanent = false;
+						Station[keys[index]].bindTooltip(tooltip);
+					}
+				});
+			}
+
+			Station[keys[index]]
 				.setIcon(stationIcon)
-				.setZIndexOffset(2000 + amount);
+				.setZIndexOffset(2000 + amount)
+				.setTooltipContent(station_tooltip);
 
 			const Level = IntensityI(Intensity);
 			const now = new Date(Sdata.Time);
-			if (Object.keys(Json)[index] == CONFIG["Real-time.station"]) {
-				document.getElementById("rt-station-name").innerText = station[Object.keys(Json)[index]].Loc;
+			if (keys[index] == CONFIG["Real-time.station"]) {
+				document.getElementById("rt-station-name").innerText = station[keys[index]].Loc;
 				document.getElementById("rt-station-time").innerText = now.format("MM/DD HH:mm:ss");
 				document.getElementById("rt-station-intensity").innerText = IntensityI(Intensity);
 				document.getElementById("rt-station-pga").innerText = amount;
 			}
-			if (pga[station[Object.keys(Json)[index]].PGA] == undefined && Intensity != "NA")
-				pga[station[Object.keys(Json)[index]].PGA] = {
+			if (pga[station[keys[index]].PGA] == undefined && Intensity != "NA")
+				pga[station[keys[index]].PGA] = {
 					"Intensity" : Intensity,
 					"Time"      : 0,
 				};
 			if (Intensity != "NA" && Intensity != 0) {
-				if (Intensity > pga[station[Object.keys(Json)[index]].PGA].Intensity) pga[station[Object.keys(Json)[index]].PGA].Intensity = Intensity;
+				if (Intensity > pga[station[keys[index]].PGA].Intensity) pga[station[keys[index]].PGA].Intensity = Intensity;
 				if (Sdata.Alert || fs.existsSync(path.join(app.getPath("userData"), "./unlockAlert.tmp"))) {
 					let find = -1;
 					for (let Index = 0; Index < All.length; Index++)
-						if (All[Index].loc == station[Object.keys(Json)[index]].Loc) {
+						if (All[Index].loc == station[keys[index]].Loc) {
 							All[Index].intensity = Intensity;
 							All[Index].time = NOW.getTime();
 							All[Index].pga = amount;
@@ -390,7 +391,7 @@ async function init() {
 						}
 					if (find == -1)
 						All.push({
-							"loc"       : station[Object.keys(Json)[index]].Loc,
+							"loc"       : station[keys[index]].Loc,
 							"intensity" : Intensity,
 							"time"      : NOW.getTime(),
 							"pga"       : amount,
@@ -399,7 +400,7 @@ async function init() {
 						limit();
 					else
 					if (RMTlimit.length < 2) {
-						if (!RMTlimit.includes(Object.keys(Json)[index])) RMTlimit.push(Object.keys(Json)[index]);
+						if (!RMTlimit.includes(keys[index])) RMTlimit.push(keys[index]);
 					} else
 						limit();
 
@@ -411,16 +412,16 @@ async function init() {
 							PGALimit = 2;
 							audioPlay("./audio/PGA2.wav");
 						}
-						pga[station[Object.keys(Json)[index]].PGA].Time = NOW.getTime();
+						pga[station[keys[index]].PGA].Time = NOW.getTime();
 					}
 				}
 				if (MAXPGA.pga < amount && Level != "NA") {
 					MAXPGA.pga = amount;
-					MAXPGA.station = Object.keys(Json)[index];
+					MAXPGA.station = keys[index];
 					MAXPGA.level = Level;
-					MAXPGA.lat = station[Object.keys(Json)[index]].Lat;
-					MAXPGA.long = station[Object.keys(Json)[index]].Long;
-					MAXPGA.loc = station[Object.keys(Json)[index]].Loc;
+					MAXPGA.lat = station[keys[index]].Lat;
+					MAXPGA.long = station[keys[index]].Long;
+					MAXPGA.loc = station[keys[index]].Loc;
 					MAXPGA.intensity = Intensity;
 					MAXPGA.ms = NOW.getTime() - Sdata.TimeStamp;
 				}
@@ -574,7 +575,7 @@ async function init() {
 		MainLock = false;
 	}
 	$("#app-version").text(app.getVersion());
-	$("#loading").text({ en: "Welcome", ja: "ようこそ", "zh-TW": "歡迎" }[CONFIG["general.locale"]]);
+	$("#loading").text(Localization[CONFIG["general.locale"]].Application_Welcome || Localization["zh-TW"].Application_Welcome);
 	$("#load").delay(1000).fadeOut(1000);
 	setInterval(() => {
 		if (mapLock) return;
@@ -1223,7 +1224,7 @@ ipcMain.on("updateLocation", (e, { city, town }) => {
 	setUserLocationMarker(city, town);
 });
 ipcMain.on("updateTitle", (e, lang) => {
-	document.title = { en: "Taiwan Real-time Earthquake Monitoring", ja: "TREM 台湾リアルタイム地震モニタリング", "zh-TW": "TREM 台灣即時地震監測" }[lang];
+	document.title = Localization[lang].Application_Title || Localization["zh-TW"].Application_Title;
 });
 // #endregion
 
